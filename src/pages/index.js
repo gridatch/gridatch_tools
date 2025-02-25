@@ -20,6 +20,10 @@ const links = [
 ];
 
 const footerLinks = [
+  {
+    text: "引用元情報",
+    url: "/image-credits",
+  },
 ];
 
 const IndexPage = () => (
