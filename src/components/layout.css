@@ -1,17 +1,18 @@
 :root {
   --border-radius: 4px;
-  --color-text: #333;
-  --color-primary: #7026b9;
-  --color-code-bg: #fff4db;
-  --color-code: #8a6534;
+  --color-text: #887c60;
+  --color-primary: #9B111E;
+  --color-bg: #FEF7E5;
+  --color-section-bg: #fffbf5;
+  --color-code: blue;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
-  --font-lg: 18px;
-  --font-md: 16px;
-  --font-sm: 14px;
-  --font-sx: 12px;
+  --font-lg: font-size: clamp(2.4rem, calc(1.9rem + 0.625vw), 2.9rem);
+  --font-md: clamp(1.5rem, calc(1.0rem + 0.625vw), 2.0rem);
+  --font-sm: clamp(1.1rem, calc(0.6rem + 0.625vw), 1.6rem);
+  --font-sx: clamp(0.9rem, calc(0.4rem + 0.625vw), 1.4rem);
   --line-height-loose: 1.75;
   --line-height-normal: 1.5;
   --line-height-dense: 1.1;
@@ -22,14 +23,14 @@
   --space-5: 32px;
   --space-6: 64px;
   --size-content: 54rem;
-  --size-gutter: var(--space-5);
-  --size-gap: var(--space-6);
+  --size-gutter: var(--space-1);
+  --size-gap: var(--space-1);
 }
 html {
   -webkit-text-size-adjust: 100%;
   box-sizing: border-box;
   font: sans-serif;
-  font-size: var(--font-md);
+  font-size: 62.5%;
   line-height: var(--line-height-normal);
   overflow-y: scroll;
 }
@@ -42,6 +43,22 @@ body {
   font-weight: normal;
   margin: 0;
   word-wrap: break-word;
+  
+  font-size: var(--font-md);
+  background-color: var(--color-bg);
+}
+main {
+  margin: var(--size-gap) var(--size-gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+section {
+  background-color: var(--color-section-bg);
+  border-radius: 10px;
+  padding: 10px;
+  border: none;
+  box-shadow: rgba(136, 124, 96, 0.16) 0px 1px 4px;
 }
 a {
   background-color: transparent;
@@ -70,27 +87,14 @@ strong {
 dfn {
   font-style: italic;
 }
-h1 {
+h1, h2, h3, h4, h5, h6 {
   margin: 0;
-  margin-bottom: 3rem;
   padding: 0;
-  line-height: var(--line-height-dense);
   letter-spacing: -0.01em;
-}
-h1 > b {
-  color: var(--color-primary);
 }
 img {
   border-style: none;
   max-width: 100%;
-}
-code,
-kbd,
-pre,
-samp {
-  font-family: var(--font-mono);
-  font-size: 1em;
-  line-height: inherit;
 }
 hr {
   box-sizing: content-box;
@@ -124,7 +128,7 @@ dd,
 p {
   margin: 0;
   padding: 0;
-  margin-bottom: var(--space-4);
+  margin-bottom: 0;
 }
 ul,
 ol {
@@ -153,6 +157,7 @@ th {
 }
 li {
   margin-bottom: calc(var(--space-4) / 2);
+  list-style: none;
 }
 ol li,
 ul li {
@@ -163,9 +168,6 @@ li > ul {
   margin-bottom: calc(var(--space-4) / 2);
   margin-left: var(--space-4);
   margin-top: calc(var(--space-4) / 2);
-}
-blockquote *:last-child {
-  margin-bottom: 0;
 }
 li *:last-child {
   margin-bottom: 0;
@@ -178,47 +180,4 @@ li > p {
 }
 p {
   max-width: 680px;
-}
-code {
-  font-size: 0.875rem;
-}
-kbd {
-  font-size: 0.875rem;
-}
-samp {
-  font-size: 0.875rem;
-}
-abbr {
-  border-bottom: 1px dotted hsla(0, 0%, 0%, 0.5);
-  cursor: help;
-}
-acronym {
-  border-bottom: 1px dotted hsla(0, 0%, 0%, 0.5);
-  cursor: help;
-}
-tt,
-code {
-  background-color: var(--color-code-bg);
-  border-radius: var(--border-radius);
-  color: var(--color-code);
-  font-family: var(--font-mono);
-  padding-bottom: 0.25em;
-  padding-top: 0.25em;
-  word-break: normal;
-}
-pre code {
-  background: none;
-}
-code:before,
-code:after,
-tt:before,
-tt:after {
-  content: "\00a0";
-  letter-spacing: -0.2em;
-}
-pre code:before,
-pre code:after,
-pre tt:before,
-pre tt:after {
-  content: none;
 }

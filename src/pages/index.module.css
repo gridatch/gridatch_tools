@@ -36,6 +36,12 @@
 .listItemLink {
   color: var(--color-primary);
   font-weight: bold;
+  display: flex;
+  background-color: var(--color-section-bg);
+  border-radius: 10px;
+  padding: 10px;
+  border: none;
+  box-shadow: rgba(136, 124, 96, 0.16) 0px 1px 4px;
 }
 
 .listItemDescription {
@@ -48,7 +54,9 @@
   text-align: center;
 }
 
-.intro {
-  max-width: none;
-  line-height: var(--line-height-loose);
+.footerLinks {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
 }

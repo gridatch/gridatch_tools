@@ -9,10 +9,10 @@
  */
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Default Starter`,
-    description: `Kick off your next, great Gatsby project with this default starter. This barebones starter ships with the main Gatsby configuration files you might need.`,
-    author: `@gatsbyjs`,
-    siteUrl: `https://gatsbystarterdefaultsource.gatsbyjs.io/`,
+    title: `わがつまだっちのツール`,
+    description: `雀魂の青雲の志攻略用ツールなどを公開しているサイト`,
+    author: `gridatch`,
+    siteUrl: `https://gridatch.com/`,
   },
   plugins: [
     `gatsby-plugin-image`,
@@ -28,16 +28,38 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `gatsby-starter-default`,
-        short_name: `starter`,
+        name: `わがつまだっちのツール`,
+        short_name: `だっちのツール`,
         start_url: `/`,
-        background_color: `#663399`,
+        background_color: `#fef7e5`,
         // This will impact how browsers show your PWA/website
         // https://css-tricks.com/meta-theme-color-and-trickery/
-        // theme_color: `#663399`,
-        display: `minimal-ui`,
-        icon: `src/images/gatsby-icon.png`, // This path is relative to the root of the site.
+        theme_color: `#887c60`,
+        display: `standalone`,
+        icon: `src/images/icon.png`, // This path is relative to the root of the site.
+        orientation: `portrait`,
+        cache_busting_mode: 'none',
       },
     },
+    {
+      // happy css modules のため
+      resolve: `gatsby-plugin-postcss`,
+      options: {
+        cssLoaderOptions: {
+          esModule: false,
+          modules: {
+            namedExport: false,
+          },
+        },
+      },
+    },
+    {
+      resolve: 'gatsby-plugin-offline',
+      options: {
+        workboxConfig: {
+          globPatterns: ['**/icon-path*'],
+        }
+      }
+    }
   ],
 }
