@@ -1,3 +1,17 @@
 {
-    "remote.WSL.fileWatcher.polling": true
+    "remote.WSL.fileWatcher.polling": true,
+    "typescript.suggest.paths": false,
+    "javascript.suggest.paths": false,
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.(css|scss|less)$",
+                "cmd": "npx hcm ${file}"
+            }
+        ]
+    },
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.patterns": {
+        "*.css": "$(capture).css.d.ts, $(capture).css.d.ts.map"
+    }
 }

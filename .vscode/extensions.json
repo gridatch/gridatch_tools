@@ -1,0 +1,9 @@
+{
+    "recommendations": [
+        "christian-kohler.path-intellisense",
+        "emeraldwalk.runonsave",
+        "mechatroner.rainbow-csv",
+        "christian-kohler.npm-intellisense",
+        "vunguyentuan.vscode-css-variables"
+    ]
+}
