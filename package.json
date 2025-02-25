@@ -2,7 +2,7 @@
   "name": "gridatch-tools",
   "private": true,
   "description": "gridatch-tools",
-  "version": "0.1.0",
+  "version": "1.1.0",
   "author": "gridatch",
   "dependencies": {
     "browserify-fs": "^1.0.0",
@@ -27,7 +27,7 @@
   "keywords": [
     "gatsby"
   ],
-  "license": "0BSD",
+  "license": "MIT",
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop -H 0.0.0.0 -p 8000",

@@ -21,6 +21,10 @@ const links = [
 
 const footerLinks = [
   {
+    text: "更新履歴",
+    url: "/history",
+  },
+  {
     text: "引用元情報",
     url: "/image-credits",
   },
@@ -42,7 +46,6 @@ const IndexPage = () => (
           >
             <StaticImage
               src="../images/mannin.png"
-              loading="eager"
               width={64}
               quality={95}
               formats={["auto", "webp", "avif"]}
