@@ -6,6 +6,9 @@ import DynamicSVGText from "../components/dynamicSVGText"
 import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence";
 import { useWallState } from "../hooks/useWallState";
 import { useHandState } from "../hooks/useHandState";
+import Wall from "../components/wall";
+import Hand from "../components/hand";
+import Result from "../components/result";
 
 // CSVファイル名に対応する索子牌の枚数
 const ALLOWED_SINGLE_COUNTS = [6, 7, 9, 10, 12];
@@ -25,58 +28,6 @@ const ManmanPage = () => {
     removeHeadSet,
     maxHand
   } = useHandState();
-
-  // 手牌表示
-  const handTilesToRender = [];
-  // 順子：1セット目は 1p,2p,3p; 2セット目は 4p,5p,6p
-  for (let i = 0; i < hand.sequenceCount; i++) {
-    if (i === 0) {
-      handTilesToRender.push({ key: `seq0_1`, tile: "1p", onClick: removeSequenceSet });
-      handTilesToRender.push({ key: `seq0_2`, tile: "2p", onClick: removeSequenceSet });
-      handTilesToRender.push({ key: `seq0_3`, tile: "3p", onClick: removeSequenceSet });
-    } else if (i === 1) {
-      handTilesToRender.push({ key: `seq1_1`, tile: "4p", onClick: removeSequenceSet });
-      handTilesToRender.push({ key: `seq1_2`, tile: "5p", onClick: removeSequenceSet });
-      handTilesToRender.push({ key: `seq1_3`, tile: "6p", onClick: removeSequenceSet });
-    }
-  }
-  // 刻子：1セット目は 7p,7p,7p; 2セット目は 8p,8p,8p
-  for (let i = 0; i < hand.tripletCount; i++) {
-    if (i === 0) {
-      handTilesToRender.push({ key: `trip0_1`, tile: "7p", onClick: removeTripletSet });
-      handTilesToRender.push({ key: `trip0_2`, tile: "7p", onClick: removeTripletSet });
-      handTilesToRender.push({ key: `trip0_3`, tile: "7p", onClick: removeTripletSet });
-    } else if (i === 1) {
-      handTilesToRender.push({ key: `trip1_1`, tile: "8p", onClick: removeTripletSet });
-      handTilesToRender.push({ key: `trip1_2`, tile: "8p", onClick: removeTripletSet });
-      handTilesToRender.push({ key: `trip1_3`, tile: "8p", onClick: removeTripletSet });
-    }
-  }
-  // 対子の表示：9p,9p
-  if (hand.head) {
-    handTilesToRender.push({ key: `head_1`, tile: "9p", onClick: removeHeadSet });
-    handTilesToRender.push({ key: `head_2`, tile: "9p", onClick: removeHeadSet });
-  }
-  // 単体牌の表示（1s～9sの昇順）
-  Object.keys(hand.singles)
-    .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
-    .forEach(tile => {
-      const count = hand.singles[tile];
-      for (let i = 0; i < count; i++) {
-        handTilesToRender.push({
-          key: `single_${tile}_${i}`,
-          tile,
-          onClick: () => removeSingle(tile)
-        });
-      }
-    });
-  while (handTilesToRender.length < maxHand) {
-    handTilesToRender.push({
-      key: `empty_${handTilesToRender.length}`,
-      tile: "empty",
-      onClick: null
-    });
-  }
   
   // CSV読み込み
   // csvData の形式は { "[手牌の枚数]": { "[手牌]": { [ロス数], [手牌], [内訳] } } }
@@ -279,124 +230,26 @@ const ManmanPage = () => {
     }
     setSimulationResults(finalCandidates);
   }, [hand, wall, csvData]);
-  
-  // 結果表示：表示順は【万象牌】【順子】【刻子】【対子（変換含む）】【単体牌（1s～9s昇順）】
-  const renderSimulationResults = () => {
-    if (simulationResults.length === 0) return null;
-    return simulationResults.map((result, idx) => {
-      const resultTilesToRender = result.candidate.flatMap((item, j) =>
-        item.tiles.map((tile, k) => (
-          <img
-            key={`${idx}_${j}_${k}`}
-            className={styles.hand_tile}
-            src={`/tiles/${tile}.png`}
-            alt={tile}
-          />
-        ))
-      );
-      
-      return (
-        <div key={`result_${idx}`} className={styles.result}>
-          <div className={styles.loss}>
-            <DynamicSVGTextSequence text={["ロス", ...`${result.loss}`, "枚", ...(result.breakdown && `（${result.breakdown}）`)]} />
-          </div>
-          <div className={styles.hand}>
-            <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
-            {resultTilesToRender}
-          </div>
-        </div>
-      );
-    });
-  };
 
   return (
     <Layout>
       <div className={styles.container}>
         <DynamicSVGText text={"万万シミュレーター"} />
         <div className={styles.contents}>
-          {/* 牌山エリア */}
-          <section className={styles.wall_section}>
-            <div>
-              <div className={styles.area_title}><DynamicSVGText text={"牌山"} /></div>
-              <div id="wall" className={`${styles.area} ${styles.wall}`}>
-                { [...Array(maxWall).keys()].map(i => {
-                    if (i < wall.length) {
-                      const tile = wall[i];
-                      return (
-                        <img key={`wall_${i}`} className={styles.wall_tile} src={`/tiles/${tile}.png`} onClick={() => removeWall(i)} alt={tile} />
-                      );
-                    } else {
-                      return (
-                        <img key={`wall_${i}`} className={styles.wall_tile} src={`/tiles/empty.png`} alt="empty" />
-                      );
-                    }
-                  })
-                }
-              </div>
-            </div>
-            <div>
-              <div className={styles.area_title}><DynamicSVGText text={"牌選択ボタン"} /></div>
-              <div id="wall_choices" className={`${styles.area} ${styles.tile_choices}`}>
-                { [...Array(9).keys()].map(i => {
-                    const tile = `${i+1}s`;
-                    return (
-                      <img key={`wall_choice_${i}`} className={styles.tile_choice} src={`/tiles/${tile}.png`} onClick={() => addWall(tile)} alt={tile} />
-                    );
-                  })
-                }
-              </div>
-            </div>
-          </section>
-          {/* 手牌エリア */}
-          <section className={styles.hand_section}>
-            <div>
-              <div className={styles.area_title}><DynamicSVGText text={"手牌"} /></div>
-              <div id="hand" className={`${styles.area} ${styles.hand}`}>
-                <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
-                { handTilesToRender.map(item => (
-                    <img key={item.key} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} onClick={item.onClick ? item.onClick : undefined} alt={item.tile} />
-                  ))
-                }
-              </div>
-            </div>
-            <div>
-              <div className={styles.area_title}><DynamicSVGText text={"牌選択ボタン"} /></div>
-              <div id="hand_choices" className={`${styles.area} ${styles.tile_choices}`}>
-                { [...Array(9).keys()].map(i => {
-                    const tile = `${i+1}s`;
-                    return (
-                      <img key={`hand_choice_${i}`} className={styles.tile_choice} src={`/tiles/${tile}.png`} onClick={() => addHandTile(tile)} alt={tile} />
-                    );
-                  })
-                }
-              </div>
-              <div id="other_color_choices" className={`${styles.area} ${styles.othe_color_choices}`}>
-                <div className={styles.set_choice} onClick={addSequenceSet}>
-                  <img className={styles.set_choice_tile} src="/tiles/1p.png" alt="他色順子" />
-                  <img className={styles.set_choice_tile} src="/tiles/2p.png" alt="他色順子" />
-                  <img className={styles.set_choice_tile} src="/tiles/3p.png" alt="他色順子" />
-                </div>
-                <div className={styles.set_choice} onClick={addTripletSet}>
-                  <img className={styles.set_choice_tile} src="/tiles/7p.png" alt="他色刻子" />
-                  <img className={styles.set_choice_tile} src="/tiles/7p.png" alt="他色刻子" />
-                  <img className={styles.set_choice_tile} src="/tiles/7p.png" alt="他色刻子" />
-                </div>
-                <div className={styles.head_choice} onClick={addHeadSet}>
-                  <img className={styles.head_choice_tile} src="/tiles/9p.png" alt="他色対子" />
-                  <img className={styles.head_choice_tile} src="/tiles/9p.png" alt="他色対子" />
-                </div>
-              </div>
-            </div>
-          </section>
-          {/* 結果エリア */}
-          <section className={styles.result_section}>
-            <div>
-              <div className={styles.area_title}><DynamicSVGText text={"最終形"} /><span style={{fontSize: "var(--font-sx)"}}><DynamicSVGText text={"※ロス数12枚以下の形を表示（10件以上の時は省略）"} /></span></div>
-              <div id="results" className={`${styles.area} ${styles.results}`}>
-                { renderSimulationResults() }
-              </div>
-            </div>
-          </section>
+          <Wall wall={wall} addWall={addWall} removeWall={removeWall} maxWall={maxWall} />
+          <Hand 
+            hand={hand}
+            addHandTile={addHandTile}
+            removeSingle={removeSingle}
+            addSequenceSet={addSequenceSet}
+            addTripletSet={addTripletSet}
+            addHeadSet={addHeadSet}
+            removeSequenceSet={removeSequenceSet}
+            removeTripletSet={removeTripletSet}
+            removeHeadSet={removeHeadSet}
+            maxHand={maxHand}
+          />
+          <Result simulationResults={simulationResults} />
         </div>
       </div>
     </Layout>
