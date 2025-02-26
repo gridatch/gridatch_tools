@@ -129,25 +129,25 @@ const ManmanPage = () => {
     // 順子
     for (let i = 0; i < hand.sequenceCount; i++) {
       const tiles = (i === 0) ? ["1p", "2p", "3p"] : ["4p", "5p", "6p"];
-      pool.push({ type: "set", setType: "sequence", tiles, weight: 3 });
+      pool.push({ type: "sequence", tiles, weight: 3 });
     }
     // 刻子
     for (let i = 0; i < hand.tripletCount; i++) {
       const tiles = (i === 0) ? ["7p", "7p", "7p"] : ["8p", "8p", "8p"];
-      pool.push({ type: "set", setType: "triplet", tiles, weight: 3 });
+      pool.push({ type: "triplet", tiles, weight: 3 });
     }
     // 対子
     if (hand.head) {
-      pool.push({ type: "set", setType: "head", tiles: ["9p", "9p"], weight: 2 });
+      pool.push({ type: "head", tiles: ["9p", "9p"], weight: 2 });
     }
     // 対子が存在しない場合、刻子を対子に変換
     if (!hand.head && hand.tripletCount > 0) {
       if (hand.tripletCount === 1) {
         // 1組の場合：["7p", "7p"]
-        pool.push({ type: "convertedHead", tile: "7p", weight: 2 });
+        pool.push({ type: "convertedHead", tiles: ["7p", "7p"], weight: 2 });
       } else if (hand.tripletCount === 2) {
         // 2組の場合：["8p", "8p"]
-        pool.push({ type: "convertedHead", tile: "8p", weight: 2 });
+        pool.push({ type: "convertedHead", tiles: ["8p", "8p"], weight: 2 });
       }
     }
     // 単体牌（各4枚まで）
@@ -171,7 +171,7 @@ const ManmanPage = () => {
     // 単体牌を Map の挿入順（1s～9s）に pool に追加
     for (const [tile, count] of singleCounts.entries()) {
       for (let i = 0; i < count; i++) {
-        pool.push({ type: "single", tile, weight: 1 });
+        pool.push({ type: "single", tiles: [tile], weight: 1 });
       }
     }
     return pool;
@@ -189,11 +189,11 @@ const ManmanPage = () => {
     
     const item = items[index];
     if (item.type === "convertedHead") {
-      if (!availableConvertedHeads[item.tile]) return;
+      if (!availableConvertedHeads[item.tiles[0]]) return;
     }
     
     const newAvailableConvertedHeads = { ...availableConvertedHeads };
-    if (item.type === "set" && item.setType === "triplet") {
+    if (item.type === "triplet") {
       // 刻子を使用すると、その刻子をヘッドに変換出来なくなる
       newAvailableConvertedHeads[item.tiles[0]] = false;
     }
@@ -213,7 +213,7 @@ const ManmanPage = () => {
   // 単体牌の数字を連結した文字列を作成
   const getSinglesStringFromCandidate = (candidate) => {
     const singles = candidate.filter(item => item.type === "single");
-    const digits = singles.map(item => item.tile.replace("s", ""));
+    const digits = singles.map(item => item.tiles[0].replace("s", ""));
     return digits.sort((a, b) => parseInt(a, 10) - parseInt(b, 10)).join("");
   };
   
@@ -284,50 +284,16 @@ const ManmanPage = () => {
   const renderSimulationResults = () => {
     if (simulationResults.length === 0) return null;
     return simulationResults.map((result, idx) => {
-      // グループ別に分ける
-      const sequenceItems = result.candidate.filter(item => item.type === "set" && item.setType === "sequence");
-      const tripletItems = result.candidate.filter(item => item.type === "set" && item.setType === "triplet");
-      const headItems = result.candidate.filter(item => (item.type === "set" && item.setType === "head") || item.type === "convertedHead");
-      const singleItems = result.candidate.filter(item => item.type === "single");
-      const renderedItems = [];
-      // 順子
-      sequenceItems.forEach(item => {
-        item.tiles.forEach((tile, j) => {
-          renderedItems.push(
-            <img key={`${idx}_seq_${j}`} className={styles.hand_tile} src={`/tiles/${tile}.png`} alt={tile} />
-          );
-        });
-      });
-      // 刻子
-      tripletItems.forEach(item => {
-        item.tiles.forEach((tile, j) => {
-          renderedItems.push(
-            <img key={`${idx}_trip_${tile}_${j}`} className={styles.hand_tile} src={`/tiles/${tile}.png`} alt={tile} />
-          );
-        });
-      });
-      // 対子
-      headItems.forEach(item => {
-        if (item.type === "convertedHead") {
-          [0, 1].forEach(j => {
-            renderedItems.push(
-              <img key={`${idx}_convHead_${j}`} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} alt={item.tile} />
-            );
-          });
-        } else {
-          item.tiles.forEach((tile, j) => {
-            renderedItems.push(
-              <img key={`${idx}_head_${j}`} className={styles.hand_tile} src={`/tiles/${tile}.png`} alt={tile} />
-            );
-          });
-        }
-      });
-      // 単体牌（1s～9s昇順）
-      singleItems.forEach((item, i) => {
-        renderedItems.push(
-          <img key={`${idx}_single_${i}`} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} alt={item.tile} />
-        );
-      });
+      const resultTilesToRender = result.candidate.flatMap((item, j) =>
+        item.tiles.map((tile, k) => (
+          <img
+            key={`${idx}_${j}_${k}`}
+            className={styles.hand_tile}
+            src={`/tiles/${tile}.png`}
+            alt={tile}
+          />
+        ))
+      );
       
       return (
         <div key={`result_${idx}`} className={styles.result}>
@@ -336,7 +302,7 @@ const ManmanPage = () => {
           </div>
           <div className={styles.hand}>
             <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
-            {renderedItems}
+            {resultTilesToRender}
           </div>
         </div>
       );
