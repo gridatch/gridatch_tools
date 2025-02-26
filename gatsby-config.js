@@ -38,7 +38,6 @@ module.exports = {
         display: `standalone`,
         icon: `src/images/icon.png`, // This path is relative to the root of the site.
         orientation: `portrait`,
-        cache_busting_mode: 'none',
       },
     },
     {
@@ -53,13 +52,6 @@ module.exports = {
         },
       },
     },
-    {
-      resolve: 'gatsby-plugin-offline',
-      options: {
-        workboxConfig: {
-          globPatterns: ['**/icon-path*'],
-        }
-      }
-    }
+    'gatsby-plugin-offline',
   ],
 }
