@@ -4,101 +4,27 @@ import Seo from "../components/seo"
 import styles from "./manman.module.css"
 import DynamicSVGText from "../components/dynamicSVGText"
 import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence";
+import { useWallState } from "../hooks/useWallState";
+import { useHandState } from "../hooks/useHandState";
 
 // CSVファイル名に対応する索子牌の枚数
 const ALLOWED_SINGLE_COUNTS = [6, 7, 9, 10, 12];
 
 const ManmanPage = () => {
   // 牌山の管理
-  const MAX_WALL = 10;
-  const [wall, setWall] = React.useState([]);
-  
-  const addWall = (tile) => {
-    if (wall.length >= MAX_WALL) return;
-    setWall([...wall, tile]);
-  };
-  
-  const removeWall = (i) => {
-    if (wall.length === 0) return;
-    setWall(wall.toSpliced(i, 1));
-  };
-
-  // 手牌（万象牌以外）の管理
-  const MAX_HAND = 12;
-  // 手牌は順子、刻子、ヘッド、単体牌（索子）に分類
-  const [hand, setHand] = React.useState({
-    sequenceCount: 0,
-    tripletCount: 0,
-    head: false,
-    singles: {}        // 単体牌: { [tile]: count }（例："1s": 2）
-  });
-  
-  const getTotalHandCount = () => {
-    const seqCount = hand.sequenceCount * 3;
-    const tripCount = hand.tripletCount * 3;
-    const headCount = hand.head ? 2 : 0;
-    const singlesCount = Object.values(hand.singles).reduce((sum, c) => sum + c, 0);
-    return seqCount + tripCount + headCount + singlesCount;
-  };
-  const addHandTile = (tile) => {
-    if (getTotalHandCount() + 1 > MAX_HAND) return;
-    setHand(prev => {
-      const count = prev.singles[tile] || 0;
-      if (count >= 4) return prev;
-      return {
-        ...prev,
-        singles: { ...prev.singles, [tile]: count + 1 }
-      };
-    });
-  };
-  const removeSingle = (tile) => {
-    setHand(prev => {
-      const count = prev.singles[tile] || 0;
-      if (count <= 1) {
-        const newSingles = { ...prev.singles };
-        delete newSingles[tile];
-        return { ...prev, singles: newSingles };
-      } else {
-        return { 
-          ...prev,
-          singles: { ...prev.singles, [tile]: count - 1 }
-        };
-      }
-    });
-  };
-  
-  const currentSetCount = hand.sequenceCount + hand.tripletCount + (hand.head ? 1 : 0);
-  const addSequenceSet = () => {
-    if (getTotalHandCount() + 3 > MAX_HAND) return;
-    if (currentSetCount >= 2) return;
-    setHand(prev => ({ ...prev, sequenceCount: prev.sequenceCount + 1 }));
-  };
-  const addTripletSet = () => {
-    if (getTotalHandCount() + 3 > MAX_HAND) return;
-    if (currentSetCount >= 2) return;
-    setHand(prev => ({ ...prev, tripletCount: prev.tripletCount + 1 }));
-  };
-  const addHeadSet = () => {
-    if (getTotalHandCount() + 2 > MAX_HAND) return;
-    if (currentSetCount >= 2) return;
-    if (hand.head) return;
-    setHand(prev => ({ ...prev, head: true }));
-  };
-  const removeSequenceSet = () => {
-    if (hand.sequenceCount > 0) {
-      setHand(prev => ({ ...prev, sequenceCount: prev.sequenceCount - 1 }));
-    }
-  };
-  const removeTripletSet = () => {
-    if (hand.tripletCount > 0) {
-      setHand(prev => ({ ...prev, tripletCount: prev.tripletCount - 1 }));
-    }
-  };
-  const removeHeadSet = () => {
-    if (hand.head) {
-      setHand(prev => ({ ...prev, head: false }));
-    }
-  };
+  const { wall, addWall, removeWall, maxWall } = useWallState();
+  const {
+    hand,
+    addHandTile,
+    removeSingle,
+    addSequenceSet,
+    addTripletSet,
+    addHeadSet,
+    removeSequenceSet,
+    removeTripletSet,
+    removeHeadSet,
+    maxHand
+  } = useHandState();
 
   // 手牌表示
   const handTilesToRender = [];
@@ -144,7 +70,7 @@ const ManmanPage = () => {
         });
       }
     });
-  while (handTilesToRender.length < MAX_HAND) {
+  while (handTilesToRender.length < maxHand) {
     handTilesToRender.push({
       key: `empty_${handTilesToRender.length}`,
       tile: "empty",
@@ -291,35 +217,6 @@ const ManmanPage = () => {
     return digits.sort((a, b) => parseInt(a, 10) - parseInt(b, 10)).join("");
   };
   
-  // ソート用の順序定義
-  const getItemOrder = (item) => {
-    if (item.type === "set") {
-      if (item.setType === "sequence") return 1;
-      if (item.setType === "triplet") return 2;
-      if (item.setType === "head") return 3;
-    } else if (item.type === "convertedHead") {
-      return 3;
-    } else if (item.type === "single") {
-      return 4;
-    }
-    return 5;
-  };
-  
-  // 候補の比較関数
-  const candidateComparator = (a, b) => {
-    const orderA = getItemOrder(a);
-    const orderB = getItemOrder(b);
-    if (orderA !== orderB) return orderA - orderB;
-    if (orderA === 4) {
-      // 単体牌同士
-      return parseInt(a.tile, 10) - parseInt(b.tile, 10);
-    }
-    // 順子、刻子、ヘッド同士は1枚目で比較
-    const tileA = a.tile || (a.tiles ? a.tiles[0] : "");
-    const tileB = b.tile || (b.tiles ? b.tiles[0] : "");
-    return tileA.localeCompare(tileB);
-  };
-  
   // 組み合わせ列挙
   const simulateCandidates = () => {
     const pool = createPool();
@@ -334,9 +231,9 @@ const ManmanPage = () => {
       }
     }
     const memoResults = [];
-    enumerateCombinations(pool, 0, [], 0, MAX_HAND, initialAvailableConvertedHeads, memoResults);
+    enumerateCombinations(pool, 0, [], 0, maxHand, initialAvailableConvertedHeads, memoResults);
     let allCandidates = [...memoResults];
-    // 各候補を表示順にソートし、重複排除
+    // 各候補の重複排除
     const candidateMap = {};
     allCandidates.forEach(candidate => {
       const key = getCandidateKey(candidate);
@@ -387,12 +284,11 @@ const ManmanPage = () => {
   const renderSimulationResults = () => {
     if (simulationResults.length === 0) return null;
     return simulationResults.map((result, idx) => {
-      const candidate = result.candidate.slice().sort(candidateComparator);
       // グループ別に分ける
-      const sequenceItems = candidate.filter(item => item.type === "set" && item.setType === "sequence");
-      const tripletItems = candidate.filter(item => item.type === "set" && item.setType === "triplet");
-      const headItems = candidate.filter(item => (item.type === "set" && item.setType === "head") || item.type === "convertedHead");
-      const singleItems = candidate.filter(item => item.type === "single");
+      const sequenceItems = result.candidate.filter(item => item.type === "set" && item.setType === "sequence");
+      const tripletItems = result.candidate.filter(item => item.type === "set" && item.setType === "triplet");
+      const headItems = result.candidate.filter(item => (item.type === "set" && item.setType === "head") || item.type === "convertedHead");
+      const singleItems = result.candidate.filter(item => item.type === "single");
       const renderedItems = [];
       // 順子
       sequenceItems.forEach(item => {
@@ -415,7 +311,7 @@ const ManmanPage = () => {
         if (item.type === "convertedHead") {
           [0, 1].forEach(j => {
             renderedItems.push(
-              <img key={`${idx}_convHead_${j}`} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} alt={`${item.tile} (converted)`} />
+              <img key={`${idx}_convHead_${j}`} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} alt={item.tile} />
             );
           });
         } else {
@@ -427,8 +323,7 @@ const ManmanPage = () => {
         }
       });
       // 単体牌（1s～9s昇順）
-      singleItems.sort((a,b)=>parseInt(a.tile,10)-parseInt(b.tile,10))
-                 .forEach((item, i) => {
+      singleItems.forEach((item, i) => {
         renderedItems.push(
           <img key={`${idx}_single_${i}`} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} alt={item.tile} />
         );
@@ -437,9 +332,7 @@ const ManmanPage = () => {
       return (
         <div key={`result_${idx}`} className={styles.result}>
           <div className={styles.loss}>
-            {
-              <DynamicSVGTextSequence text={["ロス", ...`${result.loss}`, "枚", ...(result.breakdown && `（${result.breakdown}）`)]} />
-            }
+            <DynamicSVGTextSequence text={["ロス", ...`${result.loss}`, "枚", ...(result.breakdown && `（${result.breakdown}）`)]} />
           </div>
           <div className={styles.hand}>
             <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
@@ -460,7 +353,7 @@ const ManmanPage = () => {
             <div>
               <div className={styles.area_title}><DynamicSVGText text={"牌山"} /></div>
               <div id="wall" className={`${styles.area} ${styles.wall}`}>
-                { [...Array(MAX_WALL).keys()].map(i => {
+                { [...Array(maxWall).keys()].map(i => {
                     if (i < wall.length) {
                       const tile = wall[i];
                       return (
