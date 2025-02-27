@@ -21,21 +21,21 @@ export const loadCsvData = async (fileNames) => {
           lines.slice(1).forEach(line => {
             const parts = line.split(",");
             const loss = parseInt(parts[0], 10);
-            const hand = parts[1];
+            const key = parts[1];
             const breakdown = parts[2] || "";
-            data[hand] = { loss, hand, breakdown };
+            data[key] = { loss, key, breakdown };
           });
         }
-        return { key: name, data };
+        return { name, data };
       } catch (error) {
         console.error(error);
-        return { key: name, data: {} };
+        return { name, data: {} };
       }
     })
   );
   const csvData = {};
-  results.forEach(({ key, data }) => {
-    csvData[key] = data;
+  results.forEach(({ name, data }) => {
+    csvData[name] = data;
   });
   return csvData;
 };

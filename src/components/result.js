@@ -3,7 +3,7 @@ import DynamicSVGText from "./dynamicSVGText";
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
 import styles from "../pages/manman.module.css";
 
-const Result = ({ simulationResults }) => {
+const Result = ({ optimalTenpais }) => {
   return (
     <section className={styles.result_section}>
       <div className={styles.area_title}>
@@ -14,26 +14,26 @@ const Result = ({ simulationResults }) => {
       </div>
       <div id="results" className={`${styles.area} ${styles.results}`}>
         {
-          simulationResults.map((result, idx) => {
-            const resultTilesToRender = result.candidate.flatMap((item, j) =>
-              item.tiles.map((tile, k) => (
-                <img
-                  key={`${idx}_${j}_${k}`}
-                  className={styles.hand_tile}
-                  src={`/tiles/${tile}.png`}
-                  alt={tile}
-                />
-              ))
-            );
-            
+          optimalTenpais.map((tenpai, i) => {
             return (
-              <div key={`result_${idx}`} className={styles.result}>
+              <div key={`tempai_${i}`} className={styles.result}>
                 <div className={styles.loss}>
-                  <DynamicSVGTextSequence text={["ロス", ...`${result.loss}`, "枚", ...(result.breakdown && `（${result.breakdown}）`)]} />
+                  <DynamicSVGTextSequence text={["ロス", ...`${tenpai.loss}`, "枚", ...(tenpai.breakdown && `（${tenpai.breakdown}）`)]} />
                 </div>
                 <div className={styles.hand}>
                   <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
-                  {resultTilesToRender}
+                  {
+                    tenpai.hand.flatMap((component, j) =>
+                      component.tiles.map((tile, k) => (
+                        <img
+                          key={`tempai_${i}_comp_${j}_tile_${k}`}
+                          className={styles.hand_tile}
+                          src={`/tiles/${tile}.png`}
+                          alt={tile}
+                        />
+                      ))
+                    )
+                  }
                 </div>
               </div>
             );
