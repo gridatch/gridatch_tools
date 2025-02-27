@@ -2,7 +2,7 @@ import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/manman.module.css";
 
-const Wall = ({ wall, addWall, removeWall, maxWall }) => {
+const Wall = ({ wall, addTileToWall, removeTileFromWallAtIndex, maxWall }) => {
   return (
     <section className={styles.wall_section}>
       <div>
@@ -16,7 +16,7 @@ const Wall = ({ wall, addWall, removeWall, maxWall }) => {
                 key={`wall_${i}`}
                 className={styles.wall_tile}
                 src={`/tiles/${wall[i]}.png`}
-                onClick={() => removeWall(i)}
+                onClick={() => removeTileFromWallAtIndex(i)}
                 alt={wall[i]}
               />
             ) : (
@@ -42,7 +42,7 @@ const Wall = ({ wall, addWall, removeWall, maxWall }) => {
                 key={`wall_choice_${i}`}
                 className={styles.tile_choice}
                 src={`/tiles/${tile}.png`}
-                onClick={() => addWall(tile)}
+                onClick={() => addTileToWall(tile)}
                 alt={tile}
               />
             );

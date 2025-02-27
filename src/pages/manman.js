@@ -15,17 +15,17 @@ const ALLOWED_SINGLE_COUNTS = [6, 7, 9, 10, 12];
 
 const ManmanPage = () => {
   // 牌山の管理
-  const { wall, addWall, removeWall, maxWall } = useWallState();
+  const { wall, addTileToWall, removeTileFromWallAtIndex, maxWall } = useWallState();
   const {
     hand,
-    addHandTile,
-    removeSingle,
-    addSequenceSet,
-    addTripletSet,
-    addHeadSet,
-    removeSequenceSet,
-    removeTripletSet,
-    removeHeadSet,
+    addTileToHand: addTileToHand,
+    addSequenceToHand: addSequenceToHand,
+    addTripletToHand: addTripletToHand,
+    addPairToHand: addPairToHand,
+    removeTileFromHand: removeTileFromHand,
+    removeSequenceFromHand: removeSequenceFromHand,
+    removeTripletFromHand: removeTripletFromHand,
+    removePairFromHand: removePairFromHand,
     maxHand
   } = useHandState();
   
@@ -47,25 +47,25 @@ const ManmanPage = () => {
     // 順子
     for (let i = 0; i < hand.sequenceCount; i++) {
       const tiles = (i === 0) ? ["1p", "2p", "3p"] : ["4p", "5p", "6p"];
-      pool.push({ type: "sequence", tiles, weight: 3 });
+      pool.push({ type: "sequence", tiles, tileCount: 3 });
     }
     // 刻子
     for (let i = 0; i < hand.tripletCount; i++) {
       const tiles = (i === 0) ? ["7p", "7p", "7p"] : ["8p", "8p", "8p"];
-      pool.push({ type: "triplet", tiles, weight: 3 });
+      pool.push({ type: "triplet", tiles, tileCount: 3 });
     }
     // 対子
-    if (hand.head) {
-      pool.push({ type: "head", tiles: ["9p", "9p"], weight: 2 });
+    if (hand.hasPair) {
+      pool.push({ type: "pair", tiles: ["9p", "9p"], tileCount: 2 });
     }
     // 対子が存在しない場合、刻子を対子に変換
-    if (!hand.head && hand.tripletCount > 0) {
+    if (!hand.hasPair && hand.tripletCount > 0) {
       if (hand.tripletCount === 1) {
         // 1組の場合：["7p", "7p"]
-        pool.push({ type: "convertedHead", tiles: ["7p", "7p"], weight: 2 });
+        pool.push({ type: "convertedPair", tiles: ["7p", "7p"], tileCount: 2 });
       } else if (hand.tripletCount === 2) {
         // 2組の場合：["8p", "8p"]
-        pool.push({ type: "convertedHead", tiles: ["8p", "8p"], weight: 2 });
+        pool.push({ type: "convertedPair", tiles: ["8p", "8p"], tileCount: 2 });
       }
     }
     // 単体牌（各4枚まで）
@@ -89,36 +89,36 @@ const ManmanPage = () => {
     // 単体牌を Map の挿入順（1s～9s）に pool に追加
     for (const [tile, count] of singleCounts.entries()) {
       for (let i = 0; i < count; i++) {
-        pool.push({ type: "single", tiles: [tile], weight: 1 });
+        pool.push({ type: "single", tiles: [tile], tileCount: 1 });
       }
     }
     return pool;
   };  
   
   // pool の組み合わせを再帰的列挙
-  // availableConvertedHeads: ヘッドに変換可能か（{ "7p": true } または { "7p": false, "8p": true } の形式）
-  const enumerateCombinations = (items, index, currentCombo, currentWeight, target, availableConvertedHeads, results) => {
-    if (currentWeight === target) {
+  // availableconvertedPairs: ヘッドに変換可能か（{ "7p": true } または { "7p": false, "8p": true } の形式）
+  const enumerateCombinations = (items, index, currentCombo, currentTileCount, target, availableconvertedPairs, results) => {
+    if (currentTileCount === target) {
       results.push([...currentCombo]);
       return;
     }
     if (index >= items.length) return;
-    enumerateCombinations(items, index + 1, currentCombo, currentWeight, target, availableConvertedHeads, results);
+    enumerateCombinations(items, index + 1, currentCombo, currentTileCount, target, availableconvertedPairs, results);
     
     const item = items[index];
-    if (item.type === "convertedHead") {
-      if (!availableConvertedHeads[item.tiles[0]]) return;
+    if (item.type === "convertedPair") {
+      if (!availableconvertedPairs[item.tiles[0]]) return;
     }
     
-    const newAvailableConvertedHeads = { ...availableConvertedHeads };
+    const newAvailableconvertedPairs = { ...availableconvertedPairs };
     if (item.type === "triplet") {
       // 刻子を使用すると、その刻子をヘッドに変換出来なくなる
-      newAvailableConvertedHeads[item.tiles[0]] = false;
+      newAvailableconvertedPairs[item.tiles[0]] = false;
     }
     
-    if (currentWeight + item.weight <= target) {
+    if (currentTileCount + item.tileCount <= target) {
       currentCombo.push(item);
-      enumerateCombinations(items, index + 1, currentCombo, currentWeight + item.weight, target, newAvailableConvertedHeads, results);
+      enumerateCombinations(items, index + 1, currentCombo, currentTileCount + item.tileCount, target, newAvailableconvertedPairs, results);
       currentCombo.pop();
     }
   };
@@ -138,18 +138,18 @@ const ManmanPage = () => {
   // 組み合わせ列挙
   const simulateCandidates = () => {
     const pool = createPool();
-    let initialAvailableConvertedHeads = {};
+    let initialAvailableconvertedPairs = {};
     // 対子が存在しない場合、刻子の変換可否の初期値を設定
-    if (!hand.head && hand.tripletCount > 0) {
+    if (!hand.hasPair && hand.tripletCount > 0) {
       if (hand.tripletCount === 1) {
-        initialAvailableConvertedHeads["7p"] = true;
+        initialAvailableconvertedPairs["7p"] = true;
       } else if (hand.tripletCount >= 2) {
-        initialAvailableConvertedHeads["7p"] = false;
-        initialAvailableConvertedHeads["8p"] = true;
+        initialAvailableconvertedPairs["7p"] = false;
+        initialAvailableconvertedPairs["8p"] = true;
       }
     }
     const memoResults = [];
-    enumerateCombinations(pool, 0, [], 0, maxHand, initialAvailableConvertedHeads, memoResults);
+    enumerateCombinations(pool, 0, [], 0, maxHand, initialAvailableconvertedPairs, memoResults);
     let allCandidates = [...memoResults];
     // 各候補の重複排除
     const candidateMap = {};
@@ -203,17 +203,17 @@ const ManmanPage = () => {
       <div className={styles.container}>
         <DynamicSVGText text={"万万シミュレーター"} />
         <div className={styles.contents}>
-          <Wall wall={wall} addWall={addWall} removeWall={removeWall} maxWall={maxWall} />
+          <Wall wall={wall} addTileToWall={addTileToWall} removeTileFromWallAtIndex={removeTileFromWallAtIndex} maxWall={maxWall} />
           <Hand 
             hand={hand}
-            addHandTile={addHandTile}
-            removeSingle={removeSingle}
-            addSequenceSet={addSequenceSet}
-            addTripletSet={addTripletSet}
-            addHeadSet={addHeadSet}
-            removeSequenceSet={removeSequenceSet}
-            removeTripletSet={removeTripletSet}
-            removeHeadSet={removeHeadSet}
+            addTileToHand={addTileToHand}
+            removeTileFromHand={removeTileFromHand}
+            addSequenceToHand={addSequenceToHand}
+            addTripletToHand={addTripletToHand}
+            addPairToHand={addPairToHand}
+            removeSequenceFromHand={removeSequenceFromHand}
+            removeTripletFromHand={removeTripletFromHand}
+            removePairFromHand={removePairFromHand}
             maxHand={maxHand}
           />
           <Result simulationResults={simulationResults} />

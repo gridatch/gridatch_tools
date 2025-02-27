@@ -16,13 +16,12 @@ declare const styles:
   & Readonly<{ "results": string }>
   & Readonly<{ "result": string }>
   & Readonly<{ "tile_choices": string }>
-  & Readonly<{ "tile_choices": string }>
   & Readonly<{ "tile_choice": string }>
-  & Readonly<{ "othe_color_choices": string }>
+  & Readonly<{ "other_color_choices": string }>
   & Readonly<{ "set_choice": string }>
   & Readonly<{ "set_choice_tile": string }>
-  & Readonly<{ "head_choice": string }>
-  & Readonly<{ "head_choice_tile": string }>
+  & Readonly<{ "pair_choice": string }>
+  & Readonly<{ "pair_choice_tile": string }>
 ;
 export default styles;
 //# sourceMappingURL=./manman.module.css.d.ts.map
