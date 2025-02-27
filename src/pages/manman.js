@@ -3,12 +3,12 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import styles from "./manman.module.css"
 import DynamicSVGText from "../components/dynamicSVGText"
-import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence";
 import { useWallState } from "../hooks/useWallState";
 import { useHandState } from "../hooks/useHandState";
 import Wall from "../components/wall";
 import Hand from "../components/hand";
 import Result from "../components/result";
+import { loadCsvData } from "../utils/csvLoader";
 
 // CSVファイル名に対応する索子牌の枚数
 const ALLOWED_SINGLE_COUNTS = [6, 7, 9, 10, 12];
@@ -30,46 +30,13 @@ const ManmanPage = () => {
   } = useHandState();
   
   // CSV読み込み
-  // csvData の形式は { "[手牌の枚数]": { "[手牌]": { [ロス数], [手牌], [内訳] } } }
+  // csvData の形式は { "[手牌の枚数]": { "[手牌]": { "loss": [ロス数], "hand": [手牌], "breakdown": [ロス内訳] } } }
   const [csvData, setCsvData] = React.useState({});
   React.useEffect(() => {
-    const fileNames = ["6", "7", "9", "10", "12"];
-    Promise.all(
-      fileNames.map(name =>
-        fetch(`/csv/${name}.csv`)
-          .then(res => {
-            if (!res.ok) throw new Error(`Failed to load ${name}.csv`);
-            return res.text();
-          })
-          .then(text => {
-            const lines = text.split("\n").map(line => line.trim()).filter(line => line);
-            const data = {};
-            if (lines.length > 1) {
-              // ヘッダー行を無視
-              lines.slice(1).forEach(line => {
-                const parts = line.split(",");
-                const handStr = parts[1];
-                data[handStr] = {
-                  loss: parseInt(parts[0], 10),
-                  hand: handStr,
-                  breakdown: parts[2] || ""
-                };
-              });
-            }
-            return { key: name, data };
-          })
-          .catch(error => {
-            console.error(error);
-            return { key: name, data: {} };
-          })
-      )
-    ).then(results => {
-      const csvMap = {};
-      results.forEach(({ key, data }) => {
-        csvMap[key] = data;
-      });
-      setCsvData(csvMap);
-    });
+    (async() => {
+      const csvData = await loadCsvData(ALLOWED_SINGLE_COUNTS);
+      setCsvData(csvData);
+    })()
   }, []);  
   
   // シミュレーション
