@@ -13,5 +13,9 @@
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "*.css": "$(capture).css.d.ts, $(capture).css.d.ts.map"
+    },
+    "files.eol": "\n",
+    "files.watcherExclude": {
+        "**/node_modules/**": true
     }
 }

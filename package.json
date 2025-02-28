@@ -21,8 +21,7 @@
     "sanitize-filename": "^1.6.3"
   },
   "devDependencies": {
-    "happy-css-modules": "^3.2.0",
-    "prettier": "^2.8.8"
+    "happy-css-modules": "^3.2.0"
   },
   "keywords": [
     "gatsby"
@@ -31,7 +30,6 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop -H 0.0.0.0 -p 8000",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css}\"",
     "start": "gatsby develop -H 0.0.0.0 -p 8000",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
