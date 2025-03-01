@@ -1,14 +1,16 @@
+import { HandComponent, HandState, ManmanCsvData, TenpaiResult } from "../types/simulation";
+
 // CSVファイルに記載されているロス数の最大値
 const MAX_LOSS = 12;
 
 /**
  * 手牌と牌山から手牌パーツのプールを生成する関数
- * @param {string[]} wall 牌山（牌の文字列の配列）
- * @param {object} hand 手牌（sequenceCount, tripletCount, hasPair, singles）
- * @returns {Array} プールに追加された手牌要素の配列
+ * @param wall 牌山
+ * @param hand 手牌
+ * @returns プールに追加された手牌要素の配列
  */
-const generateHandComponentPool = (hand, wall) => {
-  const pool = [];
+const generateHandComponentPool = (hand: HandState, wall: string[]): HandComponent[] => {
+  const pool: HandComponent[] = [];
   // 順子
   for (let i = 0; i < hand.sequenceCount; i++) {
     const tiles = i === 0 ? ["1p", "2p", "3p"] : ["4p", "5p", "6p"];
@@ -51,15 +53,23 @@ const generateHandComponentPool = (hand, wall) => {
 /**
  * 全ての手牌を再帰的に列挙する
  * 再帰的にプールの手牌パーツを選択し、牌数が目標値になる手牌を results に追加する
- * @param {Array} pool プール
- * @param {number} index 現在の手牌パーツのインデックス
- * @param {Array} currentHand 現在の手牌
- * @param {number} currentTileCount 現在の牌数
- * @param {number} targetTileCount 目標の牌数
- * @param {string} tripletToConvert 変換対象の刻子
- * @param {Array} results 全ての手牌の配列
+ * @param pool プール
+ * @param index 現在の手牌パーツのインデックス
+ * @param currentHand 現在の手牌
+ * @param currentTileCount 現在の牌数
+ * @param targetTileCount 目標の牌数
+ * @param tripletToConvert 変換対象の刻子
+ * @param results 全ての手牌の配列
  */
-const enumerateAllHands = (pool, index, currentHand, currentTileCount, targetTileCount, tripletToConvert, results) => {
+const enumerateAllHands = (
+  pool: HandComponent[],
+  index: number,
+  currentHand: HandComponent[],
+  currentTileCount: number,
+  targetTileCount: number,
+  tripletToConvert: string,
+  results: HandComponent[][]
+): void => {
   if (currentTileCount === targetTileCount) {
     results.push([...currentHand]);
     return;
@@ -79,7 +89,7 @@ const enumerateAllHands = (pool, index, currentHand, currentTileCount, targetTil
   
   // 刻子を変換した対子の追加
   if (component.type === "triplet" && component.tiles[0] === tripletToConvert) {
-    const convertedPair = { type: "convertedPair", tiles: [tripletToConvert, tripletToConvert], tileCount: 2 };
+    const convertedPair: HandComponent = { type: "convertedPair", tiles: [tripletToConvert, tripletToConvert], tileCount: 2 };
     if (currentTileCount + convertedPair.tileCount <= targetTileCount) {
       currentHand.push(convertedPair);
       enumerateAllHands(pool, index + 1, currentHand, currentTileCount + convertedPair.tileCount, targetTileCount, tripletToConvert, results);
@@ -89,47 +99,53 @@ const enumerateAllHands = (pool, index, currentHand, currentTileCount, targetTil
 };
 
 /**
- * CSVマッチングで使用するキーとして、手牌に含まれる単体牌の数字のみを連結した文字列を返す
- * @param {Array} hand 手牌
- * @returns {string} 単体牌の数字のみを連結した文字列（例: "1234567"）
+ * CSVマッチング用のキーを、手牌パターンから生成する関数
+ * 単体牌の数字のみを連結した文字列を返す（例: "1234567"）
+ * @param hand 手牌
+ * @returns キー文字列
  */
-const getCsvKeyFromHand = (hand) => {
+const getCsvKeyFromHand = (hand: HandComponent[]): string => {
   const singles = hand.filter(item => item.type === "single");
   return singles.map(item => item.tiles[0].replace("s", "")).join("");
 };
 
 /**
- * 手牌パターンを生成し、重複排除して返す
- * @param {object} hand 手牌の状態
- * @param {Array} wall 牌山の状態
- * @param {number} maxHand 最大手牌枚数
- * @param {Object} csvData 聴牌系ごとのロスが記録されたCSVデータ
- * @returns {Array} 手牌パターンの配列
+ * 手牌と牌山をもとに最適な聴牌形を計算する関数
+ * @param current_hand 手牌の状態
+ * @param wall 牌山の状態
+ * @param maxHand 最大手牌枚数
+ * @param csvData 聴牌系ごとのロスが記録されたCSVデータ
+ * @returns 手牌パターンの配列
  */
-export const computeOptimalTenpais = (hand, wall, maxHand, csvData) => {
+export const computeOptimalTenpais = (
+  current_hand: HandState,
+  wall: string[],
+  maxHand: number,
+  csvData: ManmanCsvData
+): TenpaiResult[] => {
   if (!csvData || Object.keys(csvData).length === 0) return [];
   
-  const pool = generateHandComponentPool(hand, wall);
+  const pool = generateHandComponentPool(current_hand, wall);
   let tripletToConvert = "";
-  if (!hand.hasPair && hand.tripletCount > 0) {
-    if (hand.tripletCount === 1) {
+  if (!current_hand.hasPair && current_hand.tripletCount > 0) {
+    if (current_hand.tripletCount === 1) {
       tripletToConvert = "7p";
-    } else if (hand.tripletCount === 2) {
+    } else if (current_hand.tripletCount === 2) {
       tripletToConvert = "8p";
     }
   }
-  let allHands = [];
+  let allHands: HandComponent[][] = [];
   enumerateAllHands(pool, 0, [], 0, maxHand, tripletToConvert, allHands);
   
   // 単体牌が一致している手牌を重複排除する
-  const handPatternMap = {};
-  allHands.forEach(handPattern => {
-    const key = getCsvKeyFromHand(handPattern);
-    handPatternMap[key] = handPattern;
+  const allHandMap: { [key: string]: HandComponent[] } = {};
+  allHands.forEach(hand => {
+    const key = getCsvKeyFromHand(hand);
+    allHandMap[key] = hand;
   });
-  allHands = Object.values(handPatternMap);
+  allHands = Object.values(allHandMap);
   
-  const tenpais = [];
+  const tenpais: TenpaiResult[] = [];
   allHands.forEach(hand => {
     const csvKey = getCsvKeyFromHand(hand);
     const count = csvKey.length;
@@ -146,7 +162,7 @@ export const computeOptimalTenpais = (hand, wall, maxHand, csvData) => {
   });
   if (tenpais.length === 0) return tenpais;
   
-  let optimalTenpais = [];
+  let optimalTenpais: TenpaiResult[] = [];
   const minLoss = Math.min(...tenpais.map(r => r.loss));
   for (let loss = minLoss; loss <= MAX_LOSS; loss++) {
     const tempaisByLoss = tenpais.filter(tenpai => tenpai.loss === loss);

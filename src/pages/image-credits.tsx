@@ -4,8 +4,9 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import DynamicSVGText from "../components/dynamicSVGText"
 import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence"
+import { PageProps } from "gatsby"
 
-const ImageCreditsPage = () => (
+const ImageCreditsPage: React.FC<PageProps> = () => (
   <Layout>
     <h2><DynamicSVGText text={"引用元情報"} /></h2>
     <section style={{maxWidth: 680}}>
@@ -16,6 +17,6 @@ const ImageCreditsPage = () => (
   </Layout>
 )
 
-export const Head = () => <Seo title="引用元情報" />
+export const Head: React.FC = () => <Seo title="引用元情報" />
 
 export default ImageCreditsPage

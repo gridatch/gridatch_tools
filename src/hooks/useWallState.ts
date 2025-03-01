@@ -1,14 +1,21 @@
 import { useState } from "react";
 
-export const useWallState = (initialWall = []) => {
+export interface UseWallStateReturn {
+  wall: string[];
+  maxWall: number;
+  addTileToWall: (tile: string) => void;
+  removeTileFromWallAtIndex: (index: number) => void;
+}
+
+export const useWallState = (initialWall: string[] = []): UseWallStateReturn => {
   const [wall, setWall] = useState(initialWall);
   const MAX_WALL = 10;
   
-  const addTileToWall = (tile) => {
+  const addTileToWall = (tile: string) => {
     setWall((prev) => (prev.length < MAX_WALL ? [...prev, tile] : prev));
   };
   
-  const removeTileFromWallAtIndex = (index) => {
+  const removeTileFromWallAtIndex = (index: number) => {
     setWall((prev) => (prev.length === 0 ? prev : prev.toSpliced(index, 1)));
   };
   

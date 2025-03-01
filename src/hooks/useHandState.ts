@@ -1,11 +1,25 @@
 import { useState } from "react";
+import { HandState } from "../types/simulation";
 
-export const useHandState = (initialHand = { 
+export interface UseHandStateReturn {
+  hand: HandState;
+  maxHand: number;
+  addTileToHand: (tile: string) => void;
+  addSequenceToHand: () => void;
+  addTripletToHand: () => void;
+  addPairToHand: () => void;
+  removeTileFromHand: (tile: string) => void;
+  removeSequenceFromHand: () => void;
+  removeTripletFromHand: () => void;
+  removePairFromHand: () => void;
+}
+
+export const useHandState = (initialHand: HandState = { 
   sequenceCount: 0, 
   tripletCount: 0, 
   hasPair: false,
   singles: {} 
-}) => {
+}): UseHandStateReturn => {
   // 手牌は順子、刻子、ヘッド、単体牌（索子）に分類
   // 単体牌: { [tile]: count }（例："1s": 2）
   const [hand, setHand] = useState(initialHand);
@@ -19,7 +33,7 @@ export const useHandState = (initialHand = {
     return seqTileCount + tripTileCount + pairTileCount + singlesTileCount;
   };
   
-  const addTileToHand = (tile) => {
+  const addTileToHand = (tile: string) => {
     if (getTotalHandCount() + 1 > MAX_HAND) return;
     setHand((prev) => {
       const count = prev.singles[tile] || 0;
@@ -47,7 +61,7 @@ export const useHandState = (initialHand = {
     setHand((prev) => ({ ...prev, hasPair: true }));
   };
   
-  const removeTileFromHand = (tile) => {
+  const removeTileFromHand = (tile: string) => {
     setHand((prev) => {
       const count = prev.singles[tile] || 0;
       if (count <= 1) {

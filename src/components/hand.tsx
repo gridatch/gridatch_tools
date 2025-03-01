@@ -1,20 +1,41 @@
 import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/manman.module.css";
+import { HandState } from "../types/simulation";
 
-const Hand = ({
+interface HandProps {
+  hand: HandState;
+  addTileToHand: (tile: string) => void;
+  addSequenceToHand: () => void;
+  addTripletToHand: () => void;
+  addPairToHand: () => void;
+  removeTileFromHand: (tile: string) => void;
+  removeSequenceFromHand: () => void;
+  removeTripletFromHand: () => void;
+  removePairFromHand: () => void;
+  maxHand: number;
+}
+
+interface TileToRender {
+  key: string;
+  tile: string;
+  onClick: (() => void) | null;
+}
+
+const Hand: React.FC<HandProps> = ({
   hand,
+  maxHand,
   addTileToHand,
-  removeTileFromHand,
   addSequenceToHand,
   addTripletToHand,
   addPairToHand,
+  removeTileFromHand,
   removeSequenceFromHand,
   removeTripletFromHand,
-  removePairFromHand,
-  maxHand
+  removePairFromHand
 }) => {
-  const handTilesToRender = [];
+  const handTilesToRender: TileToRender[] = [];
+  
   // 順子の表示：1セット目は 1p,2p,3p; 2セット目は 4p,5p,6p
   for (let i = 0; i < hand.sequenceCount; i++) {
     if (i === 0) {
@@ -27,6 +48,7 @@ const Hand = ({
       handTilesToRender.push({ key: `seq1_3`, tile: "6p", onClick: removeSequenceFromHand });
     }
   }
+  
   // 刻子の表示：1セット目は 7p,7p,7p; 2セット目は 8p,8p,8p
   for (let i = 0; i < hand.tripletCount; i++) {
     if (i === 0) {
@@ -39,11 +61,13 @@ const Hand = ({
       handTilesToRender.push({ key: `trip1_3`, tile: "8p", onClick: removeTripletFromHand });
     }
   }
+  
   // 対子の表示：9p,9p
   if (hand.hasPair) {
     handTilesToRender.push({ key: `pair_1`, tile: "9p", onClick: removePairFromHand });
     handTilesToRender.push({ key: `pair_2`, tile: "9p", onClick: removePairFromHand });
   }
+  
   // 単体牌の表示（1s～9sの昇順）
   Object.keys(hand.singles)
     .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
@@ -57,6 +81,8 @@ const Hand = ({
         });
       }
     });
+  
+  // 空の表示
   while (handTilesToRender.length < maxHand) {
     handTilesToRender.push({
       key: `empty_${handTilesToRender.length}`,

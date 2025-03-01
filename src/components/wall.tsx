@@ -2,7 +2,14 @@ import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/manman.module.css";
 
-const Wall = ({ wall, addTileToWall, removeTileFromWallAtIndex, maxWall }) => {
+interface WallProps {
+  wall: string[];
+  addTileToWall: (tile: string) => void;
+  removeTileFromWallAtIndex: (index: number) => void;
+  maxWall: number;
+}
+
+const Wall: React.FC<WallProps> = ({ wall, addTileToWall, removeTileFromWallAtIndex, maxWall }) => {
   return (
     <section className={styles.wall_section}>
       <div>

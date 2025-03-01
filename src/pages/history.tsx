@@ -4,6 +4,7 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import DynamicSVGText from "../components/dynamicSVGText"
 import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence"
+import { PageProps } from "gatsby"
 
 const history = [
   {
@@ -20,7 +21,7 @@ const history = [
   },
 ];
 
-const ImageCreditsPage = () => (
+const ImageCreditsPage: React.FC<PageProps> = () => (
   <Layout>
     <h2 style={{marginBottom: "3rem"}}><DynamicSVGText text={"更新履歴"} /></h2>
     <div style={{width: "100%", display: "flex", flexDirection: "column-reverse", gap: "10px", alignItems: "center"}}>
@@ -40,6 +41,6 @@ const ImageCreditsPage = () => (
   </Layout>
 )
 
-export const Head = () => <Seo title="更新履歴" />
+export const Head: React.FC = () => <Seo title="更新履歴" />
 
 export default ImageCreditsPage

@@ -1,10 +1,16 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import sanitize from 'sanitize-filename';
 import parse from 'html-react-parser';
 import styles from './dynamicSVGText.module.css';
 
-const StaticSVGText = ({ text, className = '', height = '1.2em' }) => {
-  const [svgText, setSvgText] = useState(null);
+interface DynamicSVGTextProps {
+  text: string;
+  className?: string;
+  height?: string;
+}
+
+const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, className = '', height = '1.2em' }) => {
+  const [svgText, setSvgText] = useState<React.ReactNode | null>(null);
 
   useEffect(() => {
     const sanitizedText = sanitize(text);
@@ -20,19 +26,18 @@ const StaticSVGText = ({ text, className = '', height = '1.2em' }) => {
         if (!response.ok) return;
         const rawSVGText = await response.text();
 
-        // SVG テキストをパースして DOM オブジェクトに変換
+        // SVG テキストを DOM オブジェクトに変換
         const domParser = new DOMParser();
         const svgDoc = domParser.parseFromString(rawSVGText, 'image/svg+xml');
         const svgElement = svgDoc.documentElement;
 
-        // svg 要素に直接 height やその他の属性を設定
+        // svg 要素に直接 height, fill, class を設定
         svgElement.setAttribute('height', height);
-        svgElement.setAttribute('fill', 'currentColor');
         svgElement.setAttribute('fill', 'currentColor');
         svgElement.classList.add(styles.staticSVGText);
         if (className) svgElement.classList.add(className);
 
-        // 修正済みの svg 要素を文字列に変換して保存
+        // svg 要素をReact element に変換
         setSvgText(parse(svgElement.outerHTML));
       } catch (error) {
         console.error(`Failed to load SVG: ${src}`, error);
@@ -42,7 +47,7 @@ const StaticSVGText = ({ text, className = '', height = '1.2em' }) => {
     fetchSVG();
   }, [text, height, className]);
 
-  return svgText ? svgText : null;
+  return svgText || null;
 };
 
-export default StaticSVGText;
+export default DynamicSVGText;

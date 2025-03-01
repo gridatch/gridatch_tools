@@ -1,8 +1,14 @@
 import React from 'react';
 import DynamicSVGText from './dynamicSVGText';
 
-const DynamicSVGTextSequence = ({ text, className = '', height = '1em' }) => {
-  let items;
+interface DynamicSVGTextSequenceProps {
+  text: string | string[];
+  className?: string;
+  height?: string;
+}
+
+const DynamicSVGTextSequence: React.FC<DynamicSVGTextSequenceProps> = ({ text, className = '', height = '1em' }) => {
+  let items: string[];
 
   if (typeof text === 'string') {
     // 文字列の場合は1文字ずつに分解

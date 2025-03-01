@@ -2,7 +2,11 @@ import * as React from "react"
 import { Link } from "gatsby"
 import DynamicSVGText from "./dynamicSVGText"
 
-const Header = ({ siteTitle }) => (
+interface HeaderProps {
+  siteTitle: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ siteTitle }) => (
   <header
     style={{
       margin: `var(--size-gap) var(--size-gutter)`,

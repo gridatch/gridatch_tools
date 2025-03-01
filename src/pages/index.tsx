@@ -6,6 +6,7 @@ import Seo from "../components/seo"
 import styles from "./index.module.css"
 import DynamicSvgText from "../components/dynamicSVGText"
 import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence"
+import { PageProps } from "gatsby"
 
 const links = [
   {
@@ -30,7 +31,7 @@ const footerLinks = [
   },
 ];
 
-const IndexPage = () => (
+const IndexPage: React.FC<PageProps> = () => (
   <Layout>
     <div className={styles.textCenter}>
       <h1 style={{ marginBottom: "3rem" }}>
@@ -66,7 +67,7 @@ const IndexPage = () => (
       ))}
     </ul>
     <div className={styles.footerLinks}>
-      {footerLinks.map((link, i) => (
+      {footerLinks.map((link) => (
         <React.Fragment key={link.url}>
           <a href={`${link.url}`}><DynamicSvgText text={link.text} /></a>
         </React.Fragment>
@@ -80,6 +81,6 @@ const IndexPage = () => (
  *
  * See: https://www.gatsbyjs.com/docs/reference/built-in-components/gatsby-head/
  */
-export const Head = () => <Seo title="ツール一覧" />
+export const Head: React.FC = () => <Seo title="ツール一覧" />
 
 export default IndexPage

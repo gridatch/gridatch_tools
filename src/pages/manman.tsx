@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import styles from "./manman.module.css"
@@ -10,11 +10,13 @@ import Hand from "../components/hand";
 import Result from "../components/result";
 import { loadCsvData } from "../utils/csvLoader";
 import { computeOptimalTenpais } from "../utils/tenpaiSimulator";
+import { PageProps } from "gatsby";
+import { ManmanCsvData, TenpaiResult } from "../types/simulation";
 
 // CSVファイル名に対応する索子牌の枚数
 const ALLOWED_SINGLE_COUNTS = [6, 7, 9, 10, 12];
 
-const ManmanPage = () => {
+const ManmanPage: React.FC<PageProps> = () => {
   // 牌山の管理
   const { wall, addTileToWall, removeTileFromWallAtIndex, maxWall } = useWallState();
   const {
@@ -32,17 +34,17 @@ const ManmanPage = () => {
   
   // CSV読み込み
   // csvData の形式は { "[手牌の枚数]": { "[手牌]": { "loss": [ロス数], "hand": [手牌], "breakdown": [ロス内訳] } } }
-  const [csvData, setCsvData] = React.useState({});
-  React.useEffect(() => {
+  const [csvData, setCsvData] = useState<ManmanCsvData>({});
+  useEffect(() => {
     (async() => {
       const csvData = await loadCsvData(ALLOWED_SINGLE_COUNTS);
       setCsvData(csvData);
     })()
   }, []);  
   
-  const [optimalTenpais, setOptimalTenpais] = React.useState([]);
-  React.useEffect(() => {
-    setOptimalTenpais(computeOptimalTenpais(hand, wall, maxHand, csvData));
+  const [tenpaiResults, setTenpaiResults] = useState<TenpaiResult[]>([]);
+  useEffect(() => {
+    setTenpaiResults(computeOptimalTenpais(hand, wall, maxHand, csvData));
   }, [hand, wall, maxHand, csvData]);
 
   return (
@@ -63,12 +65,12 @@ const ManmanPage = () => {
             removePairFromHand={removePairFromHand}
             maxHand={maxHand}
           />
-          <Result optimalTenpais={optimalTenpais} />
+          <Result tenpaiResults={tenpaiResults} />
         </div>
       </div>
     </Layout>
   );
 };
 
-export const Head = () => <Seo title="万万シミュレーター" />;
+export const Head: React.FC = () => <Seo title="万万シミュレーター" />;
 export default ManmanPage;
