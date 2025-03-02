@@ -9,7 +9,7 @@ interface WallProps {
   maxWall: number;
 }
 
-const Wall: React.FC<WallProps> = ({ wall, addTileToWall, removeTileFromWallAtIndex, maxWall }) => {
+const WallSection: React.FC<WallProps> = ({ wall, addTileToWall, removeTileFromWallAtIndex, maxWall }) => {
   return (
     <section className={styles.wall_section}>
       <div>
@@ -60,4 +60,4 @@ const Wall: React.FC<WallProps> = ({ wall, addTileToWall, removeTileFromWallAtIn
   );
 };
 
-export default Wall;
+export default WallSection;

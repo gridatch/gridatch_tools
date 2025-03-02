@@ -22,7 +22,7 @@ interface TileToRender {
   onClick: (() => void) | null;
 }
 
-const Hand: React.FC<HandProps> = ({
+const HandSection: React.FC<HandProps> = ({
   hand,
   maxHand,
   addTileToHand,
@@ -137,4 +137,4 @@ const Hand: React.FC<HandProps> = ({
   );
 };
 
-export default Hand;
+export default HandSection;

@@ -8,7 +8,7 @@ interface ResultProps {
   tenpaiResults: TenpaiResult[];
 }
 
-const Result: React.FC<ResultProps> = ({ tenpaiResults }) => {
+const ResultSection: React.FC<ResultProps> = ({ tenpaiResults }) => {
   return (
     <section className={styles.result_section}>
       <div className={styles.area_title}>
@@ -49,4 +49,4 @@ const Result: React.FC<ResultProps> = ({ tenpaiResults }) => {
   );
 };
 
-export default Result;
+export default ResultSection;

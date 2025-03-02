@@ -5,9 +5,9 @@ import styles from "./manman.module.css"
 import DynamicSVGText from "../components/dynamicSVGText"
 import { useWallState } from "../hooks/useWallState";
 import { useHandState } from "../hooks/useHandState";
-import Wall from "../components/wall";
-import Hand from "../components/hand";
-import Result from "../components/result";
+import WallSection from "../components/wallSection";
+import HandSection from "../components/handSection";
+import ResultSection from "../components/resultSection";
 import { loadCsvData } from "../utils/csvLoader";
 import { computeOptimalTenpais } from "../utils/tenpaiSimulator";
 import { PageProps } from "gatsby";
@@ -52,8 +52,8 @@ const ManmanPage: React.FC<PageProps> = () => {
       <div className={styles.container}>
         <DynamicSVGText text={"万万シミュレーター"} />
         <div className={styles.contents}>
-          <Wall wall={wall} addTileToWall={addTileToWall} removeTileFromWallAtIndex={removeTileFromWallAtIndex} maxWall={maxWall} />
-          <Hand 
+          <WallSection wall={wall} addTileToWall={addTileToWall} removeTileFromWallAtIndex={removeTileFromWallAtIndex} maxWall={maxWall} />
+          <HandSection 
             hand={hand}
             addTileToHand={addTileToHand}
             removeTileFromHand={removeTileFromHand}
@@ -65,7 +65,7 @@ const ManmanPage: React.FC<PageProps> = () => {
             removePairFromHand={removePairFromHand}
             maxHand={maxHand}
           />
-          <Result tenpaiResults={tenpaiResults} />
+          <ResultSection tenpaiResults={tenpaiResults} />
         </div>
       </div>
     </Layout>
