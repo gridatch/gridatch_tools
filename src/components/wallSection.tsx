@@ -1,15 +1,16 @@
 import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/manman.module.css";
+import { Sozu, SOZU_TILES } from "../types/simulation";
 
-interface WallProps {
+interface WallSectionProps {
   wall: string[];
-  addTileToWall: (tile: string) => void;
-  removeTileFromWallAtIndex: (index: number) => void;
   maxWall: number;
+  addTileToWall: (tile: Sozu) => void;
+  removeTileFromWallAtIndex: (index: number) => void;
 }
 
-const WallSection: React.FC<WallProps> = ({ wall, addTileToWall, removeTileFromWallAtIndex, maxWall }) => {
+const WallSection: React.FC<WallSectionProps> = ({ wall, maxWall, addTileToWall, removeTileFromWallAtIndex }) => {
   return (
     <section className={styles.wall_section}>
       <div>
@@ -42,18 +43,15 @@ const WallSection: React.FC<WallProps> = ({ wall, addTileToWall, removeTileFromW
           <DynamicSVGText text={"牌選択ボタン"} />
         </div>
         <div id="wall_choices" className={`${styles.area} ${styles.tile_choices}`}>
-          {Array.from({ length: 9 }, (_, i) => {
-            const tile = `${i + 1}s`;
-            return (
-              <img
-                key={`wall_choice_${i}`}
-                className={styles.tile_choice}
-                src={`/tiles/${tile}.png`}
-                onClick={() => addTileToWall(tile)}
-                alt={tile}
-              />
-            );
-          })}
+          {SOZU_TILES.map(tile => (
+            <img
+              key={`wall_choice_${tile}`}
+              className={styles.tile_choice}
+              src={`/tiles/${tile}.png`}
+              onClick={() => addTileToWall(tile)}
+              alt={tile}
+            />
+          ))}
         </div>
       </div>
     </section>

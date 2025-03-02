@@ -1,17 +1,18 @@
 import { useState } from "react";
+import { Sozu } from "../types/simulation";
 
 export interface UseWallStateReturn {
-  wall: string[];
+  wall: Sozu[];
   maxWall: number;
-  addTileToWall: (tile: string) => void;
+  addTileToWall: (tile: Sozu) => void;
   removeTileFromWallAtIndex: (index: number) => void;
 }
 
-export const useWallState = (initialWall: string[] = []): UseWallStateReturn => {
+export const useWallState = (initialWall: Sozu[] = []): UseWallStateReturn => {
   const [wall, setWall] = useState(initialWall);
   const MAX_WALL = 10;
   
-  const addTileToWall = (tile: string) => {
+  const addTileToWall = (tile: Sozu) => {
     setWall((prev) => (prev.length < MAX_WALL ? [...prev, tile] : prev));
   };
   

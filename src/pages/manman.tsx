@@ -18,19 +18,8 @@ const ALLOWED_SINGLE_COUNTS = [6, 7, 9, 10, 12];
 
 const ManmanPage: React.FC<PageProps> = () => {
   // 牌山の管理
-  const { wall, addTileToWall, removeTileFromWallAtIndex, maxWall } = useWallState();
-  const {
-    hand,
-    addTileToHand,
-    addSequenceToHand,
-    addTripletToHand,
-    addPairToHand,
-    removeTileFromHand,
-    removeSequenceFromHand,
-    removeTripletFromHand,
-    removePairFromHand,
-    maxHand
-  } = useHandState();
+  const { wall, maxWall, addTileToWall, removeTileFromWallAtIndex } = useWallState();
+  const { handState, maxHand, addComponentToHand, removeComponentFromHand } = useHandState();
   
   // CSV読み込み
   // csvData の形式は { "[手牌の枚数]": { "[手牌]": { "loss": [ロス数], "hand": [手牌], "breakdown": [ロス内訳] } } }
@@ -44,28 +33,22 @@ const ManmanPage: React.FC<PageProps> = () => {
   
   const [tenpaiResults, setTenpaiResults] = useState<TenpaiResult[]>([]);
   useEffect(() => {
-    setTenpaiResults(computeOptimalTenpais(hand, wall, maxHand, csvData));
-  }, [hand, wall, maxHand, csvData]);
+    setTenpaiResults(computeOptimalTenpais(handState, wall, maxHand, csvData));
+  }, [handState, wall, maxHand, csvData]);
 
   return (
     <Layout>
       <div className={styles.container}>
         <DynamicSVGText text={"万万シミュレーター"} />
         <div className={styles.contents}>
-          <WallSection wall={wall} addTileToWall={addTileToWall} removeTileFromWallAtIndex={removeTileFromWallAtIndex} maxWall={maxWall} />
+          <WallSection wall={wall} maxWall={maxWall} addTileToWall={addTileToWall} removeTileFromWallAtIndex={removeTileFromWallAtIndex} />
           <HandSection 
-            hand={hand}
-            addTileToHand={addTileToHand}
-            removeTileFromHand={removeTileFromHand}
-            addSequenceToHand={addSequenceToHand}
-            addTripletToHand={addTripletToHand}
-            addPairToHand={addPairToHand}
-            removeSequenceFromHand={removeSequenceFromHand}
-            removeTripletFromHand={removeTripletFromHand}
-            removePairFromHand={removePairFromHand}
+            hand={handState}
             maxHand={maxHand}
+            addComponentToHand={addComponentToHand}
+            removeComponentFromHand={removeComponentFromHand}
           />
-          <ResultSection tenpaiResults={tenpaiResults} />
+          <ResultSection handState={handState} tenpaiResults={tenpaiResults} />
         </div>
       </div>
     </Layout>
