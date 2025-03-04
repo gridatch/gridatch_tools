@@ -19,6 +19,12 @@ const history = [
       "横長レイアウトに対応しました。"
     ]
   },
+  {
+    version: "2.0",
+    messages: [
+      "索子多面張シミュレーターリリース。"
+    ]
+  },
 ];
 
 const ImageCreditsPage: React.FC<PageProps> = () => (

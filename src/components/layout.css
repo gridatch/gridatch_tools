@@ -11,8 +11,8 @@
     "Courier New", monospace;
   --font-lg: font-size: clamp(2.4rem, calc(1.9rem + 0.625vw), 2.9rem);
   --font-md: clamp(1.5rem, calc(1.0rem + 0.625vw), 2.0rem);
-  --font-sm: clamp(1.1rem, calc(0.6rem + 0.625vw), 1.6rem);
-  --font-sx: clamp(0.9rem, calc(0.4rem + 0.625vw), 1.4rem);
+  --font-sm: clamp(1.3rem, calc(0.8rem + 0.625vw), 1.8rem);
+  --font-sx: clamp(1.1rem, calc(0.6rem + 0.625vw), 1.6rem);
   --line-height-loose: 1.75;
   --line-height-normal: 1.5;
   --line-height-dense: 1.1;

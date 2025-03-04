@@ -7,7 +7,7 @@ interface DynamicSVGTextSequenceProps {
   height?: string;
 }
 
-const DynamicSVGTextSequence: React.FC<DynamicSVGTextSequenceProps> = ({ text, className = '', height = '1em' }) => {
+const DynamicSVGTextSequence: React.FC<DynamicSVGTextSequenceProps> = ({ text, className = '', height = '1.2em' }) => {
   let items: string[];
 
   if (typeof text === 'string') {

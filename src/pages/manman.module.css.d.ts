@@ -15,6 +15,7 @@ declare const styles:
   & Readonly<{ "hand_tile": string }>
   & Readonly<{ "results": string }>
   & Readonly<{ "result": string }>
+  & Readonly<{ "breakdown_tile": string }>
   & Readonly<{ "tile_choices": string }>
   & Readonly<{ "tile_choice": string }>
   & Readonly<{ "other_color_choices": string }>

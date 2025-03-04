@@ -1,5 +1,4 @@
 import * as React from "react"
-import { StaticImage } from "gatsby-plugin-image"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
@@ -12,10 +11,21 @@ const links = [
   {
     text: "万万シミュレーター",
     url: "/manman",
+    image: "/tool_icons/mannin.png",
     descriptions:
       [
         "ラブラブ万万編成用の索子多面張を探すツールです。",
         "ロスする索子と萬子の枚数が少ない順に最終形を出力します。"
+      ],
+  },
+  {
+    text: "索子多面張シミュレーター",
+    url: "/sozu",
+    image: "/tool_icons/sozu.png",
+    descriptions:
+      [
+        "万象牌なしの索子多面張を探すツールです。",
+        "索子の待ち牌が多い順に最終形を出力します。"
       ],
   },
 ];
@@ -45,14 +55,10 @@ const IndexPage: React.FC<PageProps> = () => (
             className={styles.listItemLink}
             href={link.url}
           >
-            <StaticImage
-              src="../images/mannin.png"
-              width={64}
-              quality={95}
-              formats={["auto", "webp", "avif"]}
-              alt=""
-              objectFit="contain"
-              style={{ flexShrink: 0, marginRight: 10 }}
+            <img
+              src={link.image}
+              alt={link.text}
+              style={{ width: 64, objectFit: "contain", flexShrink: 0, marginRight: 10 }}
             />
             <div>
               <DynamicSvgText text={link.text} />

@@ -3,14 +3,12 @@ import { INITIAL_HAND, Hand, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, HandCo
 
 export interface UseHandStateReturn {
   handState: Hand;
-  maxHand: number;
   addComponentToHand: (component: HandComponent) => void;
   removeComponentFromHand: (component: HandComponent) => void;
 }
 
-export const useHandState = (initialHand: Hand = INITIAL_HAND): UseHandStateReturn => {
+export const useHandState = (maxHand: number, initialHand: Hand = INITIAL_HAND): UseHandStateReturn => {
   const [handState, setHandState] = useState(initialHand);
-  const MAX_HAND = 12;
   
   const getTotalHandCount = (hand: Hand) => {
     return HAND_COMPONENTS.reduce((sum, component) => sum + HAND_COMPONENTS_TILE_COUNT[component] * hand[component], 0);
@@ -19,7 +17,7 @@ export const useHandState = (initialHand: Hand = INITIAL_HAND): UseHandStateRetu
   const addComponentToHand = (component: HandComponent) => {
     const tileCount = HAND_COMPONENTS_TILE_COUNT[component];
     setHandState((prev) => {
-      if (getTotalHandCount(prev) + tileCount > MAX_HAND) return prev;
+      if (getTotalHandCount(prev) + tileCount > maxHand) return prev;
       
       if (PINZU_BLOCKS.some(block => block === component)) {
         if (handState.sequence + handState.triplet + handState.pair >= 2) return prev;
@@ -40,7 +38,6 @@ export const useHandState = (initialHand: Hand = INITIAL_HAND): UseHandStateRetu
   
   return { 
     handState,
-    maxHand: MAX_HAND,
     addComponentToHand,
     removeComponentFromHand,
   };

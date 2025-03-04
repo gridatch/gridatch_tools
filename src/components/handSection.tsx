@@ -73,7 +73,10 @@ const HandSection: React.FC<HandSectionProps> = ({
           <DynamicSVGText text={"手牌"} />
         </div>
         <div id="hand" className={`${styles.area} ${styles.hand}`}>
-          <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
+          {
+            maxHand === 12 &&
+            <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
+          }
           {handTilesToRender.map(item => (
             <img key={item.key} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} onClick={item.onClick ? item.onClick : undefined} alt={item.tile} />
           ))}

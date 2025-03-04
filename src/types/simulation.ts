@@ -29,9 +29,32 @@ export interface ManmanCsvData {
   };
 }
 
-export interface TenpaiResult {
+export interface SozuCsvRow {
+  totalWaits: number;
+  key: string;
+  waits: {
+    [key in Sozu]: number
+  };
+};
+
+export interface SozuCsvData {
+  [tileCount: string]: {
+    [key: string]: SozuCsvRow;
+  };
+}
+
+export interface ManmanTenpaiResult {
   loss: number;
   key: string;
   breakdown: string;
+  hand: Hand;
+}
+
+export interface SozuTenpaiResult {
+  totalWaits: number;
+  key: string;
+  waits: {
+    [key in Sozu]: number
+  };
   hand: Hand;
 }

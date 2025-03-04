@@ -76,11 +76,17 @@ section {
 }
 
 .results {
-  
+  font-size: var(--font-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .result {
-  
+}
+
+.breakdown_tile {
+  width: 5%;
 }
 
 .tile_choices {

@@ -1,4 +1,4 @@
-import { Hand, INITIAL_HAND, ManmanCsvData, Sozu, TenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES } from "../types/simulation";
+import { Hand, INITIAL_HAND, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult } from "../types/simulation";
 
 // CSVファイルに記載されているロス数の最大値
 const MAX_LOSS = 12;
@@ -93,12 +93,12 @@ const getCsvKeyFromHand = (hand: Hand): string => {
  * @param csvData 聴牌系ごとのロスが記録されたCSVデータ
  * @returns 手牌パターンの配列
  */
-export const computeOptimalTenpais = (
+export const computeOptimalManmanTenpais = (
   handState: Hand,
   wall: Sozu[],
   maxHand: number,
   csvData: ManmanCsvData
-): TenpaiResult[] => {
+): ManmanTenpaiResult[] => {
   if (!csvData || Object.keys(csvData).length === 0) return [];
   
   const pool = generateHandComponentPool(handState, wall);
@@ -114,7 +114,7 @@ export const computeOptimalTenpais = (
   });
   allHands = Object.values(allHandMap);
   
-  const tenpais: TenpaiResult[] = [];
+  const tenpais: ManmanTenpaiResult[] = [];
   allHands.forEach(hand => {
     const csvKey = getCsvKeyFromHand(hand);
     const sozuCountStr = csvKey.length.toString();
@@ -131,11 +131,67 @@ export const computeOptimalTenpais = (
   });
   if (tenpais.length === 0) return tenpais;
   
-  let optimalTenpais: TenpaiResult[] = [];
+  let optimalTenpais: ManmanTenpaiResult[] = [];
   const minLoss = Math.min(...tenpais.map(r => r.loss));
   for (let loss = minLoss; loss <= MAX_LOSS; loss++) {
     const tempaisByLoss = tenpais.filter(tenpai => tenpai.loss === loss);
     optimalTenpais = optimalTenpais.concat(tempaisByLoss);
+    if (optimalTenpais.length >= 10) break;
+  }
+  return optimalTenpais;
+};
+
+/**
+ * 手牌と牌山をもとに最適な聴牌形を計算する関数
+ * @param handState 手牌の状態
+ * @param wall 牌山の状態
+ * @param maxHand 最大手牌枚数
+ * @param csvData 聴牌系ごとの待ちが記録されたCSVデータ
+ * @returns 手牌パターンの配列
+ */
+export const computeOptimalSozuTenpais = (
+  handState: Hand,
+  wall: Sozu[],
+  maxHand: number,
+  csvData: SozuCsvData
+): SozuTenpaiResult[] => {
+  if (!csvData || Object.keys(csvData).length === 0) return [];
+  
+  const pool = generateHandComponentPool(handState, wall);
+  
+  let allHands: Hand[] = [];
+  enumerateAllHands(pool, 0, INITIAL_HAND, 0, maxHand, allHands);
+  
+  // 単体牌が一致している手牌を重複排除する
+  const allHandMap: { [key: string]: Hand } = {};
+  allHands.forEach(hand => {
+    const key = getCsvKeyFromHand(hand);
+    allHandMap[key] = hand;
+  });
+  allHands = Object.values(allHandMap);
+  
+  const tenpais: SozuTenpaiResult[] = [];
+  allHands.forEach(hand => {
+    const csvKey = getCsvKeyFromHand(hand);
+    const sozuCountStr = csvKey.length.toString();
+    if (!(sozuCountStr in csvData)) return;
+    const csvRow = csvData[sozuCountStr] && csvData[sozuCountStr][csvKey];
+    if (csvRow) {
+      tenpais.push({
+        totalWaits: csvRow.totalWaits,
+        key: csvRow.key,
+        waits: csvRow.waits,
+        hand
+      });
+    }
+  });
+  if (tenpais.length === 0) return tenpais;
+  
+  let optimalTenpais: SozuTenpaiResult[] = [];
+  const maxWaits = Math.max(...tenpais.map(r => r.totalWaits));
+  for (let waitCount = maxWaits; waitCount >= 1; --waitCount) {
+    const tempaisByWaitCount = tenpais.filter(tenpai => tenpai.totalWaits === waitCount);
+    optimalTenpais = optimalTenpais.concat(tempaisByWaitCount);
     if (optimalTenpais.length >= 10) break;
   }
   return optimalTenpais;
