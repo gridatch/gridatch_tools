@@ -1,4 +1,4 @@
-import { Hand, INITIAL_HAND, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult } from "../types/simulation";
+import { Hand, INITIAL_HAND, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult, SanmaTile, DoraBoss, RealmTiles } from "../types/simulation";
 
 // CSVファイルに記載されているロス数の最大値
 const MAX_LOSS = 12;
@@ -195,4 +195,19 @@ export const computeOptimalSozuTenpais = (
     if (optimalTenpais.length >= 10) break;
   }
   return optimalTenpais;
+};
+
+/**
+ * 領域牌の枚数を計算する
+ * @param doraBoss ドラ関連のボス（ステージ効果）
+ * @param doraIndicators ドラ表示牌
+ * @returns 各領域牌の枚数
+ */
+const calcRealmTiles = (doraBoss: DoraBoss | "empty", doraIndicators: SanmaTile[]): RealmTiles => {
+  const pool: Hand = { ...handState };
+  
+  wall.forEach(tile => {
+    if (pool[tile] < 4) ++pool[tile];
+  });
+  return pool;
 };
