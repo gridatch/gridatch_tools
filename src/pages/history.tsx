@@ -25,6 +25,12 @@ const history = [
       "索子多面張シミュレーターリリース。"
     ]
   },
+  {
+    version: "3.0",
+    messages: [
+      "領域牌シミュレーターリリース。"
+    ]
+  },
 ];
 
 const ImageCreditsPage: React.FC<PageProps> = () => (
