@@ -23,27 +23,24 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({ doraIndic
           <DynamicSVGText text={"ドラ表示牌"} />
         </div>
         <div className={`${styles.area} ${styles.dora_indicators}`}>
-          {
-            doraIndicators.map((doraIndicator, i) => (
+          {Array.from({ length: maxDoraIndicators }, (_, i) =>
+            i < doraIndicators.length ? (
               <img
                 key={`dora_indicator_${i}`}
                 className={styles.dora_indicator}
-                src={`/tiles/${doraIndicator}.png`}
+                src={`/tiles/${doraIndicators[i]}.png`}
                 onClick={() => removeDoraIndicatorAtIndex(i)}
-                alt={doraIndicator}
+                alt={doraIndicators[i]}
               />
-            ))
-          }
-          {
-            Array.from({ length: maxDoraIndicators - doraIndicators.length }).map((_, i) => (
+            ) : (
               <img
-                key={`empty_dora_indicator_${i}`}
+                key={`dora_indicator_${i}`}
                 className={styles.dora_indicator}
                 src={`/tiles/empty.png`}
                 alt={"empty"}
               />
-            ))
-          }
+            )
+          )}
         </div>
       </div>
       <div>
