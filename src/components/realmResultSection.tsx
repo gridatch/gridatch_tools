@@ -17,6 +17,9 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realm
   ];
   const RealmTileTypeCount = realmTileCounter.size;
   const RealmTileCount = [...realmTileCounter.values()].reduce((sum, count) => sum + count, 0);
+  const SozuRealmTileCount = [...realmTileCounter.entries()]
+    .filter(counter => SOZU_TILES.some(tile => tile === counter[0]))
+    .reduce((sum, counter) => sum + counter[1], 0);
   
   return (
     <section className={styles.realm_result_section}>
@@ -26,36 +29,43 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realm
           <DynamicSVGText text={"："} />
           <DynamicSVGTextSequence text={`${RealmTileTypeCount}種${RealmTileCount}枚`} />
         </div>
-        {doraBoss === "empty"
-        ? <div className={`${styles.area} ${styles.realm_result_empty}`}>
-            <DynamicSVGText text={"ステージ効果を設定してください。"} />
-            <DynamicSVGText text={"※ドラ無効の事故防止で必須にしています。"} />
+        <div className={`${styles.area} ${styles.realm_result}`}>
+          <div className={styles.realm_result_warn}>
+            { doraBoss === "empty"
+            ? <>
+                <DynamicSVGText text={"ステージ効果を設定してください。"} />
+                <DynamicSVGText text={"※ドラ無効の事故防止で必須にしています。"} />
+              </>
+            : SozuRealmTileCount === 0 &&
+              <>
+                <DynamicSVGText text={"※索子の領域牌がありません！"} />
+                <DynamicSVGText text={"※索子の育成は索子多面張で！"} />
+              </>
+            }
           </div>
-        : <div className={`${styles.area} ${styles.realm_result}`}>
-            {tileGroups.map((group, groupIndex) => (
-              <React.Fragment key={`group-${groupIndex}`}>
-                {group.map(tile => {
-                  const is_realm = realmTileCounter.has(tile);
-                  const visibility = is_realm ? "visible" : "hidden";
-                  const tileCount = is_realm ? realmTileCounter.get(tile) : "";
-                  return (
-                    <div key={`dora_indicator_choice_${tile}`} className={styles.realm_tile_wrapper} style={{ visibility: visibility }}>
-                      <img
-                        src={`/tiles/${tile}.png`}
-                        alt={tile}
-                      />
-                      <span className={styles.realm_tile_count}>
-                        <DynamicSVGText text={"×"} />
-                        <DynamicSVGText text={`${tileCount}`} />
-                      </span>
-                    </div>
-                  );
-                })}
-                {groupIndex < tileGroups.length - 1 && <div style={{ width: "100%" }} />}
-              </React.Fragment>
-            ))}
-          </div>
-        }
+          {tileGroups.map((group, groupIndex) => (
+            <React.Fragment key={`group-${groupIndex}`}>
+              {group.map(tile => {
+                const is_realm = realmTileCounter.has(tile);
+                const visibility = is_realm ? "visible" : "hidden";
+                const tileCount = is_realm ? realmTileCounter.get(tile) : "";
+                return (
+                  <div key={`dora_indicator_choice_${tile}`} className={styles.realm_tile_wrapper} style={{ visibility: visibility }}>
+                    <img
+                      src={`/tiles/${tile}.png`}
+                      alt={tile}
+                    />
+                    <span className={styles.realm_tile_count}>
+                      <DynamicSVGText text={"×"} />
+                      <DynamicSVGText text={`${tileCount}`} />
+                    </span>
+                  </div>
+                );
+              })}
+              {groupIndex < tileGroups.length - 1 && <div style={{ width: "100%" }} />}
+            </React.Fragment>
+          ))}
+        </div>
       </div>
     </section>
   );

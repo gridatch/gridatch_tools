@@ -94,17 +94,25 @@ section {
 }
 
 .realm_result {
+  position: relative;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   flex-wrap: wrap;
 }
 
-.realm_result_empty {
+.realm_result_warn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: var(--color-primary);
 }
 
 .realm_tile_wrapper {

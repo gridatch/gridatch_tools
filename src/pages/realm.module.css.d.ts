@@ -16,7 +16,7 @@ declare const styles:
   & Readonly<{ "dora_indicator_choices": string }>
   & Readonly<{ "dora_indicator_choice": string }>
   & Readonly<{ "realm_result": string }>
-  & Readonly<{ "realm_result_empty": string }>
+  & Readonly<{ "realm_result_warn": string }>
   & Readonly<{ "realm_tile_wrapper": string }>
   & Readonly<{ "realm_tile_count": string }>
 ;
