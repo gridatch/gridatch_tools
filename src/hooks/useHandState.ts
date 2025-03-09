@@ -5,6 +5,7 @@ export interface UseHandStateReturn {
   handState: Hand;
   addComponentToHand: (component: HandComponent) => void;
   removeComponentFromHand: (component: HandComponent) => void;
+  clearHand: () => void;
 }
 
 export const useHandState = (maxHand: number, initialHand: Hand = INITIAL_HAND): UseHandStateReturn => {
@@ -36,9 +37,9 @@ export const useHandState = (maxHand: number, initialHand: Hand = INITIAL_HAND):
     });
   };
   
-  return { 
-    handState,
-    addComponentToHand,
-    removeComponentFromHand,
+  const clearHand = () => {
+    setHandState(INITIAL_HAND);
   };
+  
+  return { handState, addComponentToHand, removeComponentFromHand, clearHand };
 };

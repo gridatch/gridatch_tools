@@ -19,9 +19,13 @@ const MAX_WALL = 10;
 const MAX_HAND = 13;
 
 const SozuPage: React.FC<PageProps> = () => {
-  // 牌山の管理
-  const { wall, addTileToWall, removeTileFromWallAtIndex } = useWallState(MAX_WALL);
-  const { handState, addComponentToHand, removeComponentFromHand } = useHandState(MAX_HAND);
+  const { wall, addTileToWall, removeTileFromWallAtIndex, clearWall } = useWallState(MAX_WALL);
+  const { handState, addComponentToHand, removeComponentFromHand, clearHand } = useHandState(MAX_HAND);
+
+  const clearAll = () => {
+    clearWall();
+    clearHand();
+  }
   
   // CSV読み込み
   // csvData の形式は { "[手牌の枚数]": { "[手牌]": { "loss": [待ち牌数], "hand": [手牌], "breakdown": [待ち内訳] } } }
@@ -50,7 +54,7 @@ const SozuPage: React.FC<PageProps> = () => {
             addComponentToHand={addComponentToHand}
             removeComponentFromHand={removeComponentFromHand}
           />
-          <SozuResultSection handState={handState} tenpaiResults={tenpaiResults} />
+          <SozuResultSection handState={handState} tenpaiResults={tenpaiResults} clearAll={clearAll} />
         </div>
       </div>
     </Layout>

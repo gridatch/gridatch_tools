@@ -3,20 +3,20 @@ import DynamicSVGText from "./dynamicSVGText";
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
 import styles from "../pages/manman.module.css";
 import { Hand, SOZU_TILES, SozuTenpaiResult } from "../types/simulation";
+import ClearButton from "./clearButton";
 
 interface ResultSectionProps {
   handState: Hand;
   tenpaiResults: SozuTenpaiResult[];
+  clearAll: () => void;
 }
 
-const SozuResultSection: React.FC<ResultSectionProps> = ({ handState, tenpaiResults }) => {
+const SozuResultSection: React.FC<ResultSectionProps> = ({ handState, tenpaiResults, clearAll }) => {
   return (
     <section className={styles.result_section}>
-      <div className={styles.area_title}>
+      <div className={styles.area_title} style={{position: "relative"}}>
         <DynamicSVGText text={"最終形"} />
-        <span style={{ fontSize: "var(--font-sx)" }}>
-          <DynamicSVGText text={"※10件以上の時は省略"} />
-        </span>
+        <ClearButton onClick={clearAll} style={{ marginTop: "-5px" }} />
       </div>
       <div id="results" className={`${styles.area} ${styles.results}`}>
         {

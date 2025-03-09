@@ -13,7 +13,12 @@ import RealmResultSection from "../components/realmResultSection";
 
 const RealmPage: React.FC<PageProps> = () => {
   const [doraBoss, setDoraBoss] = useState<DoraBoss>("empty");
-  const { doraIndicators, maxDoraIndicators, addDoraIndicator, removeDoraIndicatorAtIndex } = useDoraIndicatorsState(doraBoss);
+  const { doraIndicators, maxDoraIndicators, addDoraIndicator, removeDoraIndicatorAtIndex, clearDoraIndicator } = useDoraIndicatorsState(doraBoss);
+
+  const clearAll = () => {
+    setDoraBoss("empty");
+    clearDoraIndicator();
+  }
   
   const [realmTileCounter, setRealmTileCounter] = useState<Map<SanmaTile, number>>(new Map<SanmaTile, number>());
   useEffect(() => {
@@ -32,7 +37,7 @@ const RealmPage: React.FC<PageProps> = () => {
             addDoraIndicator={addDoraIndicator}
             removeDoraIndicatorAtIndex={removeDoraIndicatorAtIndex}
           />
-          <RealmResultSection doraBoss={doraBoss} realmTileCounter={realmTileCounter} />
+          <RealmResultSection doraBoss={doraBoss} realmTileCounter={realmTileCounter} clearAll={clearAll} />
         </div>
       </div>
     </Layout>

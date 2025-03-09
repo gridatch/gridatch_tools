@@ -3,13 +3,15 @@ import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm.module.css";
 import { PINZU_TILES, SOZU_TILES, SANMA_MANZU_TILES, WIND_TILES, DRAGON_TILES, SanmaTile, DoraBoss } from "../types/simulation";
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
+import ClearButton from "./clearButton";
 
 interface RealmResultSectionProps {
   doraBoss: DoraBoss;
   realmTileCounter: Map<SanmaTile, number>;
+  clearAll: () => void;
 }
 
-const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realmTileCounter }) => {
+const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realmTileCounter, clearAll }) => {
   const tileGroups: SanmaTile[][] = [
     [...PINZU_TILES],
     [...SOZU_TILES],
@@ -24,10 +26,13 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realm
   return (
     <section className={styles.realm_result_section}>
       <div>
-        <div className={styles.area_title}>
-          <DynamicSVGText text={"領域牌"} />
-          <DynamicSVGText text={"："} />
-          <DynamicSVGTextSequence text={`${RealmTileTypeCount}種${RealmTileCount}枚`} />
+        <div className={styles.area_title} style={{position: "relative"}}>
+          <span>
+            <DynamicSVGText text={"領域牌"} />
+            <DynamicSVGText text={"："} />
+            <DynamicSVGTextSequence text={`${RealmTileTypeCount}種${RealmTileCount}枚`} />
+          </span>
+          <ClearButton onClick={clearAll} height="1.5em" style={{ marginTop: "-5px" }} />
         </div>
         <div className={`${styles.area} ${styles.realm_result}`}>
           <div className={styles.realm_result_warn}>

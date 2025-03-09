@@ -8,6 +8,7 @@ export interface UseDoraIndicatorsStateReturn {
   maxDoraIndicators: number;
   addDoraIndicator: (tile: SanmaTile) => void;
   removeDoraIndicatorAtIndex: (index: number) => void;
+  clearDoraIndicator: () => void;
 }
 
 export const useDoraIndicatorsState = (doraBoss: DoraBoss, initialDoraIndicators: SanmaTile[] = []): UseDoraIndicatorsStateReturn => {
@@ -25,6 +26,10 @@ export const useDoraIndicatorsState = (doraBoss: DoraBoss, initialDoraIndicators
   const removeDoraIndicatorAtIndex = (index: number) => {
     setDoraIndicators((prev) => (prev.length === 0 ? prev : prev.toSpliced(index, 1)));
   };
+    
+  const clearDoraIndicator = () => {
+    setDoraIndicators([]);
+  };
   
-  return { doraIndicators, maxDoraIndicators, addDoraIndicator, removeDoraIndicatorAtIndex };
+  return { doraIndicators, maxDoraIndicators, addDoraIndicator, removeDoraIndicatorAtIndex, clearDoraIndicator };
 };

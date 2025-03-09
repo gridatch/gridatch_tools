@@ -5,6 +5,7 @@ export interface UseWallStateReturn {
   wall: Sozu[];
   addTileToWall: (tile: Sozu) => void;
   removeTileFromWallAtIndex: (index: number) => void;
+  clearWall: () => void;
 }
 
 export const useWallState = (maxWall: number, initialWall: Sozu[] = []): UseWallStateReturn => {
@@ -18,5 +19,9 @@ export const useWallState = (maxWall: number, initialWall: Sozu[] = []): UseWall
     setWall((prev) => (prev.length === 0 ? prev : prev.toSpliced(index, 1)));
   };
   
-  return { wall, addTileToWall, removeTileFromWallAtIndex };
+  const clearWall = () => {
+    setWall([]);
+  };
+  
+  return { wall, addTileToWall, removeTileFromWallAtIndex, clearWall };
 };

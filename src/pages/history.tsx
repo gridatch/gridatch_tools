@@ -31,6 +31,12 @@ const history = [
       "領域牌シミュレーターリリース。"
     ]
   },
+  {
+    version: "3.1",
+    messages: [
+      "各シミュレーターにリセットボタンを追加しました。"
+    ]
+  },
 ];
 
 const ImageCreditsPage: React.FC<PageProps> = () => (
