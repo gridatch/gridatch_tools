@@ -5,8 +5,6 @@
   "version": "3.1.0",
   "author": "gridatch",
   "dependencies": {
-    "@eslint/compat": "^1.2.7",
-    "browserify-fs": "^1.0.0",
     "gatsby": "^5.14.1",
     "gatsby-plugin-image": "^3.14.0",
     "gatsby-plugin-manifest": "^5.14.0",
@@ -22,6 +20,7 @@
     "sanitize-filename": "^1.6.3"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.7",
     "@types/node": "^22.13.5",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
