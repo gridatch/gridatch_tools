@@ -17,8 +17,8 @@ declare const styles:
   & Readonly<{ "dora_indicator_choice": string }>
   & Readonly<{ "realm_result": string }>
   & Readonly<{ "realm_result_warn": string }>
-  & Readonly<{ "realm_tile_wrapper": string }>
-  & Readonly<{ "realm_tile_count": string }>
+  & Readonly<{ "tile_counter": string }>
+  & Readonly<{ "tile_counter_text": string }>
 ;
 export default styles;
 //# sourceMappingURL=./realm.module.css.d.ts.map

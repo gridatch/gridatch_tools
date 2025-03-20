@@ -28,7 +28,7 @@ const RealmPage: React.FC<PageProps> = () => {
   return (
     <Layout>
       <div className={styles.container}>
-        <DynamicSVGText text={"領域牌シミュレーター"} />
+        <DynamicSVGText text={"領域牌表示ツール"} />
         <div className={styles.contents}>
           <DoraBossSection doraBoss={doraBoss} setDoraBoss={setDoraBoss} />
           <DoraIndicatorsSection
@@ -44,5 +44,5 @@ const RealmPage: React.FC<PageProps> = () => {
   );
 };
 
-export const Head: React.FC = () => <Seo title="領域牌シミュレーター" />;
+export const Head: React.FC = () => <Seo title="領域牌表示ツール" />;
 export default RealmPage;

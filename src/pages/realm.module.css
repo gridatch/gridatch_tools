@@ -115,14 +115,14 @@ section {
   color: var(--color-primary);
 }
 
-.realm_tile_wrapper {
+.tile_counter {
   width: calc(100% / 9 - 1%);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.realm_tile_count {
+.tile_counter_text {
   display: flex;
   flex-direction: row;
   align-items: center;

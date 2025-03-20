@@ -55,7 +55,7 @@ const ClearButton: React.FC<ClearButtonProps> = ({ width = "2em", height = "2em"
             padding: 0,
             border: "2px solid var(--color-text)",
             borderRadius: "3px",
-            backgroundColor: "var(--color-bg)",
+            backgroundColor: "var(--color-button-bg)",
             cursor: "pointer",
             fontSize: "inherit",
           },

@@ -1,7 +1,7 @@
 import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm.module.css";
-import { PINZU_TILES, SOZU_TILES, SANMA_MANZU_TILES, WIND_TILES, DRAGON_TILES, SanmaTile, DoraBoss } from "../types/simulation";
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, DoraBoss } from "../types/simulation";
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
 import ClearButton from "./clearButton";
 
@@ -15,7 +15,7 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realm
   const tileGroups: SanmaTile[][] = [
     [...PINZU_TILES],
     [...SOZU_TILES],
-    [...SANMA_MANZU_TILES, ...WIND_TILES, ...DRAGON_TILES],
+    [...NON_SEQUENTIAL_TILES],
   ];
   const RealmTileTypeCount = realmTileCounter.size;
   const RealmTileCount = [...realmTileCounter.values()].reduce((sum, count) => sum + count, 0);
@@ -55,12 +55,12 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realm
                 const visibility = is_realm ? "visible" : "hidden";
                 const tileCount = is_realm ? realmTileCounter.get(tile) : "";
                 return (
-                  <div key={`dora_indicator_choice_${tile}`} className={styles.realm_tile_wrapper} style={{ visibility: visibility }}>
+                  <div key={`dora_indicator_choice_${tile}`} className={styles.tile_counter} style={{ visibility: visibility }}>
                     <img
                       src={`/tiles/${tile}.png`}
                       alt={tile}
                     />
-                    <span className={styles.realm_tile_count}>
+                    <span className={styles.tile_counter_text}>
                       <DynamicSVGText text={"×"} />
                       <DynamicSVGText text={`${tileCount}`} />
                     </span>

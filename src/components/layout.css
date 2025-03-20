@@ -2,9 +2,10 @@
   --border-radius: 4px;
   --color-text: #887c60;
   --color-primary: #9B111E;
+  --color-secondary: #1313B3;
   --color-bg: #FEF7E5;
   --color-section-bg: #fffbf5;
-  --color-code: blue;
+  --color-button-bg: #faf0d6;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
@@ -33,6 +34,9 @@ html {
   font-size: 62.5%;
   line-height: var(--line-height-normal);
   overflow-y: scroll;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -moz-touch-callout: none;
 }
 body {
   -moz-osx-font-smoothing: grayscale;

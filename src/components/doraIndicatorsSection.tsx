@@ -1,7 +1,7 @@
 import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm.module.css";
-import { SanmaTile, PINZU_TILES, SOZU_TILES, SANMA_MANZU_TILES, WIND_TILES, DRAGON_TILES } from "../types/simulation";
+import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "../types/simulation";
 
 interface DoraIndicatorsSectionProps {
   doraIndicators: SanmaTile[];
@@ -14,7 +14,7 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({ doraIndic
   const tileGroups: SanmaTile[][] = [
     [...PINZU_TILES],
     [...SOZU_TILES],
-    [...SANMA_MANZU_TILES, ...WIND_TILES, ...DRAGON_TILES],
+    [...NON_SEQUENTIAL_TILES],
   ];
   return (
     <section className={styles.dora_indicators_section}>

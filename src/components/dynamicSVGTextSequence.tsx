@@ -22,11 +22,11 @@ const DynamicSVGTextSequence: React.FC<DynamicSVGTextSequenceProps> = ({ text, c
   }
 
   return (
-    <span>
+    <>
       {items.map((item, index) => (
         <DynamicSVGText key={index} text={item} className={className} height={height} />
       ))}
-    </span>
+    </>
   );
 };
 

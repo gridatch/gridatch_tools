@@ -1,0 +1,57 @@
+declare const styles:
+  & Readonly<{ "container": string }>
+  & Readonly<{ "container": string }>
+  & Readonly<{ "contents": string }>
+  & Readonly<{ "contents": string }>
+  & Readonly<{ "confirmed_section": string }>
+  & Readonly<{ "dora_boss_section": string }>
+  & Readonly<{ "dora_indicators_section": string }>
+  & Readonly<{ "wall_section": string }>
+  & Readonly<{ "hand_section": string }>
+  & Readonly<{ "realm_result_section": string }>
+  & Readonly<{ "area_title": string }>
+  & Readonly<{ "area": string }>
+  & Readonly<{ "not_realm": string }>
+  & Readonly<{ "tile_counter": string }>
+  & Readonly<{ "tile_counter_realm": string }>
+  & Readonly<{ "tile_counter_image": string }>
+  & Readonly<{ "tile_counter_text": string }>
+  & Readonly<{ "sold_out": string }>
+  & Readonly<{ "sold_out_text": string }>
+  & Readonly<{ "confirmed_dora": string }>
+  & Readonly<{ "confirmed_dora_indicators": string }>
+  & Readonly<{ "confirmed_dora_indicator": string }>
+  & Readonly<{ "confirmed_wall": string }>
+  & Readonly<{ "confirmed_wall_tile": string }>
+  & Readonly<{ "dora_boss": string }>
+  & Readonly<{ "dora_boss_image": string }>
+  & Readonly<{ "dora_boss_choices": string }>
+  & Readonly<{ "dora_indicators": string }>
+  & Readonly<{ "dora_indicator": string }>
+  & Readonly<{ "dora_indicator_choices": string }>
+  & Readonly<{ "dora_indicator_choice": string }>
+  & Readonly<{ "realm_wall": string }>
+  & Readonly<{ "realm_wall_tile": string }>
+  & Readonly<{ "realm_wall_tile_choices": string }>
+  & Readonly<{ "realm_warn_wrapper": string }>
+  & Readonly<{ "realm_warn": string }>
+  & Readonly<{ "hand": string }>
+  & Readonly<{ "under_hand_line": string }>
+  & Readonly<{ "hand_tile_counter": string }>
+  & Readonly<{ "hand_tile_counter_text": string }>
+  & Readonly<{ "result_tile_counter_text_spacing": string }>
+  & Readonly<{ "hand_tile_pending_icon_wrapper": string }>
+  & Readonly<{ "hand_tile_pending_icon": string }>
+  & Readonly<{ "hand_tile_pending_icon_draw": string }>
+  & Readonly<{ "hand_tile_pending_icon_discard": string }>
+  & Readonly<{ "hand_tile_pending": string }>
+  & Readonly<{ "draw_choices": string }>
+  & Readonly<{ "realm_results": string }>
+  & Readonly<{ "realm_result": string }>
+  & Readonly<{ "result_non_realm_tile": string }>
+  & Readonly<{ "realm_result_hand": string }>
+  & Readonly<{ "result_tile_counter": string }>
+  & Readonly<{ "result_tile_counter_text": string }>
+;
+export default styles;
+//# sourceMappingURL=./realm-plus.module.css.d.ts.map
