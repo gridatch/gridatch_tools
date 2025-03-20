@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { SanmaTile, WallTile } from "../types/simulation";
 
 const MAX_WALL = 30;
@@ -10,7 +10,7 @@ export interface useRealmWallStateReturn {
   removeTileFromWallAtIndex: (index: number) => void;
   clearWall: () => void;
   wallConfirmed: boolean;
-  setWallConfirmed: (wallConfirmed: boolean) => void;
+  setWallConfirmed: Dispatch<SetStateAction<boolean>>;
 }
 
 export const useRealmWallState = (
@@ -44,6 +44,7 @@ export const useRealmWallState = (
     
   const clearWall = () => {
     setWall(initialWall);
+    setWallConfirmed(false);
   };
   
   return {

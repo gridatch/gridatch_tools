@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
 import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES } from "../types/simulation";
@@ -12,7 +12,7 @@ interface RealmWallSectionProps {
   removeTileFromWallAtIndex: (index: number) => void;
   doraIndicatorsConfirmed: boolean;
   wallConfirmed: boolean;
-  setWallConfirmed: (wallConfirmed: boolean) => void;
+  setWallConfirmed: Dispatch<SetStateAction<boolean>>;
 }
 
 const RealmWallSection: React.FC<RealmWallSectionProps> = ({

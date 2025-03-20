@@ -55,8 +55,8 @@ const RealmPage: React.FC<PageProps> = () => {
   } = useRealmHandState(isRealmEachTile, remainingTiles);
 
   const clearAll = () => {
-    // TODO:
     setDoraBoss("empty");
+    setDoraBossConfirmed(false);
     clearDoraIndicator();
     clearWall();
     clearHandState();
@@ -73,7 +73,11 @@ const RealmPage: React.FC<PageProps> = () => {
   const [realmWinsByTenpaiTurns, setRealmWinsByTenpaiTurns] = useState<number[]>([]);
   const [nonRealmWinsByTenpaiTurnsPerSozu, setNonRealmWinsByTenpaiTurnsPerSozu] = useState<Record<Sozu, number>[]>([]);
   useEffect(() => {
-    if (!wallConfirmed) return;
+    if (!wallConfirmed) {
+      setRealmWinsByTenpaiTurns([]);
+      setNonRealmWinsByTenpaiTurnsPerSozu([]);
+      return;
+    }
     setRealmWinsByTenpaiTurns(calcRealmWinsByTenpaiTurns(wall, maxWall, isRealmEachTile));
     setNonRealmWinsByTenpaiTurnsPerSozu(calcNonRealmWinsByTenpaiTurnsPerSozu(wall, maxWall, isRealmEachTile));
   }, [isRealmEachTile, maxWall, wall, wallConfirmed])
@@ -81,9 +85,11 @@ const RealmPage: React.FC<PageProps> = () => {
   const [result, setResult] = useState<RealmTenpaiResult[] | null>(null);
   const [drawTurnsByTile, setDrawTurnsByTile] = useState<Record<SanmaTile, number[]>>(structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY));
   useEffect(() => {
-    if (!wallConfirmed) return;
-    if (realmWinsByTenpaiTurns.length === 0) return;
-    if (nonRealmWinsByTenpaiTurnsPerSozu.length === 0) return;
+    if (!wallConfirmed || realmWinsByTenpaiTurns.length === 0 || nonRealmWinsByTenpaiTurnsPerSozu.length === 0) {
+      setResult(null);
+      setDrawTurnsByTile(structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY));
+      return;
+    }
     setResult(calcRealmTenpai(isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu));
     setDrawTurnsByTile(calcDrawTurnsByTiles(handState, wall));
   }, [wallConfirmed, isDrawPhase, isRealmEachTile, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu])
@@ -101,6 +107,7 @@ const RealmPage: React.FC<PageProps> = () => {
             isRealmEachTile={isRealmEachTile}
             wall={wall}
             wallConfirmed={wallConfirmed}
+            clearAll={clearAll}
           />
           <DoraBossSectionPlus doraBoss={doraBoss} setDoraBoss={setDoraBoss} doraBossConfirmed={doraBossConfirmed} setDoraBossConfirmed={setDoraBossConfirmed} />
           <DoraIndicatorsSectionPlus
@@ -139,7 +146,6 @@ const RealmPage: React.FC<PageProps> = () => {
           <RealmResultSectionPlus
             results={result}
             drawTurnsByTile={drawTurnsByTile}
-            clearAll={clearAll}
           />
         </div>
       </div>

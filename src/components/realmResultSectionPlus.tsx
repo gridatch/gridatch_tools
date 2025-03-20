@@ -7,18 +7,16 @@ import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
 interface RealmResultSectionProps {
   results: RealmTenpaiResult[] | null;
   drawTurnsByTile: Record<SanmaTile, number[]>;
-  clearAll: () => void;
 }
 
-const RealmResultSectionPlus: React.FC<RealmResultSectionProps> = ({ results, drawTurnsByTile, clearAll }) => {
+const RealmResultSectionPlus: React.FC<RealmResultSectionProps> = ({ results, drawTurnsByTile }) => {
   if (!results) return;
   return (
     <section className={styles.realm_result_section}>
-      <div className={styles.area_title} style={{position: "relative"}}>
+      <div className={styles.area_title}>
         <span>
           <DynamicSVGText text={"最終形"} />
         </span>
-        {/* <ClearButton onClick={clearAll} height="1.5em" style={{ marginTop: "-5px" }} /> */}
       </div>
       <div className={`${styles.area} ${styles.realm_results}`}>
         {

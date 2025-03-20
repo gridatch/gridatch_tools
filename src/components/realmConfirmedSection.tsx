@@ -2,6 +2,7 @@ import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
 import { DoraBoss, SanmaTile, WallTile } from "../types/simulation";
+import ClearButton from "./clearButton";
 
 interface RealmConfirmedSectionProps {
   doraBoss: DoraBoss;
@@ -11,6 +12,7 @@ interface RealmConfirmedSectionProps {
   isRealmEachTile: Record<SanmaTile, boolean>;
   wall: WallTile[];
   wallConfirmed: boolean;
+  clearAll: () => void;
 }
 
 const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
@@ -21,13 +23,15 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
   isRealmEachTile,
   wall,
   wallConfirmed,
+  clearAll,
 }) => {
   if (!doraBossConfirmed) return;
   return (
     <section className={styles.confirmed_section}>
       <div>
-        <div className={styles.area_title}>
+        <div className={styles.area_title} style={{position: "relative"}}>
           <DynamicSVGText text={"場の状態"} />
+          <ClearButton onClick={clearAll} style={{ marginTop: "-5px" }} />
         </div>
         <div className={`${styles.area} ${styles.confirmed_dora}`}>
           <img

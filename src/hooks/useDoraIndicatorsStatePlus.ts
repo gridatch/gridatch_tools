@@ -28,17 +28,16 @@ export const useDoraIndicatorsState = (
   
   const addDoraIndicator = (tile: SanmaTile) => {
     if (remainingTiles[tile] === 0) return;
-    // setRemainingTiles((prev) => ({ ...prev, [tile]: prev[tile] - 1 }));
     setDoraIndicators((prev) => (prev.length < maxDoraIndicators ? [...prev, tile] : prev));
   };
   
   const removeDoraIndicatorAtIndex = (index: number) => {
-    // setRemainingTiles((prev) => ({ ...prev, [doraIndicators[index]]: prev[doraIndicators[index]] + 1 }));
     setDoraIndicators((prev) => (prev.length === 0 ? prev : prev.toSpliced(index, 1)));
   };
     
   const clearDoraIndicator = () => {
     setDoraIndicators([]);
+    setDoraIndicatorsConfirmed(false);
   };
   
   return {
