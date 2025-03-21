@@ -90,9 +90,9 @@ const RealmPage: React.FC<PageProps> = () => {
       setDrawTurnsByTile(structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY));
       return;
     }
-    setResult(calcRealmTenpai(isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu));
+    setResult(calcRealmTenpai(isDrawPhase, isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu));
     setDrawTurnsByTile(calcDrawTurnsByTiles(handState, wall));
-  }, [wallConfirmed, isDrawPhase, isRealmEachTile, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu])
+  }, [isRealmEachTile, wall, wallConfirmed, nonRealmWinsByTenpaiTurnsPerSozu, realmWinsByTenpaiTurns, isDrawPhase, handState])
 
   return (
     <Layout>

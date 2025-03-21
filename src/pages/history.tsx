@@ -43,6 +43,12 @@ const history = [
       "領域和了シミュレーターリリース。"
     ]
   },
+  {
+    version: "4.1",
+    messages: [
+      "領域和了シミュレーターが想定より高速だったため、ツモ候補や打牌候補を操作するたびに最終形を更新するよう改善しました。"
+    ]
+  },
 ];
 
 const ImageCreditsPage: React.FC<PageProps> = () => (

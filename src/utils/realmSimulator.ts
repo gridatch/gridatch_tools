@@ -438,6 +438,7 @@ function createKokushiTenpai(pool: Record<SanmaTile, number>, nonRealmWinsPerSoz
 /**
  * 各聴牌形（面子手、七対子、国士無双）で索子待ちの聴牌をする最も早い巡目と聴牌時の手牌を計算する
  * 純粋な索子待ちのみを結果に含める
+ * @param isDrawPhase ツモフェーズ or 打牌フェーズ
  * @param isRealmEachTile 各牌が領域牌かどうか
  * @param handState 手牌の状態
  * @param wall 牌山
@@ -445,6 +446,7 @@ function createKokushiTenpai(pool: Record<SanmaTile, number>, nonRealmWinsPerSoz
  * @returns 各聴牌形で索子待ちの聴牌をする最も早い巡目と聴牌時の手牌。聴牌しない場合は正の無限大の巡目と空の手牌を設定する。
  */
 export const calcRealmTenpai = (
+  isDrawPhase: boolean,
   isRealmEachTile: Record<SanmaTile, boolean>,
   handState: HandState,
   wall: WallTile[],
@@ -453,7 +455,9 @@ export const calcRealmTenpai = (
 ): RealmTenpaiResult[] => {
   const pool: Record<SanmaTile, number> = { ...SANMA_TILE_RECORD_0 };
   for (const tile of SANMA_TILES) {
-    pool[tile] = isRealmEachTile[tile] ? handState[tile].length : 0;
+    // ツモフェーズ時はツモ候補を牌プールに含める
+    // 打牌フェーズ時は打牌候補を牌プールから除外する
+    pool[tile] = isRealmEachTile[tile] ? handState[tile].filter(status => isDrawPhase ? true : status === "confirmed").length : 0;
   }
   
   const standardResult: RealmTenpaiResult = {
