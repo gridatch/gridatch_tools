@@ -128,23 +128,27 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
           ))}
         </div>
       </div>
-      <div style={{ display: "flex" }}>
-        <button
-          style={{
-            height: "2.5em",
-            border: "2px solid var(--color-text)",
-            borderRadius: "3px",
-            backgroundColor: "var(--color-button-bg)",
-            padding: "0 1em",
-            cursor: "pointer",
-            marginLeft: "auto",
-            color: "var(--color-text)",
-            visibility: confirmButtonVisible ? "visible" : "hidden",
-          }}
-          onClick={isDrawPhase ? confirmDraw : confirmDiscard}
-        >
-          <DynamicSVGText text={isDrawPhase ? "ツモ牌決定" : "捨て牌決定"} height="1.5em" />
-        </button>
+      <div style={{ position: "relative" }}>
+        <div style={{ position: "absolute", inset: 0, height: "100px", display: "flex", justifyContent: "flex-end" }}>
+          <div className={styles.toggle_phase_button_wrapper} >
+            <button
+              style={{
+                height: "2.5em",
+                border: "2px solid var(--color-text)",
+                borderRadius: "3px",
+                backgroundColor: "var(--color-button-bg)",
+                padding: "0 1em",
+                cursor: "pointer",
+                marginLeft: "auto",
+                color: "var(--color-text)",
+                visibility: confirmButtonVisible ? "visible" : "hidden",
+              }}
+              onClick={isDrawPhase ? confirmDraw : confirmDiscard}
+            >
+              <DynamicSVGText text={isDrawPhase ? "ツモ牌決定" : "捨て牌決定"} height="1.5em" />
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );

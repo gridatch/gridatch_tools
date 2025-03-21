@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { SanmaTile, WallTile } from "../types/simulation";
 
-const MAX_WALL = 30;
+const MAX_WALL = 36;
 
 export interface useRealmWallStateReturn {
   wall: WallTile[];

@@ -30,7 +30,9 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
     <section className={styles.confirmed_section}>
       <div>
         <div className={styles.area_title} style={{position: "relative"}}>
-          <DynamicSVGText text={"場の状態"} />
+          <span style={{position: "absolute"}}>
+            <DynamicSVGText text={"場"} />
+          </span>
           <ClearButton onClick={clearAll} style={{ marginTop: "-5px" }} />
         </div>
         <div className={`${styles.area} ${styles.confirmed_dora}`}>
@@ -57,9 +59,6 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
             const isNotRealm = wall[i] !== "empty" && wall[i] !== "closed" && !isRealmEachTile[wall[i]];
             return (
               <React.Fragment key={`wall_${i}`}>
-                {
-                  i % 10 === 0 && i !== 0 && <div style={{ width: "100%" }}></div>
-                }
                 {
                   wall[i] !== "empty" && (
                     <img

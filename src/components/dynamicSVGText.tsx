@@ -46,7 +46,7 @@ const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, className = '', h
 
         svgElement.setAttribute('height', height);
         svgElement.setAttribute('fill', 'currentColor');
-        svgElement.classList.add(styles.staticSVGText);
+        svgElement.classList.add(styles.dynamicSVGText);
         if (className) {
           // 空白区切りのクラスを個別に追加
           const classes = className.split(/\s+/).filter(Boolean);

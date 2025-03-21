@@ -92,7 +92,7 @@ section {
 }
 
 .confirmed_dora {
-  padding-inline: 5%;
+  padding-inline: 15%;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -105,11 +105,11 @@ section {
 }
 
 .confirmed_dora_indicator {
-  width: calc(100% / 15);
+  width: calc(100% / 12);
 }
 
 .confirmed_wall {
-  padding-inline: 5%;
+  padding-inline: 15%;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -118,7 +118,7 @@ section {
 }
 
 .confirmed_wall_tile {
-  width: calc(100% / 10);
+  width: calc(100% / 9);
 }
 
 .dora_boss {
@@ -161,6 +161,7 @@ section {
 }
 
 .realm_wall {
+  padding-inline: 5%;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -169,7 +170,7 @@ section {
 }
 
 .realm_wall_tile {
-  width: calc(100% / 10);
+  width: calc(100% / 9);
 }
 
 .realm_wall_tile_choices {
@@ -198,6 +199,10 @@ section {
   color: var(--color-primary);
   z-index: 1;
   filter: drop-shadow(0 0 5px var(--color-section-bg)) drop-shadow(0 0 5px var(--color-section-bg)) drop-shadow(0 0 5px var(--color-section-bg));
+}
+
+.hand_section {
+  border-bottom-right-radius: 0;
 }
 
 .hand {
@@ -270,6 +275,31 @@ section {
   flex-direction: row;
   justify-content: space-between;
   flex-wrap: wrap;
+}
+
+.toggle_phase_button_wrapper {
+  position: relative;
+  margin-inline: -10px;
+  margin-top: 10px;
+  margin-bottom: auto;
+  padding-inline: 10px;
+  padding-bottom: 10px;
+  border-radius: 0 0 10px 10px;
+  background-color: var(--color-section-bg);
+  box-shadow: rgba(136, 124, 96, 0.16) 0px 1px 4px;
+}
+
+.toggle_phase_button_wrapper::before {
+  position: absolute;
+  top: -5px;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: 5px;
+  background-color: var(--color-section-bg);
+  display: block;
+  content: "";
+  z-index: 1;
 }
 
 .realm_results {

@@ -35,6 +35,7 @@ declare const styles:
   & Readonly<{ "realm_wall_tile_choices": string }>
   & Readonly<{ "realm_warn_wrapper": string }>
   & Readonly<{ "realm_warn": string }>
+  & Readonly<{ "hand_section": string }>
   & Readonly<{ "hand": string }>
   & Readonly<{ "under_hand_line": string }>
   & Readonly<{ "hand_tile_counter": string }>
@@ -46,6 +47,8 @@ declare const styles:
   & Readonly<{ "hand_tile_pending_icon_discard": string }>
   & Readonly<{ "hand_tile_pending": string }>
   & Readonly<{ "draw_choices": string }>
+  & Readonly<{ "toggle_phase_button_wrapper": string }>
+  & Readonly<{ "toggle_phase_button_wrapper": string }>
   & Readonly<{ "realm_results": string }>
   & Readonly<{ "realm_result": string }>
   & Readonly<{ "result_non_realm_tile": string }>

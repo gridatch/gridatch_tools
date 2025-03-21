@@ -50,9 +50,6 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
             return (
               <React.Fragment key={`wall_${i}`}>
                 {
-                  i % 10 === 0 && i !== 0 && <div style={{ width: "100%" }}></div>
-                }
-                {
                   tile === "empty" ? (
                     <img
                       className={styles.realm_wall_tile}
