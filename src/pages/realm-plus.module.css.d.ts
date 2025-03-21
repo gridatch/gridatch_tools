@@ -47,8 +47,13 @@ declare const styles:
   & Readonly<{ "hand_tile_pending_icon_discard": string }>
   & Readonly<{ "hand_tile_pending": string }>
   & Readonly<{ "draw_choices": string }>
-  & Readonly<{ "toggle_phase_button_wrapper": string }>
-  & Readonly<{ "toggle_phase_button_wrapper": string }>
+  & Readonly<{ "toggle_phase_button_wrapper_landscape": string }>
+  & Readonly<{ "toggle_phase_button_wrapper_portrait_relative": string }>
+  & Readonly<{ "toggle_phase_button_wrapper_landscape": string }>
+  & Readonly<{ "toggle_phase_button_wrapper_portrait_relative": string }>
+  & Readonly<{ "toggle_phase_button_wrapper_portrait_absolute": string }>
+  & Readonly<{ "toggle_phase_button_portrait_background": string }>
+  & Readonly<{ "toggle_phase_button_portrait_background": string }>
   & Readonly<{ "realm_results": string }>
   & Readonly<{ "realm_result": string }>
   & Readonly<{ "result_non_realm_tile": string }>

@@ -111,14 +111,7 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
           <div style={{ display: "flex" }}>
             <button
               style={{
-                height: "2.5em",
-                border: "2px solid var(--color-text)",
-                borderRadius: "3px",
-                backgroundColor: "var(--color-button-bg)",
-                padding: "0 1em",
-                cursor: "pointer",
                 marginLeft: "auto",
-                color: "var(--color-text)",
                 visibility: wall.some(tile => tile == "empty") ? "hidden" : "visible",
               }}
               onClick={() => setWallConfirmed(true)}

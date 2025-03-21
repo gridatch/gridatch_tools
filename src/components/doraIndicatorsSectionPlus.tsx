@@ -87,14 +87,7 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
       <div style={{ display: "flex" }}>
         <button
           style={{
-            height: "2.5em",
-            border: "2px solid var(--color-text)",
-            borderRadius: "3px",
-            backgroundColor: "var(--color-button-bg)",
-            padding: "0 1em",
-            cursor: "pointer",
             marginLeft: "auto",
-            color: "var(--color-text)",
             visibility: doraIndicators.length === maxDoraIndicators ? "visible" : "hidden",
           }}
           onClick={() => setDoraIndicatorsConfirmed(true)}

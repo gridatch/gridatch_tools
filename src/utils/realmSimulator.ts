@@ -321,8 +321,6 @@ function createStandardTenpai(pool: Record<SanmaTile, number>, nonRealmWinsPerSo
       totalNonRealmWins,
       nonRealmWinsPerTiles: result.nonRealmWinsPerTiles,
     }
-    console.table(blockCombination);
-    console.table(tenpai.hand);
     if (tenpai.totalNonRealmWins > bestTenpai.totalNonRealmWins) {
       bestTenpai = tenpai;
     }

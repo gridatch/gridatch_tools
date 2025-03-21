@@ -78,10 +78,15 @@ a:hover {
   outline-width: 0;
   text-decoration: none;
 }
-abbr[title] {
-  border-bottom: 1px dotted hsla(0, 0%, 0%, 0.5);
-  cursor: help;
-  text-decoration: none;
+button {
+  margin-left: auto;
+  padding: 0 1em;
+  height: 2.5em;
+  border: 2px solid var(--color-text);
+  border-radius: 3px;
+  background-color: var(--color-button-bg);
+  cursor: pointer;
+  color: var(--color-text);
 }
 b,
 strong {

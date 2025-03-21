@@ -9,7 +9,7 @@
 
 @media screen and (orientation: landscape) {
   .container {
-    max-width: calc(100vh * 1.1);
+    max-width: calc(100vh * 1.0);
   }
 }
 
@@ -46,7 +46,7 @@ section {
 
 @media screen and (orientation: landscape) {
   section {
-    max-width: calc(100vh * 0.75);
+    max-width: calc(100vh * 0.5);
   }
 }
 
@@ -277,29 +277,57 @@ section {
   flex-wrap: wrap;
 }
 
-.toggle_phase_button_wrapper {
-  position: relative;
-  margin-inline: -10px;
-  margin-top: 10px;
-  margin-bottom: auto;
-  padding-inline: 10px;
-  padding-bottom: 10px;
-  border-radius: 0 0 10px 10px;
-  background-color: var(--color-section-bg);
-  box-shadow: rgba(136, 124, 96, 0.16) 0px 1px 4px;
+@media screen and (orientation: landscape) {
+  .toggle_phase_button_wrapper_landscape {
+    display: flex;
+  }
+
+  .toggle_phase_button_wrapper_portrait_relative {
+    display: none;
+  }
 }
 
-.toggle_phase_button_wrapper::before {
-  position: absolute;
-  top: -5px;
-  bottom: 0;
-  right: 0;
-  width: 100%;
-  height: 5px;
-  background-color: var(--color-section-bg);
-  display: block;
-  content: "";
-  z-index: 1;
+@media screen and (orientation: portrait) {
+  .toggle_phase_button_wrapper_landscape {
+    display: none;
+  }
+
+  .toggle_phase_button_wrapper_portrait_relative {
+    position: relative;
+  }
+
+  .toggle_phase_button_wrapper_portrait_absolute {
+    position: absolute;
+    inset: 0;
+    height: 100px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .toggle_phase_button_portrait_background {
+    position: relative;
+    margin-inline: -10px;
+    margin-top: 10px;
+    margin-bottom: auto;
+    padding-inline: 10px;
+    padding-bottom: 10px;
+    border-radius: 0 0 10px 10px;
+    background-color: var(--color-section-bg);
+    box-shadow: rgba(136, 124, 96, 0.16) 0px 1px 4px;
+  }
+
+  .toggle_phase_button_portrait_background::before {
+    position: absolute;
+    top: -5px;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 5px;
+    background-color: var(--color-section-bg);
+    display: block;
+    content: "";
+    z-index: 1;
+  }
 }
 
 .realm_results {
