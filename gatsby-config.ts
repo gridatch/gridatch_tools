@@ -29,7 +29,7 @@ module.exports = {
       resolve: `gatsby-plugin-manifest`,
       options: {
         name: `わがつまだっちのツール`,
-        short_name: `だっちのツール`,
+        short_name: `わがつまだっち`,
         start_url: `/`,
         background_color: `#fef7e5`,
         // This will impact how browsers show your PWA/website
@@ -38,6 +38,7 @@ module.exports = {
         display: `standalone`,
         icon: `src/images/icon.png`, // This path is relative to the root of the site.
         orientation: `portrait`,
+        legacy: false, // this will not add apple-touch-icon links to <head>
       },
     },
     {
