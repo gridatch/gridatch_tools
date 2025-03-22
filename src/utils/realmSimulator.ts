@@ -48,7 +48,7 @@ export const calcRealmTiles = (doraBoss: DoraBoss, doraIndicators: SanmaTile[]):
  * 全ての牌について領域牌かどうかを判定する
  * @param doraBoss ドラ関連のボス（ステージ効果）
  * @param doraIndicators ドラ表示牌
- * @returns 各牌が領域牌かどうかの連想配列
+ * @returns 各牌が領域牌かどうか
  */
 export const calcIsRealmEachTile = (doraBoss: DoraBoss, doraIndicators: SanmaTile[]): Record<SanmaTile, boolean> => {
   const isRealmEachTile = { ...SANMA_TILE_RECORD_FALSE };
@@ -116,6 +116,12 @@ export const calcRemainingTiles = (
   return remainingTiles;
 };
 
+/**
+ * 各牌を引く巡目を計算する（手牌にある牌は0巡目）
+ * @param handState 手牌
+ * @param wall 牌山
+ * @returns 各牌を引く巡目
+ */
 export const calcDrawTurnsByTiles = (handState: HandState, wall: WallTile[]): Record<SanmaTile, number[]> => {
   const result = structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
   for (const tile of SANMA_TILES) {
@@ -155,11 +161,11 @@ export const calcRealmWinsByTenpaiTurns = (wall: WallTile[], maxWall: number, is
 };
 
 /**
- * 聴牌巡目ごとの各索子牌の非領域の和了回数を計算する
+ * 聴牌巡目ごとの各索子牌による非領域の和了回数を計算する
  * @param wall 牌山
  * @param maxWall 牌山の最大枚数
  * @param isRealmEachTile 各牌が領域牌かどうか
- * @returns 聴牌巡目ごとの各索子牌の非領域の和了回数
+ * @returns 聴牌巡目ごとの各索子牌による非領域の和了回数
  */
 export const calcNonRealmWinsByTenpaiTurnsPerSozu = (wall: WallTile[], maxWall: number, isRealmEachTile: Record<SanmaTile, boolean>): Record<Sozu, number>[] => {
   // 最終巡目の聴牌は0和了確定
