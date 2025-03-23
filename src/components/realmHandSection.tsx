@@ -62,10 +62,10 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
           <DynamicSVGText text={"手牌"} />
           <DynamicSVGText text={isDrawPhase ? "（ツモ牌選択中）" : "（捨て牌選択中）"} />
           <button onClick={undo} disabled={!canUndo} >
-            <DynamicSVGText text="1手戻す" height="1.5em" />
+            <DynamicSVGText text="1手戻す" height="1.1em" />
           </button>
           <button onClick={redo} disabled={!canRedo} >
-            <DynamicSVGText text="1手進む" height="1.5em" />
+            <DynamicSVGText text="1手進む" height="1.1em" />
           </button>
         </div>
         <div className={`${styles.area} ${styles.hand}`}>
@@ -152,7 +152,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
           }}
           onClick={isDrawPhase ? confirmDraw : confirmDiscard}
         >
-          <DynamicSVGText text={isDrawPhase ? "ツモ牌決定" : "捨て牌決定"} height="1.5em" />
+          <DynamicSVGText text={isDrawPhase ? "ツモ牌決定" : "捨て牌決定"} height="1.2em" />
         </button>
       </div>
       <div className={styles.toggle_phase_button_wrapper_portrait_relative}>
@@ -165,7 +165,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
               }}
               onClick={isDrawPhase ? confirmDraw : confirmDiscard}
             >
-              <DynamicSVGText text={isDrawPhase ? "ツモ牌決定" : "捨て牌決定"} height="1.5em" />
+              <DynamicSVGText text={isDrawPhase ? "ツモ牌決定" : "捨て牌決定"} height="1.2em" />
             </button>
           </div>
         </div>

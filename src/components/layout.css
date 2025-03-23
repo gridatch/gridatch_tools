@@ -82,12 +82,13 @@ a:hover {
 }
 button {
   padding: 0 1em;
-  height: 2.5em;
+  height: 2.0em;
   border: 2px solid var(--color-text);
   border-radius: 3px;
   background-color: var(--color-button-bg);
   cursor: pointer;
   color: var(--color-text);
+  font-size: inherit;
 }
 button:disabled {
   border-color: var(--color-disabled-text);

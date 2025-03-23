@@ -1,4 +1,10 @@
 
+@media screen and (orientation: landscape) {
+  html {
+    font-size: 1vh;
+  }
+}
+
 .container {
   display: flex;
   flex-direction: column;

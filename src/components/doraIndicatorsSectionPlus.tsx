@@ -101,7 +101,7 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
           }}
           onClick={() => setDoraIndicatorsConfirmed(true)}
         >
-          <DynamicSVGText text={confirmButtonText} height="1.5em" />
+          <DynamicSVGText text={confirmButtonText} height="1.2em" />
         </button>
       </div>
     </section>

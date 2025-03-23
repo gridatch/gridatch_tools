@@ -62,7 +62,7 @@ const DoraBossSection: React.FC<DoraBossSectionProps> = ({ isEditing, doraBoss, 
           }}
           onClick={() => setDoraBossConfirmed(true)}
         >
-          <DynamicSVGText text={confirmButtonText} height="1.5em" />
+          <DynamicSVGText text={confirmButtonText} height="1.2em" />
         </button>
       </div>
     </section>
