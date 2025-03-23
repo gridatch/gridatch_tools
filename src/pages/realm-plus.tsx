@@ -186,6 +186,7 @@ const RealmPage: React.FC<PageProps> = () => {
             isDrawPhase={isDrawPhase}
             handState={handState}
             maxHand={maxHand}
+            drawTurnsByTile={drawTurnsByTile}
             draw={draw}
             cancelDraw={cancelDraw}
             confirmDraw={confirmDraw}

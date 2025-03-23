@@ -246,14 +246,18 @@ section.editing {
   position: absolute;
   top: 100%;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  justify-content: flex-start;
   align-items: center;
+  white-space: nowrap;
 }
 
 .result_tile_counter_text_spacing {
   margin-top: 2px;
   visibility: hidden;
   display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
   font-size: var(--font-sm);
 }
 
