@@ -5,6 +5,8 @@ import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SAN
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
 
 interface RealmWallSectionProps {
+  isEditing: boolean;
+  setIsEditing: Dispatch<SetStateAction<boolean>>;
   wall: WallTile[];
   isRealmEachTile: Record<SanmaTile, boolean>;
   remainingTiles: Record<SanmaTile, number>;
@@ -16,6 +18,8 @@ interface RealmWallSectionProps {
 }
 
 const RealmWallSection: React.FC<RealmWallSectionProps> = ({
+  isEditing,
+  setIsEditing,
   wall,
   isRealmEachTile,
   remainingTiles,
@@ -38,9 +42,16 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
     [...NON_SEQUENTIAL_TILES],
     ["closed"],
   ];
+  const confirmButtonText = isEditing ? "修正" : "決定";
   return (
-    <section className={styles.wall_section}>
-      <div>
+    <section className={`${styles.wall_section} ${isEditing && styles.editing}`}>
+      <div style={{position: "relative"}}>
+        {
+          isEditing && 
+          <div className={styles.editingTextWrapper}>
+            <DynamicSVGText text={"修正中"} />  
+          </div>
+        }
         <div className={styles.area_title}>
           <DynamicSVGText text={"牌山"} />
         </div>
@@ -114,9 +125,12 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
                 marginLeft: "auto",
                 visibility: wall.some(tile => tile == "empty") ? "hidden" : "visible",
               }}
-              onClick={() => setWallConfirmed(true)}
+              onClick={() => {
+                setWallConfirmed(true);
+                setIsEditing(false);
+              }}
             >
-              <DynamicSVGText text="決定" height="1.5em" />
+              <DynamicSVGText text={confirmButtonText} height="1.5em" />
             </button>
           </div>
         </div>

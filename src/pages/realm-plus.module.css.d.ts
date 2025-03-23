@@ -9,8 +9,10 @@ declare const styles:
   & Readonly<{ "wall_section": string }>
   & Readonly<{ "hand_section": string }>
   & Readonly<{ "realm_result_section": string }>
+  & Readonly<{ "editing": string }>
   & Readonly<{ "area_title": string }>
   & Readonly<{ "area": string }>
+  & Readonly<{ "editingTextWrapper": string }>
   & Readonly<{ "not_realm": string }>
   & Readonly<{ "tile_counter": string }>
   & Readonly<{ "tile_counter_realm": string }>

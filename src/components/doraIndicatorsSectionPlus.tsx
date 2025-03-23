@@ -1,9 +1,10 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
 import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "../types/simulation";
 
 interface DoraIndicatorsSectionProps {
+  isEditing: boolean;
   doraIndicators: SanmaTile[];
   remainingTiles: Record<SanmaTile, number>;
   maxDoraIndicators: number;
@@ -11,10 +12,11 @@ interface DoraIndicatorsSectionProps {
   removeDoraIndicatorAtIndex: (index: number) => void;
   doraBossConfirmed: boolean;
   doraIndicatorsConfirmed: boolean;
-  setDoraIndicatorsConfirmed: (doraIndicatorsConfirmed: boolean) => void;
+  setDoraIndicatorsConfirmed: Dispatch<SetStateAction<boolean>>;
 }
 
 const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
+  isEditing,
   doraIndicators,
   remainingTiles,
   maxDoraIndicators,
@@ -31,9 +33,16 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
     [...SOZU_TILES],
     [...NON_SEQUENTIAL_TILES],
   ];
+  const confirmButtonText = isEditing ? "修正" : "決定";
   return (
-    <section className={styles.dora_indicators_section}>
-      <div>
+    <section className={`${styles.dora_indicators_section} ${isEditing && styles.editing}`}>
+      <div style={{position: "relative"}}>
+        {
+          isEditing && 
+          <div className={styles.editingTextWrapper}>
+            <DynamicSVGText text={"修正中"} />  
+          </div>
+        }
         <div className={styles.area_title}>
           <DynamicSVGText text={"ドラ表示牌"} />
         </div>
@@ -92,7 +101,7 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
           }}
           onClick={() => setDoraIndicatorsConfirmed(true)}
         >
-          <DynamicSVGText text="決定" height="1.5em" />
+          <DynamicSVGText text={confirmButtonText} height="1.5em" />
         </button>
       </div>
     </section>

@@ -1,19 +1,19 @@
 import React, { useState, useEffect, ButtonHTMLAttributes } from "react";
 import parse from "html-react-parser";
 
-interface ClearButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface EditButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   width?: string;
   height?: string;
 }
 
-const ClearButton: React.FC<ClearButtonProps> = ({ width = "10%", height = "10%", style, ...props }) => {
+const EditButton: React.FC<EditButtonProps> = ({ width = "10%", height = "10%", style, ...props }) => {
   const [baseSvg, setBaseSvg] = useState<string | null>(null);
   const [svgContent, setSvgContent] = useState<React.ReactNode | null>(null);
   const SVG_COLOR = "var(--color-text)";
 
   useEffect(() => {
     const fetchSvg = async () => {
-      const src = "/ui_icons/clear.svg";
+      const src = "/ui_icons/edit.svg";
       try {
         const response = await fetch(src);
         const data = await response.text();
@@ -33,8 +33,9 @@ const ClearButton: React.FC<ClearButtonProps> = ({ width = "10%", height = "10%"
       const svgElement = svgDoc.documentElement;
       if (svgElement) {
         svgElement.setAttribute("fill", SVG_COLOR);
-        svgElement.setAttribute("height", "100%");
-        svgElement.setAttribute("width", "100%");
+        svgElement.setAttribute("height", "80%");
+        svgElement.setAttribute("width", "80%");
+        svgElement.style.margin = "10%";
         setSvgContent(parse(svgElement.outerHTML));
       }
     }
@@ -44,7 +45,7 @@ const ClearButton: React.FC<ClearButtonProps> = ({ width = "10%", height = "10%"
     <div style={{
       padding: `calc(${height} / 2) calc(${width} / 2)`,
       position: "absolute",
-      top: 0,
+      bottom: 0,
       right: 0,
     }}>
       <button
@@ -69,4 +70,4 @@ const ClearButton: React.FC<ClearButtonProps> = ({ width = "10%", height = "10%"
   );
 };
 
-export default ClearButton;
+export default EditButton;

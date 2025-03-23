@@ -28,6 +28,9 @@ import RealmHandSection from "../components/realmHandSection";
 import RealmResultSectionPlus from "../components/realmResultSectionPlus";
 
 const RealmPage: React.FC<PageProps> = () => {
+  // 修正中かどうか
+  const [isEditing, setIsEditing] = useState(false);
+  
   // ステージ効果関連の state
   const [doraBoss, setDoraBoss] = useState<DoraBoss>("empty");
   const [doraBossConfirmed, setDoraBossConfirmed] = useState(false);
@@ -108,8 +111,17 @@ const RealmPage: React.FC<PageProps> = () => {
     return calcDrawTurnsByTiles(handState, wall);
   }, [wallConfirmed, wall, handState]);
 
+  /** 場の編集 */
+  const editField = useCallback(() => {
+    setIsEditing(true);
+    setDoraBossConfirmed(false);
+    setDoraIndicatorsConfirmed(false);
+    setWallConfirmed(false);
+  }, [setDoraBossConfirmed, setDoraIndicatorsConfirmed, setWallConfirmed]);
+
   /** 初期化 */
   const clearAll = useCallback(() => {
+    setIsEditing(false);
     setDoraBoss("empty");
     setDoraBossConfirmed(false);
     clearDoraIndicator();
@@ -123,6 +135,7 @@ const RealmPage: React.FC<PageProps> = () => {
         <DynamicSVGText text={"領域和了シミュレーター"} />
         <div className={styles.contents}>
           <RealmConfirmedSection
+            editField={editField}
             doraBoss={doraBoss}
             doraBossConfirmed={doraBossConfirmed}
             doraIndicators={doraIndicators}
@@ -133,12 +146,14 @@ const RealmPage: React.FC<PageProps> = () => {
             clearAll={clearAll}
           />
           <DoraBossSectionPlus
+            isEditing={isEditing}
             doraBoss={doraBoss}
             setDoraBoss={setDoraBoss}
             doraBossConfirmed={doraBossConfirmed}
             setDoraBossConfirmed={setDoraBossConfirmed}
           />
           <DoraIndicatorsSectionPlus
+            isEditing={isEditing}
             doraIndicators={doraIndicators}
             remainingTiles={remainingTiles}
             maxDoraIndicators={maxDoraIndicators}
@@ -149,6 +164,8 @@ const RealmPage: React.FC<PageProps> = () => {
             setDoraIndicatorsConfirmed={setDoraIndicatorsConfirmed}
           />
           <RealmWallSection
+            isEditing={isEditing}
+            setIsEditing={setIsEditing}
             wall={wall}
             isRealmEachTile={isRealmEachTile}
             remainingTiles={remainingTiles}

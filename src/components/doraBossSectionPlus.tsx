@@ -1,21 +1,29 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/realm.module.css";
+import styles from "../pages/realm-plus.module.css";
 import { DORA_BOSSES, DoraBoss } from "../types/simulation";
 import { DORA_BOSS_DESCRIPTIONS } from "../constants/strings";
 
 interface DoraBossSectionProps {
+  isEditing: boolean;
   doraBoss: DoraBoss;
-  setDoraBoss: (doraBoss: DoraBoss) => void;
+  setDoraBoss: Dispatch<SetStateAction<DoraBoss>>;
   doraBossConfirmed: boolean;
-  setDoraBossConfirmed: (doraBossConfirmed: boolean) => void;
+  setDoraBossConfirmed: Dispatch<SetStateAction<boolean>>;
 }
 
-const DoraBossSection: React.FC<DoraBossSectionProps> = ({ doraBoss, setDoraBoss, doraBossConfirmed, setDoraBossConfirmed }) => {
+const DoraBossSection: React.FC<DoraBossSectionProps> = ({ isEditing, doraBoss, setDoraBoss, doraBossConfirmed, setDoraBossConfirmed }) => {
   if (doraBossConfirmed) return;
+  const confirmButtonText = isEditing ? "修正" : "決定";
   return (
-    <section className={styles.dora_boss_section}>
-      <div>
+    <section className={`${styles.dora_boss_section} ${isEditing && styles.editing}`}>
+      <div style={{position: "relative"}}>
+        {
+          isEditing && 
+          <div className={styles.editingTextWrapper}>
+            <DynamicSVGText text={"修正中"} />  
+          </div>
+        }
         <div className={styles.area_title}>
           <DynamicSVGText text={"ステージ効果"} />
         </div>
@@ -54,7 +62,7 @@ const DoraBossSection: React.FC<DoraBossSectionProps> = ({ doraBoss, setDoraBoss
           }}
           onClick={() => setDoraBossConfirmed(true)}
         >
-          <DynamicSVGText text="決定" height="1.5em" />
+          <DynamicSVGText text={confirmButtonText} height="1.5em" />
         </button>
       </div>
     </section>

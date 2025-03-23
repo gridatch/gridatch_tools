@@ -2,7 +2,7 @@
   "name": "gridatch-tools",
   "private": true,
   "description": "gridatch-tools",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "author": "gridatch",
   "dependencies": {
     "@eslint/compat": "^1.2.7",

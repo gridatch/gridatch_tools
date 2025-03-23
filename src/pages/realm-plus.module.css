@@ -44,6 +44,10 @@ section {
   gap: 5px;
 }
 
+section.editing {
+  background-color: #fff1f0;
+}
+
 @media screen and (orientation: landscape) {
   section {
     max-width: calc(100vh * 0.5);
@@ -55,6 +59,13 @@ section {
 }
 
 .area {
+}
+
+.editingTextWrapper {
+  color: var(--color-primary);
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .not_realm {
