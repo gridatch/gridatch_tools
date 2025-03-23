@@ -16,6 +16,10 @@ interface RealmHandSectionProps {
   confirmDraw: () => void;
   toggleDiscard: (tile: SanmaTile, index: number) => void;
   confirmDiscard: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
 }
 
 const RealmHandSection: React.FC<RealmHandSectionProps> = ({
@@ -30,6 +34,10 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
   confirmDraw,
   toggleDiscard,
   confirmDiscard,
+  canUndo,
+  canRedo,
+  undo,
+  redo,
 }) => {
   if (!wallConfirmed) return;
   const handTileCount = Object.values(handState).reduce((acc, arr) => acc + arr.length, 0);
@@ -43,14 +51,22 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
     [...SOZU_TILES],
     [...NON_SEQUENTIAL_TILES],
   ];
-  const confirmButtonVisible = isDrawPhase ? handTileCount === maxHand : true;
+  const confirmButtonVisible = isDrawPhase
+    ? handTileCount === maxHand
+    : SANMA_TILES.some(tile => handState[tile].includes("pending"));
   
   return (
     <section className={styles.hand_section}>
       <div>
-        <div className={styles.area_title}>
+        <div className={styles.area_title} style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <DynamicSVGText text={"手牌"} />
           <DynamicSVGText text={isDrawPhase ? "（ツモ牌選択中）" : "（捨て牌選択中）"} />
+          <button onClick={undo} disabled={!canUndo} >
+            <DynamicSVGText text="1手戻す" height="1.5em" />
+          </button>
+          <button onClick={redo} disabled={!canRedo} >
+            <DynamicSVGText text="1手進む" height="1.5em" />
+          </button>
         </div>
         <div className={`${styles.area} ${styles.hand}`}>
           {SANMA_TILES.map((tile) => (

@@ -55,6 +55,12 @@ const history = [
       "領域和了シミュレーターに場の修正ボタンを追加しました。"
     ]
   },
+  {
+    version: "4.3",
+    messages: [
+      "領域和了シミュレーターに「1手戻る」「1手進む」ボタンを追加しました。"
+    ]
+  },
 ];
 
 const ImageCreditsPage: React.FC<PageProps> = () => (

@@ -217,7 +217,7 @@ section.editing {
 }
 
 .hand {
-  margin-top: calc(100% / 13 * (120 / 89) * 0.3);
+  margin-top: calc(100% / 13 * (120 / 89) * 0.3 + 5px);
   display: flex;
 }
 

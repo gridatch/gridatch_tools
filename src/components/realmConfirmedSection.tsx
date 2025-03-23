@@ -33,7 +33,7 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
   return (
     <section className={styles.confirmed_section}>
       <div style={{position: "relative"}}>
-        <ClearButton onClick={clearAll} />
+        <ClearButton onClick={clearAll} style={{ marginTop: "-5px" }} />
         {
           wallConfirmed && <EditButton onClick={editField} />
         }

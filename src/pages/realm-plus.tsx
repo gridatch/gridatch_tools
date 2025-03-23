@@ -77,6 +77,10 @@ const RealmPage: React.FC<PageProps> = () => {
     confirmDraw,
     toggleDiscard,
     confirmDiscard,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
     clearHandState,
   } = useRealmHandState(isRealmEachTile, remainingTiles);
 
@@ -187,6 +191,10 @@ const RealmPage: React.FC<PageProps> = () => {
             confirmDraw={confirmDraw}
             toggleDiscard={toggleDiscard}
             confirmDiscard={confirmDiscard}
+            canUndo={canUndo}
+            canRedo={canRedo}
+            undo={undo}
+            redo={redo}
           />
           <RealmResultSectionPlus
             results={result}

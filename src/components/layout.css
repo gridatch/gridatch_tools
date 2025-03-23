@@ -6,6 +6,8 @@
   --color-bg: #FEF7E5;
   --color-section-bg: #fffbf5;
   --color-button-bg: #faf0d6;
+  --color-disabled-text: #aaa;
+  --color-disabled-bg: #eee;
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial,
     sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
@@ -79,7 +81,6 @@ a:hover {
   text-decoration: none;
 }
 button {
-  margin-left: auto;
   padding: 0 1em;
   height: 2.5em;
   border: 2px solid var(--color-text);
@@ -87,6 +88,12 @@ button {
   background-color: var(--color-button-bg);
   cursor: pointer;
   color: var(--color-text);
+}
+button:disabled {
+  border-color: var(--color-disabled-text);
+  background-color: var(--color-disabled-bg);
+  cursor: default;
+  color: var(--color-disabled-text);
 }
 b,
 strong {
