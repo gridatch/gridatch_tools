@@ -62,6 +62,7 @@ declare const styles:
   & Readonly<{ "realm_result_hand": string }>
   & Readonly<{ "result_tile_counter": string }>
   & Readonly<{ "result_tile_counter_text": string }>
+  & Readonly<{ "tile_counter_text_negative_margin_right": string }>
 ;
 export default styles;
 //# sourceMappingURL=./realm-plus.module.css.d.ts.map

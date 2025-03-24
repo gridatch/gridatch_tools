@@ -94,6 +94,7 @@ export type DoraBoss = (typeof DORA_BOSSES)[number];
 export const SANMA_TILE_RECORD_FALSE: Record<SanmaTile, boolean> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, false])) as Record<SanmaTile, boolean>);
 export const SANMA_TILE_RECORD_TRUE: Record<SanmaTile, boolean> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, true])) as Record<SanmaTile, boolean>);
 
+export const SANMA_TILE_RECORD_MINUS_1: Record<SanmaTile, number> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, -1])) as Record<SanmaTile, number>);
 export const SANMA_TILE_RECORD_0: Record<SanmaTile, number> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, 0])) as Record<SanmaTile, number>);
 export const SANMA_TILE_RECORD_4: Record<SanmaTile, number> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, 4])) as Record<SanmaTile, number>);
 

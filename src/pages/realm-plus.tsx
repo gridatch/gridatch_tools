@@ -7,6 +7,7 @@ import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsStatePlus";
 import { PageProps } from "gatsby";
 import { 
   DoraBoss, 
+  SANMA_TILE_RECORD_0, 
   SANMA_TILE_RECORD_4, 
   SANMA_TILE_RECORD_NUMBER_ARRAY, 
 } from "../types/simulation";
@@ -16,7 +17,8 @@ import {
   calcRealmTenpai, 
   calcRemainingTiles, 
   calcRealmWinsByTenpaiTurns, 
-  calcNonRealmWinsByTenpaiTurnsPerSozu 
+  calcNonRealmWinsByTenpaiTurnsPerSozu, 
+  calcFirstDrawTurnByTiles
 } from "../utils/realmSimulator";
 import DoraBossSectionPlus from "../components/doraBossSectionPlus";
 import DoraIndicatorsSectionPlus from "../components/doraIndicatorsSectionPlus";
@@ -26,6 +28,7 @@ import RealmWallSection from "../components/realmWallSection";
 import { useRealmHandState } from "../hooks/useRealmHandState";
 import RealmHandSection from "../components/realmHandSection";
 import RealmResultSectionPlus from "../components/realmResultSectionPlus";
+import "./realm-plus-variables.css"
 
 const RealmPage: React.FC<PageProps> = () => {
   // 修正中かどうか
@@ -107,8 +110,16 @@ const RealmPage: React.FC<PageProps> = () => {
     return calcRealmTenpai(isDrawPhase, isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu);
   }, [wallConfirmed, isDrawPhase, isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu]);
 
+  // 牌山から各牌を最初に引く巡目
+  const firstDrawTurnByTiles = useMemo(() => {
+    if (!wallConfirmed) {
+      return { ...SANMA_TILE_RECORD_0 };
+    }
+    return calcFirstDrawTurnByTiles(wall);
+  }, [wallConfirmed, wall]);
+
   // 各牌を引く巡目（手牌にある牌は0巡目）
-  const drawTurnsByTile = useMemo(() => {
+  const drawTurnsByTiles = useMemo(() => {
     if (!wallConfirmed) {
       return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
     }
@@ -186,7 +197,7 @@ const RealmPage: React.FC<PageProps> = () => {
             isDrawPhase={isDrawPhase}
             handState={handState}
             maxHand={maxHand}
-            drawTurnsByTile={drawTurnsByTile}
+            firstDrawTurnByTiles={firstDrawTurnByTiles}
             draw={draw}
             cancelDraw={cancelDraw}
             confirmDraw={confirmDraw}
@@ -199,7 +210,7 @@ const RealmPage: React.FC<PageProps> = () => {
           />
           <RealmResultSectionPlus
             results={result}
-            drawTurnsByTile={drawTurnsByTile}
+            drawTurnsByTiles={drawTurnsByTiles}
           />
         </div>
       </div>

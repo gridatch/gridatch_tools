@@ -18,7 +18,6 @@ const Header: React.FC<HeaderProps> = ({ siteTitle }) => (
     <Link
       to="/"
       style={{
-        fontSize: `var(--font-lg)`,
         textDecoration: `none`,
       }}
     >

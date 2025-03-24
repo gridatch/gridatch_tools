@@ -1,21 +1,16 @@
-
-@media screen and (orientation: landscape) {
-  html {
-    font-size: 1vh;
-  }
-}
-
 .container {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
   max-width: calc(100vh / 2);
+  font-size: var(--font-md);
 }
 
 @media screen and (orientation: landscape) {
   .container {
     max-width: calc(100vh * 1.0);
+    font-size: var(--font-md);
   }
 }
 
@@ -84,6 +79,7 @@ section.editing {
   display: flex;
   flex-direction: column;
   align-items: center;
+  font-size: var(--font-md);
 }
 
 .tile_counter_realm {
@@ -250,6 +246,7 @@ section.editing {
   justify-content: flex-start;
   align-items: center;
   white-space: nowrap;
+  font-size: var(--font-sm);
 }
 
 .result_tile_counter_text_spacing {
@@ -385,4 +382,9 @@ section.editing {
   display: flex;
   flex-direction: row;
   align-items: center;
+  font-size: var(--font-sx);
+}
+
+.tile_counter_text_negative_margin_right {
+  margin-right: -3%;
 }

@@ -11,7 +11,7 @@ interface RealmHandSectionProps {
   isDrawPhase: boolean;
   handState: HandState;
   maxHand: number;
-  drawTurnsByTile: Record<SanmaTile, number[]>;
+  firstDrawTurnByTiles: Record<SanmaTile, number>;
   draw: (tile: SanmaTile) => void;
   cancelDraw: (tile: SanmaTile, index: number) => void;
   confirmDraw: () => void;
@@ -30,7 +30,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
   isDrawPhase,
   handState,
   maxHand,
-  drawTurnsByTile,
+  firstDrawTurnByTiles,
   draw,
   cancelDraw,
   confirmDraw,
@@ -75,8 +75,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
             handState[tile].map((tileExchengeStatus, i) => {
               const isPending = tileExchengeStatus === "pending";
               const isNotRealm = !isRealmEachTile[tile];
-              const isInWall = drawTurnsByTile[tile].filter(turn => turn > 0).length > 0;
-              const firstDrawTurn = isInWall ? drawTurnsByTile[tile].filter(turn => turn !== 0)[0] : -1;
+              const isInWall = firstDrawTurnByTiles[tile] !== -1;
               return (
                 <div key={`hand_${tile}_${i}`} className={styles.hand_tile_counter}>
                   <img
@@ -86,8 +85,9 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                     alt={tile}
                   />
                   <span className={styles.hand_tile_counter_text}>
-                    <span style={{ visibility: isInWall ? "visible" : "hidden", marginBottom: "-0.5em" }}>
-                      <DynamicSVGTextSequence text={`${firstDrawTurn}`} />
+                    <span style={{ visibility: isInWall ? "visible" : "hidden", marginBottom: "-0.5em", fontSize: "var(--font-sx)" }}>
+                      <DynamicSVGTextSequence text={`${firstDrawTurnByTiles[tile]}`} className={styles.tile_counter_text_negative_margin_right} />
+                      <DynamicSVGText text="巡" />
                     </span>
                     <span>
                       <DynamicSVGText text={"×"} />
@@ -118,7 +118,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
         </div>
         <div className={styles.under_hand_line} />
         <span className={styles.result_tile_counter_text_spacing} >
-          <span style={{ marginBottom: "-0.5em", display: "flex" }}>
+          <span style={{ marginBottom: "-0.5em", display: "flex", fontSize: "var(--font-sx)" }}>
             <DynamicSVGText text="×" />
           </span>
           <span >

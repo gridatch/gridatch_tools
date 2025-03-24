@@ -108,7 +108,7 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
                       alt={tile}
                     />
                     { tile !== "empty" && tile !== "closed" &&
-                      <span className={styles.tile_counter_text}>
+                      <span className={`${styles.tile_counter_text} ${soldOut && styles.sold_out_text}`}>
                         <DynamicSVGText text={"×"} />
                         <DynamicSVGText text={`${remainingTiles[tile]}`} />
                       </span>

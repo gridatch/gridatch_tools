@@ -1,0 +1,18 @@
+
+@media screen and (orientation: portrait) {
+  main {
+    --font-md: min(4.0vw, 2.0vh);
+    --font-lg: calc(var(--font-md) * 1.2);
+    --font-sm: calc(var(--font-md) * 0.9);
+    --font-sx: calc(var(--font-md) * 0.8);
+  }
+}
+
+@media screen and (orientation: landscape) {
+  main {
+    --font-md: min(2.0vw, 2.0vh);
+    --font-lg: calc(var(--font-md) * 1.2);
+    --font-sm: calc(var(--font-md) * 0.9);
+    --font-sx: calc(var(--font-md) * 0.8);
+  }
+}

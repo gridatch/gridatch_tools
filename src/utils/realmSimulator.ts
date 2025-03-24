@@ -1,4 +1,4 @@
-import { DoraBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_4, SANMA_TILE_RECORD_FALSE, HandState, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, SOZU_RECORD_0, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS } from "../types/simulation";
+import { DoraBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_4, SANMA_TILE_RECORD_FALSE, HandState, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, SOZU_RECORD_0, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS, SANMA_TILE_RECORD_MINUS_1 } from "../types/simulation";
 import { decomposeTilesIntoBlocks, mergeDecomposedResult, ResultInternal } from "./blockDecomposer";
 
 /**
@@ -114,6 +114,21 @@ export const calcRemainingTiles = (
   });
   
   return remainingTiles;
+};
+
+/**
+ * 牌山から各牌を最初に引く巡目を計算する（存在しない場合は-1巡目）
+ * @param wall 牌山
+ * @returns 牌山から各牌を最初に引く巡目
+ */
+export const calcFirstDrawTurnByTiles = (wall: WallTile[]): Record<SanmaTile, number> => {
+  const result = { ...SANMA_TILE_RECORD_MINUS_1 };
+  wall.forEach((tile, i) => {
+    if (tile === "closed" || tile === "empty") return;
+    if (result[tile] === -1) result[tile] = (i + 1);
+  })
+  
+  return result;
 };
 
 /**
