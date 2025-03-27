@@ -1,7 +1,7 @@
 import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, HandState, SANMA_TILES } from "../types/simulation";
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, HandState, SANMA_TILES, WallTile } from "../types/simulation";
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
 
 interface RealmHandSectionProps {
@@ -15,8 +15,11 @@ interface RealmHandSectionProps {
   draw: (tile: SanmaTile) => void;
   cancelDraw: (tile: SanmaTile, index: number) => void;
   confirmDraw: () => void;
-  toggleDiscard: (tile: SanmaTile, index: number) => void;
+  discard: (tile: SanmaTile, index: number) => void;
   confirmDiscard: () => void;
+  exchangesConfirmed: boolean;
+  confirmExchanges: () => void;
+  currentWallTile: WallTile;
   canUndo: boolean;
   canRedo: boolean;
   undo: () => void;
@@ -34,8 +37,13 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
   draw,
   cancelDraw,
   confirmDraw,
-  toggleDiscard,
+  // toggleDiscard,
   confirmDiscard,
+  exchangesConfirmed,
+  confirmExchanges,
+  currentWallTile,
+  // selectClosedTile,
+  discard,
   canUndo,
   canRedo,
   undo,
@@ -53,6 +61,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
     [...SOZU_TILES],
     [...NON_SEQUENTIAL_TILES],
   ];
+  const confirmExchangeButtonVisible = !exchangesConfirmed && !isDrawPhase
   const confirmButtonVisible = isDrawPhase
     ? handTileCount === maxHand
     : SANMA_TILES.some(tile => handState.closed[tile].some(status => status.isSelected));
@@ -81,19 +90,9 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                   <img
                     className={`${isSelected && styles.hand_tile_selected} ${isNotRealm && styles.not_realm}`}
                     src={`/tiles/${tile}.png`}
-                    onClick={() => isDrawPhase ? cancelDraw(tile, i) : toggleDiscard(tile, i)}
+                    onClick={() => isDrawPhase ? cancelDraw(tile, i) : discard(tile, i)}
                     alt={tile}
                   />
-                  <span className={styles.hand_tile_counter_text}>
-                    <span style={{ visibility: isInWall ? "visible" : "hidden", marginBottom: "-0.5em", fontSize: "var(--font-sx)" }}>
-                      <DynamicSVGTextSequence text={`${firstDrawTurnByTiles[tile]}`} className={styles.tile_counter_text_negative_margin_right} />
-                      <DynamicSVGText text="巡" />
-                    </span>
-                    <span>
-                      <DynamicSVGText text={"×"} />
-                      <DynamicSVGText text={`${remainingTiles[tile]}`} />
-                    </span>
-                  </span>
                   {
                     isSelected && <div className={styles.hand_tile_selected_icon_wrapper}>
                       {
@@ -115,6 +114,26 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
               />
             </div>
           ))}
+          {
+            exchangesConfirmed && currentWallTile !== "closed" &&
+            <div className={styles.hand_tile_counter} style={{ marginLeft: "2%" }}>
+              <img
+                src={`/tiles/${currentWallTile}.png`}
+                onClick={() => currentWallTile !== "empty" && discard(currentWallTile, -1)}
+                alt={currentWallTile}
+              />
+              {/* <span className={styles.hand_tile_counter_text}>
+                <span style={{ visibility: isInWall ? "visible" : "hidden", marginBottom: "-0.5em", fontSize: "var(--font-sx)" }}>
+                  <DynamicSVGTextSequence text={`${firstDrawTurnByTiles[tile]}`} className={styles.tile_counter_text_negative_margin_right} />
+                  <DynamicSVGText text="巡" />
+                </span>
+                <span>
+                  <DynamicSVGText text={"×"} />
+                  <DynamicSVGText text={`${remainingTiles[tile]}`} />
+                </span>
+              </span> */}
+            </div>
+          }
         </div>
         <div className={styles.under_hand_line} />
         <span className={styles.result_tile_counter_text_spacing} >
@@ -162,6 +181,15 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
         <button
           style={{
             marginLeft: "auto",
+            visibility: confirmExchangeButtonVisible ? "visible" : "hidden",
+          }}
+          onClick={confirmExchanges}
+        >
+          <DynamicSVGText text={"入替終了"} height="1.2em" />
+        </button>
+        <button
+          style={{
+            marginLeft: "auto",
             visibility: confirmButtonVisible ? "visible" : "hidden",
           }}
           onClick={isDrawPhase ? confirmDraw : confirmDiscard}
@@ -172,6 +200,15 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
       <div className={styles.toggle_phase_button_wrapper_portrait_relative}>
         <div className={styles.toggle_phase_button_wrapper_portrait_absolute}>
           <div className={styles.toggle_phase_button_portrait_background} >
+            <button
+              style={{
+                marginLeft: "auto",
+                visibility: confirmExchangeButtonVisible ? "visible" : "hidden",
+              }}
+              onClick={confirmExchanges}
+            >
+              <DynamicSVGText text={"入替終了"} height="1.2em" />
+            </button>
             <button
               style={{
                 marginLeft: "auto",

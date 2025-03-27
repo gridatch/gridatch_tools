@@ -62,7 +62,7 @@ const RealmPage: React.FC<PageProps> = () => {
     wallConfirmed,
     setWallConfirmed,
   } = useRealmWallState(remainingTiles);
-
+  
   /** 各牌が領域牌かどうか */
   const isRealmEachTile = useMemo(
     () => calcIsRealmEachTile(doraBoss, doraIndicators),
@@ -71,15 +71,23 @@ const RealmPage: React.FC<PageProps> = () => {
 
   // 手牌関連のフック
   const {
-    isDrawPhase,
+    isExchangeDrawStep: isDrawPhase,
     handState,
     discardedTiles,
     maxHand,
+    // exchangeDraw: draw,
+    cancelExchangeDraw: cancelDraw,
+    confirmExchangeDraw: confirmDraw,
+    // toggleExchangeDiscard: toggleDiscard,
+    confirmExchangeDiscard: confirmDiscard,
+    exchangesConfirmed,
+    confirmExchanges,
+    currentWallIndex,
+    // selectClosedTile,
+    // mainDiscard,
+    setCurrentWallTile,
     draw,
-    cancelDraw,
-    confirmDraw,
-    toggleDiscard,
-    confirmDiscard,
+    discard,
     canUndo,
     canRedo,
     undo,
@@ -91,6 +99,13 @@ const RealmPage: React.FC<PageProps> = () => {
   useEffect(() => {
     setRemainingTiles(calcRemainingTiles(doraIndicators, wall, handState, discardedTiles));
   }, [doraIndicators, wall, handState, discardedTiles]);
+
+  // メインフェーズ：ツモ牌の種類を設定
+  useEffect(() => {
+    if (!exchangesConfirmed) return;
+    if (currentWallIndex < 0 || currentWallIndex >= wall.length) return;
+    setCurrentWallTile(wall[currentWallIndex]);
+  }, [currentWallIndex, wall, exchangesConfirmed, setCurrentWallTile]);
 
   /** 聴牌巡目ごとの領域の和了回数 */
   const realmWinsByTenpaiTurns = useMemo(() => {
@@ -157,6 +172,7 @@ const RealmPage: React.FC<PageProps> = () => {
             doraIndicatorsConfirmed={doraIndicatorsConfirmed}
             isRealmEachTile={isRealmEachTile}
             wall={wall}
+            currentWallIndex={currentWallIndex}
             wallConfirmed={wallConfirmed}
             clearAll={clearAll}
           />
@@ -201,8 +217,12 @@ const RealmPage: React.FC<PageProps> = () => {
             draw={draw}
             cancelDraw={cancelDraw}
             confirmDraw={confirmDraw}
-            toggleDiscard={toggleDiscard}
+            discard={discard}
             confirmDiscard={confirmDiscard}
+            exchangesConfirmed={exchangesConfirmed}
+            confirmExchanges={confirmExchanges}
+            currentWallTile={wall[currentWallIndex]}
+            // selectClosedTile={selectClosedTile}
             canUndo={canUndo}
             canRedo={canRedo}
             undo={undo}

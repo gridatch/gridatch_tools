@@ -75,3 +75,4 @@ https://mahjongsoul.com/
 修正
 1手戻す
 1手進む
+入替終了

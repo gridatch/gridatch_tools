@@ -13,6 +13,7 @@ interface RealmConfirmedSectionProps {
   isRealmEachTile: Record<SanmaTile, boolean>;
   wall: WallTile[];
   wallConfirmed: boolean;
+  currentWallIndex: number;
   editField: () => void;
   clearAll: () => void;
 }
@@ -25,6 +26,7 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
   isRealmEachTile,
   wall,
   wallConfirmed,
+  currentWallIndex,
   editField,
   clearAll,
 }) => {
@@ -64,12 +66,14 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
         <div className={`${styles.area} ${styles.confirmed_wall}`}>
           {wallConfirmed && wall.map((tile, i) => {
             const isNotRealm = wall[i] !== "empty" && wall[i] !== "closed" && !isRealmEachTile[wall[i]];
+            const visible = i > currentWallIndex;
             return (
               <React.Fragment key={`wall_${i}`}>
                 {
                   wall[i] !== "empty" && (
                     <img
                       className={`${styles.confirmed_wall_tile} ${isNotRealm && styles.not_realm}`}
+                      style={{ visibility: visible ? "visible" : "hidden" }}
                       src={`/tiles/${tile}.png`}
                       alt={tile}
                     />
