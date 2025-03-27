@@ -258,7 +258,7 @@ section.editing {
   font-size: var(--font-sm);
 }
 
-.hand_tile_pending_icon_wrapper {
+.hand_tile_selected_icon_wrapper {
   position: absolute;
   top: -30%;
   right: -15%;
@@ -267,7 +267,7 @@ section.editing {
   z-index: 1;
 }
 
-.hand_tile_pending_icon {
+.hand_tile_selected_icon {
   position: absolute;
   inset: -25% 0;
   width: 100%;
@@ -276,15 +276,15 @@ section.editing {
   filter: drop-shadow(0 0 1px var(--color-section-bg));
 }
 
-.hand_tile_pending_icon_draw {
+.hand_tile_selected_icon_draw {
   color: var(--color-primary);
 }
 
-.hand_tile_pending_icon_discard {
+.hand_tile_selected_icon_discard {
   color: var(--color-secondary);
 }
 
-.hand_tile_pending {
+.hand_tile_selected {
   transform: translateY(-30%);
 }
 

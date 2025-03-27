@@ -106,7 +106,7 @@ export const calcRemainingTiles = (
   });
 
   SANMA_TILES.forEach((tile) => {
-    remainingTiles[tile] -= handState[tile].length;
+    remainingTiles[tile] -= handState.closed[tile].length;
   });
 
   SANMA_TILES.forEach((tile) => {
@@ -140,7 +140,7 @@ export const calcFirstDrawTurnByTiles = (wall: WallTile[]): Record<SanmaTile, nu
 export const calcDrawTurnsByTiles = (handState: HandState, wall: WallTile[]): Record<SanmaTile, number[]> => {
   const result = structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
   for (const tile of SANMA_TILES) {
-    for (let i = 0; i < handState[tile].length; ++i) {
+    for (let i = 0; i < handState.closed[tile].length; ++i) {
       result[tile].push(0);
     }
   }
@@ -478,7 +478,7 @@ export const calcRealmTenpai = (
   for (const tile of SANMA_TILES) {
     // ツモフェーズ時はツモ候補を牌プールに含める
     // 打牌フェーズ時は打牌候補を牌プールから除外する
-    pool[tile] = isRealmEachTile[tile] ? handState[tile].filter(status => isDrawPhase ? true : status === "confirmed").length : 0;
+    pool[tile] = isRealmEachTile[tile] ? handState.closed[tile].filter(status => isDrawPhase ? true : !status.isSelected).length : 0;
   }
   
   const standardResult: RealmTenpaiResult = {

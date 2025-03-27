@@ -103,8 +103,25 @@ export const SANMA_TILE_RECORD_NUMBER_ARRAY: Record<SanmaTile, number[]> = deepF
 export const SOZU_RECORD_0: Record<Sozu, number> = Object.freeze(Object.fromEntries(SOZU_TILES.map(tile => [tile, 0])) as Record<Sozu, number>);
 export const SOZU_RECORD_4: Record<Sozu, number> = Object.freeze(Object.fromEntries(SOZU_TILES.map(tile => [tile, 4])) as Record<Sozu, number>);
 
-export type TileExchengeStatus = "pending" | "confirmed";
-export type HandState = Record<SanmaTile, TileExchengeStatus[]>;
+export interface TileStatus {
+  isSelected: boolean;
+}
+
+export interface DrawnTile {
+  isClosed: boolean;
+  tile: WallTile;
+  isSelected: boolean;
+}
+
+export interface HandState {
+  closed: Record<SanmaTile, TileStatus[]>;
+  drawn: DrawnTile;
+}
+
+export const INITIAL_HAND_STATE: HandState = deepFreeze({
+  closed: Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as TileStatus[]])) as Record<SanmaTile, TileStatus[]>,
+  drawn: { isClosed: false, tile: "empty", isSelected: false }
+})
 
 // --- 手牌のブロック分解 ---
 export const MENTSU_TYPES = ["shuntsu", "kotsu"] as const;

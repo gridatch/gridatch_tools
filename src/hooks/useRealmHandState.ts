@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { HandState, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile } from "../types/simulation";
+import { HandState, INITIAL_HAND_STATE, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile, TileStatus } from "../types/simulation";
 
 const MAX_HAND = 13;
 
@@ -56,11 +56,7 @@ export const useRealmHandState = (
   remainingTiles: Record<SanmaTile, number>,
   initialHandState?: HandState
 ): UseRealmHandStateReturn => {
-  const defaultInitialHandState: HandState = {} as HandState;
-  SANMA_TILES.forEach(tile => {
-    defaultInitialHandState[tile] = [];
-  });
-  const initialState: HandState = initialHandState ? initialHandState : defaultInitialHandState;
+  const initialState: HandState = initialHandState ? initialHandState : structuredClone(INITIAL_HAND_STATE);
 
   const [handState, setHandState] = useState<HandState>(initialState);
   const [discardedTiles, setDiscardedTiles] = useState<Record<SanmaTile, number>>({ ...SANMA_TILE_RECORD_0 });
@@ -96,7 +92,7 @@ export const useRealmHandState = (
   };
 
   const getTotalTileCount = (): number =>
-    Object.values(handState).reduce((acc, arr) => acc + arr.length, 0);
+    Object.values(handState.closed).reduce((acc, arr) => acc + arr.length, 0);
 
   /** 
    * ツモフェーズ：指定した牌をツモ牌候補に加える。
@@ -107,7 +103,10 @@ export const useRealmHandState = (
     if (getTotalTileCount() >= MAX_HAND) return;
     setHandState(prev => ({
       ...prev,
-      [tile]: [...prev[tile], "pending"]
+      closed: {
+        ...prev.closed,
+        [tile]: [...prev.closed[tile], { isSelected: true }]
+      },
     }));
   };
 
@@ -117,11 +116,14 @@ export const useRealmHandState = (
   const cancelDraw = (tile: SanmaTile, index: number) => {
     if (!isDrawPhase) return;
     setHandState(prev => {
-      const tileStatuses = prev[tile];
-      if (index < 0 || index >= tileStatuses.length) return prev;
-      if (tileStatuses[index] !== "pending") return prev;
-      const newStatuses = tileStatuses.filter((_, i) => i !== index);
-      return { ...prev, [tile]: newStatuses };
+      const statuses = prev.closed[tile];
+      if (index < 0 || index >= statuses.length) return prev;
+      if (!statuses[index].isSelected) return prev;
+      const newStatuses = statuses.filter((_, i) => i !== index);
+      return {
+        ...prev,
+        closed: { ...prev.closed, [tile]: newStatuses },
+      };
     });
   };
 
@@ -141,16 +143,20 @@ export const useRealmHandState = (
     };
     pushHistory(pendingSnapshot);
 
-    const newState: HandState = {} as HandState;
-    SANMA_TILES.forEach((tile) => {
-      newState[tile] = handState[tile].map(() =>
-        isRealmEachTile[tile] ? "confirmed" : "pending"
-      );
+    const newClosed = {} as Record<SanmaTile, TileStatus[]>;
+    SANMA_TILES.forEach(tile => {
+      newClosed[tile] = handState.closed[tile].map(() => {
+        return { isSelected: !isRealmEachTile[tile] }
+      });
     });
-    setHandState(newState);
+    const newHandState: HandState = {
+      ...handState,
+      closed: newClosed,
+    };
+    setHandState(newHandState);
     setIsDrawPhase(false);
     const confirmedSnapshot: HandStateSnapshot = {
-      handState: newState,
+      handState: newHandState,
       discardedTiles: { ...discardedTiles },
       isDrawPhase: false,
     };
@@ -164,11 +170,15 @@ export const useRealmHandState = (
   const toggleDiscard = (tile: SanmaTile, index: number) => {
     if (isDrawPhase) return;
     setHandState(prev => {
-      const tileStatuses = prev[tile];
-      if (index < 0 || index >= tileStatuses.length) return prev;
-      const newStatuses = [...tileStatuses];
-      newStatuses[index] = newStatuses[index] === "confirmed" ? "pending" : "confirmed";
-      return { ...prev, [tile]: newStatuses };
+      const statuses = prev.closed[tile];
+      if (index < 0 || index >= statuses.length) return prev;
+      const newStatuses = statuses.map((status, i) =>
+        i === index ? { isSelected: !status.isSelected } : status
+      );
+      return {
+        ...prev,
+        closed: { ...prev.closed, [tile]: newStatuses },
+      };
     });
   };
 
@@ -188,18 +198,22 @@ export const useRealmHandState = (
     };
     pushHistory(pendingSnapshot);
 
-    const pendingCounts: Record<SanmaTile, number> = {} as Record<SanmaTile, number>;
+    const selectedCounts: Record<SanmaTile, number> = {} as Record<SanmaTile, number>;
     SANMA_TILES.forEach((tile) => {
-      pendingCounts[tile] = handState[tile].filter((status) => status === "pending").length;
+      selectedCounts[tile] = handState.closed[tile].filter((status) => status.isSelected).length;
     });
     const newDiscarded: Record<SanmaTile, number> = { ...discardedTiles };
     SANMA_TILES.forEach((tile) => {
-      newDiscarded[tile] = (newDiscarded[tile] || 0) + pendingCounts[tile];
+      newDiscarded[tile] = (newDiscarded[tile] || 0) + selectedCounts[tile];
     });
-    const newHandState: HandState = {} as HandState;
-    SANMA_TILES.forEach((tile) => {
-      newHandState[tile] = handState[tile].filter((status) => status === "confirmed");
+    const newClosed: Record<SanmaTile, TileStatus[]> = {} as Record<SanmaTile, TileStatus[]>;
+    SANMA_TILES.forEach(tile => {
+      newClosed[tile] = handState.closed[tile].filter(status => !status.isSelected);
     });
+    const newHandState: HandState = {
+      ...handState,
+      closed: newClosed,
+    };
     setDiscardedTiles(newDiscarded);
     setHandState(newHandState);
     setIsDrawPhase(true);
@@ -245,7 +259,7 @@ export const useRealmHandState = (
    * 手牌、捨て牌、フェーズをリセットする
    */
   const clearHandState = () => {
-    const clearedState = { ...defaultInitialHandState };
+    const clearedState = structuredClone(INITIAL_HAND_STATE);
     const clearedDiscarded = { ...SANMA_TILE_RECORD_0 };
     setHandState(clearedState);
     setDiscardedTiles(clearedDiscarded);

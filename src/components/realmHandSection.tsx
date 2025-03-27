@@ -42,7 +42,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
   redo,
 }) => {
   if (!wallConfirmed) return;
-  const handTileCount = Object.values(handState).reduce((acc, arr) => acc + arr.length, 0);
+  const handTileCount = Object.values(handState.closed).reduce((acc, arr) => acc + arr.length, 0);
   
   const realmTileTypeCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).length;
   const remainingRealmTileCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).reduce((sum, tile) => sum + remainingTiles[tile], 0);
@@ -55,7 +55,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
   ];
   const confirmButtonVisible = isDrawPhase
     ? handTileCount === maxHand
-    : SANMA_TILES.some(tile => handState[tile].includes("pending"));
+    : SANMA_TILES.some(tile => handState.closed[tile].some(status => status.isSelected));
   
   return (
     <section className={styles.hand_section}>
@@ -72,14 +72,14 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
         </div>
         <div className={`${styles.area} ${styles.hand}`}>
           {SANMA_TILES.map((tile) => (
-            handState[tile].map((tileExchengeStatus, i) => {
-              const isPending = tileExchengeStatus === "pending";
+            handState.closed[tile].map((status, i) => {
+              const isSelected = status.isSelected;
               const isNotRealm = !isRealmEachTile[tile];
               const isInWall = firstDrawTurnByTiles[tile] !== -1;
               return (
                 <div key={`hand_${tile}_${i}`} className={styles.hand_tile_counter}>
                   <img
-                    className={`${isPending && styles.hand_tile_pending} ${isNotRealm && styles.not_realm}`}
+                    className={`${isSelected && styles.hand_tile_selected} ${isNotRealm && styles.not_realm}`}
                     src={`/tiles/${tile}.png`}
                     onClick={() => isDrawPhase ? cancelDraw(tile, i) : toggleDiscard(tile, i)}
                     alt={tile}
@@ -95,11 +95,11 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                     </span>
                   </span>
                   {
-                    isPending && <div className={styles.hand_tile_pending_icon_wrapper}>
+                    isSelected && <div className={styles.hand_tile_selected_icon_wrapper}>
                       {
                         isDrawPhase
-                          ? <DynamicSVGText text="+" className={`${styles.hand_tile_pending_icon} ${styles.hand_tile_pending_icon_draw}`} />
-                          : <DynamicSVGText text="-" className={`${styles.hand_tile_pending_icon} ${styles.hand_tile_pending_icon_discard}`} />
+                          ? <DynamicSVGText text="+" className={`${styles.hand_tile_selected_icon} ${styles.hand_tile_selected_icon_draw}`} />
+                          : <DynamicSVGText text="-" className={`${styles.hand_tile_selected_icon} ${styles.hand_tile_selected_icon_discard}`} />
                       }
                     </div>
                   }

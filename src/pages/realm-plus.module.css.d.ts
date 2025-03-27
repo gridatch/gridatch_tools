@@ -43,11 +43,11 @@ declare const styles:
   & Readonly<{ "hand_tile_counter": string }>
   & Readonly<{ "hand_tile_counter_text": string }>
   & Readonly<{ "result_tile_counter_text_spacing": string }>
-  & Readonly<{ "hand_tile_pending_icon_wrapper": string }>
-  & Readonly<{ "hand_tile_pending_icon": string }>
-  & Readonly<{ "hand_tile_pending_icon_draw": string }>
-  & Readonly<{ "hand_tile_pending_icon_discard": string }>
-  & Readonly<{ "hand_tile_pending": string }>
+  & Readonly<{ "hand_tile_selected_icon_wrapper": string }>
+  & Readonly<{ "hand_tile_selected_icon": string }>
+  & Readonly<{ "hand_tile_selected_icon_draw": string }>
+  & Readonly<{ "hand_tile_selected_icon_discard": string }>
+  & Readonly<{ "hand_tile_selected": string }>
   & Readonly<{ "draw_choices": string }>
   & Readonly<{ "toggle_phase_button_wrapper_landscape": string }>
   & Readonly<{ "toggle_phase_button_wrapper_portrait_relative": string }>
