@@ -108,8 +108,8 @@ export interface TileStatus {
 }
 
 export interface DrawnTile {
-  isClosed: boolean;
   tile: WallTile;
+  isClosed: boolean;
   isSelected: boolean;
 }
 
@@ -120,7 +120,7 @@ export interface HandState {
 
 export const INITIAL_HAND_STATE: HandState = deepFreeze({
   closed: Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as TileStatus[]])) as Record<SanmaTile, TileStatus[]>,
-  drawn: { isClosed: false, tile: "empty", isSelected: false }
+  drawn: { tile: "empty", isClosed: false, isSelected: false }
 })
 
 // --- 手牌のブロック分解 ---

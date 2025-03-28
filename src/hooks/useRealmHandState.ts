@@ -27,8 +27,8 @@ export interface UseRealmHandStateReturn {
   confirmExchanges: () => void;
   /** メインフェーズのツモ牌を指す牌山のインデックス */
   currentWallIndex: number;
-  /** メインフェーズでツモ牌の種類を設定するための関数。 */
-  setCurrentWallTile: (tile: WallTile) => void;
+  /** メインフェーズで、ツモ牌を更新する関数。 */
+  updateDrawnTile: (tile: WallTile) => void;
   draw: (tile: SanmaTile) => void;
   discard: (tile: SanmaTile, index: number) => void;
   /** undo が可能かどうか */
@@ -50,8 +50,6 @@ interface HandStateSnapshot {
   isExchangeDrawStep: boolean;
   exchangesConfirmed: boolean;
   currentWallIndex: number;
-  currentWallTile: WallTile | null;
-  closedTile: SanmaTile | null;
 }
 
 /**
@@ -79,8 +77,6 @@ export const useRealmHandState = (
     isExchangeDrawStep: true,
     exchangesConfirmed: false,
     currentWallIndex: -1,
-    currentWallTile: null,
-    closedTile: null,
   };
   const [history, setHistory] = useState<HandStateSnapshot[]>([initialSnapshot]);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
@@ -89,10 +85,6 @@ export const useRealmHandState = (
   // メインフェーズ
   // ツモ牌を指す牌山のインデックス（UI側で牌山からの牌を逐次設定するための目安）
   const [currentWallIndex, setCurrentWallIndex] = useState<number>(-1);
-  // ツモ牌の種類
-  const [currentWallTile, setCurrentWallTile] = useState<WallTile | null>(null);
-  // ツモ牌の裏牌の種類
-  const [closedTile, setClosedTile] = useState<SanmaTile | null>(null);
   
   /**
    * 現在の状態に変更があった項目のみを上書きし、
@@ -104,8 +96,6 @@ export const useRealmHandState = (
     isExchangeDrawStep: changes.isExchangeDrawStep ?? isExchangeDrawStep,
     exchangesConfirmed: changes.exchangesConfirmed ?? exchangesConfirmed,
     currentWallIndex: changes.currentWallIndex ?? currentWallIndex,
-    currentWallTile: changes.currentWallTile ?? currentWallTile,
-    closedTile: changes.closedTile ?? closedTile,
   });
 
   /**
@@ -129,7 +119,7 @@ export const useRealmHandState = (
   };
 
   const getTotalTileCount = (): number =>
-    Object.values(handState.closed).reduce((acc, arr) => acc + arr.length, 0);
+    SANMA_TILES.reduce((acc, tile) => acc + handState.closed[tile].length, 0);
 
   /** 牌交換フェーズのツモステップ：指定した牌をツモ牌候補に加える。 */
   const exchangeDraw = (tile: SanmaTile) => {
@@ -254,8 +244,6 @@ export const useRealmHandState = (
     setIsDrawPhase(snapshot.isExchangeDrawStep);
     setExchangesConfirmed(snapshot.exchangesConfirmed);
     setCurrentWallIndex(snapshot.currentWallIndex);
-    setCurrentWallTile(snapshot.currentWallTile);
-    setClosedTile(snapshot.closedTile);
     setHistoryIndex(newIndex);
   };
 
@@ -269,8 +257,6 @@ export const useRealmHandState = (
     setIsDrawPhase(snapshot.isExchangeDrawStep);
     setExchangesConfirmed(snapshot.exchangesConfirmed);
     setCurrentWallIndex(snapshot.currentWallIndex);
-    setCurrentWallTile(snapshot.currentWallTile);
-    setClosedTile(snapshot.closedTile);
     setHistoryIndex(newIndex);
   };
 
@@ -295,57 +281,119 @@ export const useRealmHandState = (
     }));
   };
 
+  /** メインフェーズで、ツモ牌を更新する関数。 */
+  const updateDrawnTile = (tile: WallTile) => {
+    const newHandState: HandState = {
+      ...handState,
+      drawn: { tile, isClosed: tile === "closed", isSelected: false },
+    };
+    setHandState(newHandState);
+    pushHistory(createSnapshot({ handState: newHandState }));
+  };
+
   /** メインフェーズでツモ牌の裏牌の種類を選択する。 */
   const selectClosedTile = (tile: SanmaTile) => {
     if (!exchangesConfirmed) return;
     // 現在の交換対象牌が "closed" である場合のみ反映
-    if (currentWallTile === "closed") {
-      setClosedTile(tile);
-    }
+    if (!handState.drawn.isClosed) return;
+
+    setHandState(prev => ({
+      ...prev,
+      drawn: { ...prev.drawn, tile }
+    }));
   };
 
   /**
-   * メインフェーズで手牌とツモ牌の中から1枚打牌する。
-   * @param tile 対象牌
-   * @param index 対象牌の中のindex、ツモ切りの場合は -1
+   * メインフェーズで手牌とツモ牌の中から打牌候補を1枚選択し、他の牌の選択を解除する。
+   * @param tile 対象の牌の種類
+   * @param index 対象の牌の中のindex、ツモ牌の場合は -1
    * @returns 
    */
   const mainDiscard = (tile: SanmaTile, index: number) => {
     if (!exchangesConfirmed) return;
-    const exchangeTile: SanmaTile | null =
-      currentWallTile === "closed" && closedTile ? closedTile
-      : (currentWallTile as SanmaTile | null);
-    if (!exchangeTile) return;
 
-    const newHandState: HandState = {};
-    SANMA_TILES.forEach(tile => {
-      newHandState[tile] = [...handState[tile]];
+    const newHandState = structuredClone(handState);
+    // 手牌の全ての牌の選択を解除する
+    SANMA_TILES.forEach(t => {
+      newHandState.closed[t].forEach(status => status.isSelected = false);
     });
-    
+    newHandState.drawn.isSelected = false;
+  
     if (index === -1) {
-      // ツモ切り
+      // ツモ牌を選択
+      newHandState.drawn.isSelected = true;
     } else {
-      // 手出し
-      newHandState[tile] = newHandState[tile].filter((_, i) => i !== index);
-      newHandState[exchangeTile].push("confirmed");
+      // 指定された手牌を選択
+      newHandState.closed[tile][index].isSelected = true;
+    }
+  
+    setHandState(newHandState);
+  };
+
+  /** メインフェーズで手牌とツモ牌の中から選択されている牌を1枚打牌する。 */
+  const confirmMainDiscard = () => {
+    if (!exchangesConfirmed) return;
+
+    if (handState.drawn.tile === "closed" || handState.drawn.tile === "empty") {
+      console.error(`confirmMainDiscard: ツモ牌が"${handState.drawn.tile}"です。`);
+      return;
     }
 
-    const newDiscarded = { ...discardedTiles };
-    newDiscarded[tile] += 1;
+    const selectedClosedTiles: { tile: SanmaTile; index: number }[] = [];
+    SANMA_TILES.forEach(tile => {
+      handState.closed[tile].forEach((status, index) => {
+        if (status.isSelected) {
+          selectedClosedTiles.push({ tile, index });
+        }
+      });
+    });
+    const drawnSelected = handState.drawn.isSelected;
+    const totalSelected = (drawnSelected ? 1 : 0) + selectedClosedTiles.length;
+    if (totalSelected > 1) {
+      console.error("confirmMainDiscard: 複数の牌が選択されています。");
+      return;
+    }
 
-    setHandState(newHandState);
-    setDiscardedTiles(newDiscarded);
-    setCurrentWallIndex(prev => prev + 1);
-    setCurrentWallTile(null);
-    setClosedTile(null);
+    // 履歴から現在のindexのスナップショットを削除
+    popHistory();
 
-    pushHistory(createSnapshot({
-      handState: newHandState,
-      discardedTiles: newDiscarded,
-      currentWallIndex: currentWallIndex + 1,
-      currentWallTile: null,
-      closedTile: null,
-    }));
+    // 履歴に確定前のスナップショットを追加
+    pushHistory(createSnapshot());
+  
+    if (drawnSelected) {
+      // ツモ切り
+      const newDiscarded = { ...discardedTiles };
+      const drawnTile = handState.drawn.tile;
+      newDiscarded[drawnTile] += 1;
+      setDiscardedTiles(newDiscarded);
+      // drawn の選択状態をリセット
+      setHandState(prev => ({
+        ...prev,
+        drawn: { ...prev.drawn, isSelected: false }
+      }));
+      pushHistory(createSnapshot({ discardedTiles: newDiscarded }));
+    } else if (selectedClosedTiles.length === 1) {
+      // 手出し
+      const { tile, index } = selectedClosedTiles[0];
+      const newDiscarded = { ...discardedTiles };
+      newDiscarded[tile] += 1;
+      // 選択された牌を closed から削除
+      const newClosed = { ...handState.closed };
+      newClosed[tile] = newClosed[tile].filter((_, i) => i !== index);
+      // drawn の牌を closed に追加（confirmed 状態: isSelected false）
+      newClosed[handState.drawn.tile] = [
+        ...newClosed[handState.drawn.tile as SanmaTile],
+        { isSelected: false }
+      ];
+      const newHandState: HandState = {
+        ...handState,
+        closed: newClosed,
+        drawn: { tile: "empty", isClosed: false , isSelected: false }
+      };
+      setDiscardedTiles(newDiscarded);
+      setHandState(newHandState);
+      pushHistory(createSnapshot({ handState: newHandState, discardedTiles: newDiscarded }));
+    }
   };
 
   /** ツモ牌選択のラッパー。交換フェーズではツモ牌候補を選択、メインフェーズでは裏牌のツモ牌を選択 */
@@ -353,7 +401,7 @@ export const useRealmHandState = (
     if (!exchangesConfirmed) {
       exchangeDraw(tile);
     } else {
-      if (currentWallTile === "closed") selectClosedTile(tile);
+      if (handState.drawn.isClosed) selectClosedTile(tile);
     }
   };
 
@@ -380,16 +428,12 @@ export const useRealmHandState = (
     setIsDrawPhase(true);
     setExchangesConfirmed(false);
     setCurrentWallIndex(-1);
-    setCurrentWallTile(null);
-    setClosedTile(null);
     const initialSnapshot: HandStateSnapshot = {
       handState: clearedState,
       discardedTiles: clearedDiscarded,
       isExchangeDrawStep: true,
       exchangesConfirmed: false,
       currentWallIndex: -1,
-      currentWallTile: null,
-      closedTile: null,
     };
     setHistory([initialSnapshot]);
     setHistoryIndex(0);
@@ -406,7 +450,7 @@ export const useRealmHandState = (
     exchangesConfirmed,
     confirmExchanges,
     currentWallIndex,
-    setCurrentWallTile,
+    updateDrawnTile,
     draw,
     discard,
     canUndo,
