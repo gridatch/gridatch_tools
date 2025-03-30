@@ -34,16 +34,16 @@ export const HAND_COMPONENTS = [...PINZU_BLOCKS, ...SOZU_TILES] as const;
 export type PinzuBlock = (typeof PINZU_BLOCKS)[number];
 export type HandComponent = (typeof HAND_COMPONENTS)[number];
 
-export type Hand = {
+export type SozuHand = {
   [key in HandComponent]: number
 };
 
-export const INITIAL_HAND: Hand = Object.fromEntries(HAND_COMPONENTS.map(component => [component, 0])) as Hand;
-export const HAND_COMPONENTS_TILE_COUNT: Hand = Object.fromEntries(HAND_COMPONENTS.map(component => { 
+export const INITIAL_SOZU_HAND: SozuHand = Object.fromEntries(HAND_COMPONENTS.map(component => [component, 0])) as SozuHand;
+export const HAND_COMPONENTS_TILE_COUNT: SozuHand = Object.fromEntries(HAND_COMPONENTS.map(component => { 
   if (component === "sequence" || component === "triplet") return [component, 3];
   if (component === "pair") return [component, 2];
   return [component, 1];
-})) as Hand;
+})) as SozuHand;
 
 export interface ManmanCsvRow {
   loss: number;
@@ -61,7 +61,7 @@ export interface ManmanTenpaiResult {
   loss: number;
   key: string;
   breakdown: string;
-  hand: Hand;
+  hand: SozuHand;
 }
 
 export interface SozuCsvRow {
@@ -84,7 +84,7 @@ export interface SozuTenpaiResult {
   waits: {
     [key in Sozu]: number
   };
-  hand: Hand;
+  hand: SozuHand;
 }
 
 // --- 領域 ---

@@ -2,11 +2,11 @@ import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
 import styles from "../pages/manman.module.css";
-import { Hand, SOZU_TILES, ManmanTenpaiResult } from "../types/simulation";
+import { SozuHand, SOZU_TILES, ManmanTenpaiResult } from "../types/simulation";
 import ClearButton from "./clearButton";
 
 interface ResultSectionProps {
-  handState: Hand;
+  handState: SozuHand;
   tenpaiResults: ManmanTenpaiResult[];
   clearAll: () => void;
 }

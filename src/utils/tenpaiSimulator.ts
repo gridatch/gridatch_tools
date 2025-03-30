@@ -1,4 +1,4 @@
-import { Hand, INITIAL_HAND, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult } from "../types/simulation";
+import { SozuHand, INITIAL_SOZU_HAND, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult } from "../types/simulation";
 
 // CSVファイルに記載されているロス数の最大値
 const MAX_LOSS = 12;
@@ -9,8 +9,8 @@ const MAX_LOSS = 12;
  * @param wall 牌山
  * @returns プール
  */
-const generateHandComponentPool = (handState: Hand, wall: Sozu[]): Hand => {
-  const pool: Hand = { ...handState };
+const generateHandComponentPool = (handState: SozuHand, wall: Sozu[]): SozuHand => {
+  const pool: SozuHand = { ...handState };
   
   wall.forEach(tile => {
     if (pool[tile] < 4) ++pool[tile];
@@ -29,12 +29,12 @@ const generateHandComponentPool = (handState: Hand, wall: Sozu[]): Hand => {
  * @param results 結果を格納する配列
  */
 const enumerateAllHands = (
-  pool: Hand,
+  pool: SozuHand,
   componentIndex: number,
-  currentHand: Hand,
+  currentHand: SozuHand,
   currentTileCount: number,
   targetTileCount: number,
-  results: Hand[]
+  results: SozuHand[]
 ): void => {
   if (currentTileCount === targetTileCount) {
     results.push({ ...currentHand });
@@ -74,7 +74,7 @@ const enumerateAllHands = (
  * @param hand 手牌
  * @returns キー文字列
  */
-const getCsvKeyFromHand = (hand: Hand): string => {
+const getCsvKeyFromHand = (hand: SozuHand): string => {
   let csvKey = "";
   SOZU_TILES.forEach((tile) => {
     const digitStr = tile.replace("s", "");
@@ -94,7 +94,7 @@ const getCsvKeyFromHand = (hand: Hand): string => {
  * @returns 手牌パターンの配列
  */
 export const computeOptimalManmanTenpais = (
-  handState: Hand,
+  handState: SozuHand,
   wall: Sozu[],
   maxHand: number,
   csvData: ManmanCsvData
@@ -103,11 +103,11 @@ export const computeOptimalManmanTenpais = (
   
   const pool = generateHandComponentPool(handState, wall);
   
-  let allHands: Hand[] = [];
-  enumerateAllHands(pool, 0, INITIAL_HAND, 0, maxHand, allHands);
+  let allHands: SozuHand[] = [];
+  enumerateAllHands(pool, 0, INITIAL_SOZU_HAND, 0, maxHand, allHands);
   
   // 単体牌が一致している手牌を重複排除する
-  const allHandMap: { [key: string]: Hand } = {};
+  const allHandMap: { [key: string]: SozuHand } = {};
   allHands.forEach(hand => {
     const key = getCsvKeyFromHand(hand);
     allHandMap[key] = hand;
@@ -150,7 +150,7 @@ export const computeOptimalManmanTenpais = (
  * @returns 手牌パターンの配列
  */
 export const computeOptimalSozuTenpais = (
-  handState: Hand,
+  handState: SozuHand,
   wall: Sozu[],
   maxHand: number,
   csvData: SozuCsvData
@@ -159,11 +159,11 @@ export const computeOptimalSozuTenpais = (
   
   const pool = generateHandComponentPool(handState, wall);
   
-  let allHands: Hand[] = [];
-  enumerateAllHands(pool, 0, INITIAL_HAND, 0, maxHand, allHands);
+  let allHands: SozuHand[] = [];
+  enumerateAllHands(pool, 0, INITIAL_SOZU_HAND, 0, maxHand, allHands);
   
   // 単体牌が一致している手牌を重複排除する
-  const allHandMap: { [key: string]: Hand } = {};
+  const allHandMap: { [key: string]: SozuHand } = {};
   allHands.forEach(hand => {
     const key = getCsvKeyFromHand(hand);
     allHandMap[key] = hand;

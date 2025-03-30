@@ -1,10 +1,10 @@
 import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/manman.module.css";
-import { Hand, HandComponent, SOZU_TILES } from "../types/simulation";
+import { SozuHand, HandComponent, SOZU_TILES } from "../types/simulation";
 
 interface HandSectionProps {
-  hand: Hand;
+  hand: SozuHand;
   maxHand: number;
   addComponentToHand: (component: HandComponent) => void;
   removeComponentFromHand: (component: HandComponent) => void;

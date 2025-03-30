@@ -1,17 +1,17 @@
 import { useState } from "react";
-import { INITIAL_HAND, Hand, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, HandComponent, PINZU_BLOCKS, SOZU_TILES } from "../types/simulation";
+import { INITIAL_SOZU_HAND, SozuHand, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, HandComponent, PINZU_BLOCKS, SOZU_TILES } from "../types/simulation";
 
 export interface UseHandStateReturn {
-  handState: Hand;
+  handState: SozuHand;
   addComponentToHand: (component: HandComponent) => void;
   removeComponentFromHand: (component: HandComponent) => void;
   clearHand: () => void;
 }
 
-export const useHandState = (maxHand: number, initialHand: Hand = INITIAL_HAND): UseHandStateReturn => {
+export const useHandState = (maxHand: number, initialHand: SozuHand = INITIAL_SOZU_HAND): UseHandStateReturn => {
   const [handState, setHandState] = useState(initialHand);
   
-  const getTotalHandCount = (hand: Hand) => {
+  const getTotalHandCount = (hand: SozuHand) => {
     return HAND_COMPONENTS.reduce((sum, component) => sum + HAND_COMPONENTS_TILE_COUNT[component] * hand[component], 0);
   };
   
@@ -38,7 +38,7 @@ export const useHandState = (maxHand: number, initialHand: Hand = INITIAL_HAND):
   };
   
   const clearHand = () => {
-    setHandState(INITIAL_HAND);
+    setHandState(INITIAL_SOZU_HAND);
   };
   
   return { handState, addComponentToHand, removeComponentFromHand, clearHand };
