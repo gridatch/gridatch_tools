@@ -88,6 +88,35 @@ export interface SozuTenpaiResult {
 }
 
 // --- 領域 ---
+// フェーズ
+export enum RealmPhase {
+  Boss = 0,
+  DoraIndicators = 1,
+  Wall = 2,
+  Exchange = 3,
+  Main = 4,
+}
+
+// フェーズ内で行うアクション
+export enum RealmPhaseAction {
+  Draw = "draw",
+  Discard = "discard",
+}
+
+// シミュレーションの進行状況
+export type RealmSimulationProgress = (
+  | {
+      phase: RealmPhase.Boss | RealmPhase.DoraIndicators | RealmPhase.Wall;
+      action?: never;
+    }
+  | {
+      phase: RealmPhase.Exchange | RealmPhase.Main;
+      action: RealmPhaseAction;
+    }
+  ) & {
+    turn: number;
+  };
+    
 export const DORA_BOSSES = ["dora_indicator", "dora_manzu", "dora_pinzu", "dora_sozu", "others", "empty"] as const;
 export type DoraBoss = (typeof DORA_BOSSES)[number];
 
@@ -108,8 +137,8 @@ export interface TileStatus {
 }
 
 export interface DrawnTile {
-  isClosed: boolean;
   tile: WallTile;
+  isClosed: boolean;
   isSelected: boolean;
 }
 
@@ -120,7 +149,7 @@ export interface HandState {
 
 export const INITIAL_HAND_STATE: HandState = deepFreeze({
   closed: Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as TileStatus[]])) as Record<SanmaTile, TileStatus[]>,
-  drawn: { isClosed: false, tile: "empty", isSelected: false }
+  drawn: { tile: "empty", isClosed: false, isSelected: false }
 })
 
 // --- 手牌のブロック分解 ---

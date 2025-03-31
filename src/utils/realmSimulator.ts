@@ -117,16 +117,23 @@ export const calcRemainingTiles = (
 };
 
 /**
- * 牌山から各牌を最初に引く巡目を計算する（存在しない場合は-1巡目）
+ * 巡目ごとの牌山から各牌を最初に引く巡目を計算する（存在しない場合は-1巡目）
  * @param wall 牌山
- * @returns 牌山から各牌を最初に引く巡目
+ * @returns 巡目ごとの牌山から各牌を最初に引く巡目
  */
-export const calcFirstDrawTurnByTiles = (wall: WallTile[]): Record<SanmaTile, number> => {
-  const result = { ...SANMA_TILE_RECORD_MINUS_1 };
-  wall.forEach((tile, i) => {
-    if (tile === "closed" || tile === "empty") return;
-    if (result[tile] === -1) result[tile] = (i + 1);
-  })
+export const calcFirstDrawTurnsByTilesByTurns = (wall: WallTile[], maxWall: number): Record<SanmaTile, number>[] => {
+  const result: Record<SanmaTile, number>[] = new Array(maxWall + 1);
+  
+  const firstDrawTurnsByTiles = { ...SANMA_TILE_RECORD_MINUS_1 };
+  result[maxWall] = { ...firstDrawTurnsByTiles };
+  
+  for (let i = maxWall - 1; i >= 0; --i) {
+    const tile = wall[i];
+    if (tile !== "empty" && tile !== "closed") {
+      firstDrawTurnsByTiles[tile] = i + 1;
+    }
+    result[i] = { ...firstDrawTurnsByTiles };
+  }
   
   return result;
 };
@@ -137,14 +144,17 @@ export const calcFirstDrawTurnByTiles = (wall: WallTile[]): Record<SanmaTile, nu
  * @param wall 牌山
  * @returns 各牌を引く巡目
  */
-export const calcDrawTurnsByTiles = (handState: HandState, wall: WallTile[]): Record<SanmaTile, number[]> => {
+export const calcDrawTurnsByTiles = (isDrawPhase: boolean, handState: HandState, wall: WallTile[], currentWallIndex: number): Record<SanmaTile, number[]> => {
   const result = structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
   for (const tile of SANMA_TILES) {
     for (let i = 0; i < handState.closed[tile].length; ++i) {
+      if ((currentWallIndex > -1 || !isDrawPhase) && handState.closed[tile][i].isSelected) continue;
       result[tile].push(0);
     }
   }
+  if (handState.drawn.tile !== "empty" && handState.drawn.tile !== "closed" && !handState.drawn.isSelected) result[handState.drawn.tile].push(0);
   wall.forEach((tile, i) => {
+    if (i <= currentWallIndex) return;
     if (tile === "closed" || tile === "empty") return;
     result[tile].push(i + 1);
   })
@@ -463,6 +473,7 @@ function createKokushiTenpai(pool: Record<SanmaTile, number>, nonRealmWinsPerSoz
  * @param isRealmEachTile 各牌が領域牌かどうか
  * @param handState 手牌の状態
  * @param wall 牌山
+ * @param currentWallIndex ツモ牌を指す牌山のインデックス
  * @param nonRealmWinsByTenpaiTurnsPerSozu 聴牌巡目ごとの各索子牌の非領域の和了回数
  * @returns 各聴牌形で索子待ちの聴牌をする最も早い巡目と聴牌時の手牌。聴牌しない場合は正の無限大の巡目と空の手牌を設定する。
  */
@@ -471,14 +482,19 @@ export const calcRealmTenpai = (
   isRealmEachTile: Record<SanmaTile, boolean>,
   handState: HandState,
   wall: WallTile[],
+  currentWallIndex: number,
   realmWinsByTenpaiTurns: number[],
   nonRealmWinsByTenpaiTurnsPerSozu: Record<Sozu, number>[],
 ): RealmTenpaiResult[] => {
   const pool: Record<SanmaTile, number> = { ...SANMA_TILE_RECORD_0 };
   for (const tile of SANMA_TILES) {
-    // ツモフェーズ時はツモ候補を牌プールに含める
-    // 打牌フェーズ時は打牌候補を牌プールから除外する
-    pool[tile] = isRealmEachTile[tile] ? handState.closed[tile].filter(status => isDrawPhase ? true : !status.isSelected).length : 0;
+    if (!isRealmEachTile[tile]) continue;
+    // ツモ牌選択中はツモ候補を牌プールに含める
+    // 捨て牌選択中は打牌候補を牌プールから除外する
+    pool[tile] = handState.closed[tile].filter(status => (currentWallIndex === -1 && isDrawPhase) ? true : !status.isSelected).length;
+  }
+  if (handState.drawn.tile !== "empty" && handState.drawn.tile !== "closed" && !handState.drawn.isSelected) {
+    ++pool[handState.drawn.tile];
   }
   
   const standardResult: RealmTenpaiResult = {
@@ -507,14 +523,17 @@ export const calcRealmTenpai = (
   };
   
   const results: RealmTenpaiResult[] = [];
+  console.table(pool);
   
-  for (let turn = 0; turn <= wall.length; ++turn) {
-    if (turn >= 1) {
-      const drawn = wall[turn - 1];
-      if (drawn === "closed" || drawn === "empty") continue;
-      if (!isRealmEachTile[drawn]) continue;
-      pool[drawn] += 1;
+  for (let turn = currentWallIndex + 1; turn <= wall.length; ++turn) {
+    if (turn > currentWallIndex + 1) {
+      const tile = wall[turn - 1];
+      if (tile === "closed" || tile === "empty") continue;
+      if (!isRealmEachTile[tile]) continue;
+      pool[tile] += 1;
     }
+    console.log(turn);
+    console.table(pool);
     if (totalTiles(pool) < 13) continue;
     
     const nonRealmWinsPerSozu = nonRealmWinsByTenpaiTurnsPerSozu[turn];

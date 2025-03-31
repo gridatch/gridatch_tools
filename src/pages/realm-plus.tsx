@@ -7,9 +7,9 @@ import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsStatePlus";
 import { PageProps } from "gatsby";
 import { 
   DoraBoss, 
-  SANMA_TILE_RECORD_0, 
   SANMA_TILE_RECORD_4, 
-  SANMA_TILE_RECORD_NUMBER_ARRAY, 
+  SANMA_TILE_RECORD_NUMBER_ARRAY,
+  SanmaTile, 
 } from "../types/simulation";
 import { 
   calcDrawTurnsByTiles, 
@@ -18,7 +18,7 @@ import {
   calcRemainingTiles, 
   calcRealmWinsByTenpaiTurns, 
   calcNonRealmWinsByTenpaiTurnsPerSozu, 
-  calcFirstDrawTurnByTiles
+  calcFirstDrawTurnsByTilesByTurns
 } from "../utils/realmSimulator";
 import DoraBossSectionPlus from "../components/doraBossSectionPlus";
 import DoraIndicatorsSectionPlus from "../components/doraIndicatorsSectionPlus";
@@ -62,7 +62,7 @@ const RealmPage: React.FC<PageProps> = () => {
     wallConfirmed,
     setWallConfirmed,
   } = useRealmWallState(remainingTiles);
-
+  
   /** 各牌が領域牌かどうか */
   const isRealmEachTile = useMemo(
     () => calcIsRealmEachTile(doraBoss, doraIndicators),
@@ -71,21 +71,28 @@ const RealmPage: React.FC<PageProps> = () => {
 
   // 手牌関連のフック
   const {
-    isDrawPhase,
+    isExchangeDrawStep: isDrawPhase,
     handState,
     discardedTiles,
     maxHand,
-    draw,
-    cancelDraw,
-    confirmDraw,
-    toggleDiscard,
+    // exchangeDraw: draw,
+    cancelExchangeDraw: cancelDraw,
+    confirmExchangeDraw: confirmDraw,
+    // toggleExchangeDiscard: toggleDiscard,
     confirmDiscard,
+    exchangesConfirmed,
+    confirmExchanges,
+    currentWallIndex,
+    // selectClosedTile,
+    // mainDiscard,
+    draw,
+    discard,
     canUndo,
     canRedo,
     undo,
     redo,
     clearHandState,
-  } = useRealmHandState(isRealmEachTile, remainingTiles);
+  } = useRealmHandState(isRealmEachTile, remainingTiles, wall);
 
   // 残り牌の計算
   useEffect(() => {
@@ -107,24 +114,24 @@ const RealmPage: React.FC<PageProps> = () => {
   // 結果の計算（聴牌形シミュレーション）と、各牌のツモ巡目の補助値
   const result = useMemo(() => {
     if (!wallConfirmed) return null;
-    return calcRealmTenpai(isDrawPhase, isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu);
-  }, [wallConfirmed, isDrawPhase, isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu]);
+    return calcRealmTenpai(isDrawPhase, isRealmEachTile, handState, wall, currentWallIndex, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu);
+  }, [wallConfirmed, isDrawPhase, isRealmEachTile, handState, wall, currentWallIndex, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu]);
 
-  // 牌山から各牌を最初に引く巡目
-  const firstDrawTurnByTiles = useMemo(() => {
+  // 巡目ごとの牌山から各牌を最初に引く巡目
+  const firstDrawTurnsByTilesByTurns = useMemo(() => {
     if (!wallConfirmed) {
-      return { ...SANMA_TILE_RECORD_0 };
+      return [] as Record<SanmaTile, number>[];
     }
-    return calcFirstDrawTurnByTiles(wall);
-  }, [wallConfirmed, wall]);
+    return calcFirstDrawTurnsByTilesByTurns(wall, maxWall);
+  }, [wallConfirmed, wall, maxWall]);
 
   // 各牌を引く巡目（手牌にある牌は0巡目）
   const drawTurnsByTiles = useMemo(() => {
     if (!wallConfirmed) {
       return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
     }
-    return calcDrawTurnsByTiles(handState, wall);
-  }, [wallConfirmed, wall, handState]);
+    return calcDrawTurnsByTiles(isDrawPhase, handState, wall, currentWallIndex);
+  }, [wallConfirmed, isDrawPhase, wall, handState, currentWallIndex]);
 
   /** 場の編集 */
   const editField = useCallback(() => {
@@ -157,6 +164,7 @@ const RealmPage: React.FC<PageProps> = () => {
             doraIndicatorsConfirmed={doraIndicatorsConfirmed}
             isRealmEachTile={isRealmEachTile}
             wall={wall}
+            currentWallIndex={currentWallIndex}
             wallConfirmed={wallConfirmed}
             clearAll={clearAll}
           />
@@ -197,12 +205,16 @@ const RealmPage: React.FC<PageProps> = () => {
             isDrawPhase={isDrawPhase}
             handState={handState}
             maxHand={maxHand}
-            firstDrawTurnByTiles={firstDrawTurnByTiles}
+            firstDrawTurnsByTiles={firstDrawTurnsByTilesByTurns[currentWallIndex + 1]}
             draw={draw}
             cancelDraw={cancelDraw}
             confirmDraw={confirmDraw}
-            toggleDiscard={toggleDiscard}
+            discard={discard}
             confirmDiscard={confirmDiscard}
+            exchangesConfirmed={exchangesConfirmed}
+            confirmExchanges={confirmExchanges}
+            // currentWallTile={wall[currentWallIndex]}
+            // selectClosedTile={selectClosedTile}
             canUndo={canUndo}
             canRedo={canRedo}
             undo={undo}
