@@ -88,8 +88,53 @@ export interface SozuTenpaiResult {
 }
 
 // --- 領域 ---
-export const DORA_BOSSES = ["dora_indicator", "dora_manzu", "dora_pinzu", "dora_sozu", "others", "empty"] as const;
-export type DoraBoss = (typeof DORA_BOSSES)[number];
+// フェーズ
+export enum RealmPhase {
+  Boss = 0,
+  DoraIndicators = 1,
+  Wall = 2,
+  Exchange = 3,
+  Main = 4,
+}
+
+// フェーズ内で行うアクション
+export enum RealmPhaseAction {
+  Draw = "draw",
+  Discard = "discard",
+}
+
+// シミュレーションの進行状況
+export type RealmSimulationProgress = (
+  | {
+    phase: RealmPhase.Boss | RealmPhase.DoraIndicators | RealmPhase.Wall;
+    action?: never;
+  }
+  | {
+    phase: RealmPhase.Exchange | RealmPhase.Main;
+    action: RealmPhaseAction;
+  }
+) & {
+  turn: number;
+};
+
+// 編集モードのフェーズ
+export enum RealmEditPhase {
+  Boss = 0,
+  DoraIndicators = 1,
+  Wall = 2,
+}
+
+// 編集モードの進行状況
+export type RealmEditProgress = {
+  isEditing: true;
+  phase: RealmEditPhase.Boss | RealmEditPhase.DoraIndicators | RealmEditPhase.Wall;
+} | {
+  isEditing: false;
+  phase?: never;
+};
+
+export const REALM_BOSSES = ["dora_indicator", "dora_manzu", "dora_pinzu", "dora_sozu", "others", "empty"] as const;
+export type RealmBoss = (typeof REALM_BOSSES)[number];
 
 export const SANMA_TILE_RECORD_FALSE: Record<SanmaTile, boolean> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, false])) as Record<SanmaTile, boolean>);
 export const SANMA_TILE_RECORD_TRUE: Record<SanmaTile, boolean> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, true])) as Record<SanmaTile, boolean>);
@@ -113,12 +158,12 @@ export interface DrawnTile {
   isSelected: boolean;
 }
 
-export interface HandState {
+export interface Hand {
   closed: Record<SanmaTile, TileStatus[]>;
   drawn: DrawnTile;
 }
 
-export const INITIAL_HAND_STATE: HandState = deepFreeze({
+export const INITIAL_HAND: Hand = deepFreeze({
   closed: Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as TileStatus[]])) as Record<SanmaTile, TileStatus[]>,
   drawn: { isClosed: false, tile: "empty", isSelected: false }
 })

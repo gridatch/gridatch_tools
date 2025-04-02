@@ -1,24 +1,21 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
-import styles from "../pages/manman.module.css";
-import { SozuHand, SOZU_TILES, ManmanTenpaiResult } from "../types/simulation";
-import ClearButton from "./clearButton";
+import DynamicSVGText from "../dynamicSVGText";
+import DynamicSVGTextSequence from "../dynamicSVGTextSequence";
+import styles from "../../pages/manman.module.css";
+import { SozuHand, SOZU_TILES, SozuTenpaiResult } from "../../types/simulation";
+import ClearButton from "../clearButton";
 
-interface ResultSectionProps {
+interface SozuResultSectionProps {
   handState: SozuHand;
-  tenpaiResults: ManmanTenpaiResult[];
+  tenpaiResults: SozuTenpaiResult[];
   clearAll: () => void;
 }
 
-const ResultSection: React.FC<ResultSectionProps> = ({ handState, tenpaiResults, clearAll }) => {
+const SozuResultSection: React.FC<SozuResultSectionProps> = ({ handState, tenpaiResults, clearAll }) => {
   return (
     <section className={styles.result_section}>
       <div className={styles.area_title} style={{position: "relative"}}>
         <DynamicSVGText text={"最終形"} />
-        <span style={{ fontSize: "var(--font-sx)" }}>
-          <DynamicSVGText text={"※ロス数12枚以下の形を表示"} />
-        </span>
         <ClearButton onClick={clearAll} style={{ marginTop: "-5px" }} />
       </div>
       <div id="results" className={`${styles.area} ${styles.results}`}>
@@ -65,10 +62,27 @@ const ResultSection: React.FC<ResultSectionProps> = ({ handState, tenpaiResults,
             return (
               <div key={`tempai_${i}`} className={styles.result}>
                 <div>
-                  <DynamicSVGTextSequence text={["ロス", ...`${tenpai.loss}`, "枚", ...(tenpai.breakdown && `（${tenpai.breakdown}）`)]} />
+                  <DynamicSVGTextSequence text={[`待ち`, ...`${tenpai.totalWaits}枚：`]} />
+                  {
+                    SOZU_TILES.map(tile => {
+                      if (tenpai.waits[tile] === 0) return null;
+                      return (
+                        <React.Fragment key={`breakdown_${i}_${tile}`}>
+                          <img
+                            className={styles.breakdown_tile}
+                            src={`/tiles/${tile}.png`}
+                            alt={tile}
+                          />
+                          <span style={{fontSize: "var(--font-sm)"}}>
+                            <DynamicSVGText text="×" />
+                            <DynamicSVGText text={tenpai.waits[tile].toString()} />
+                          </span>
+                        </React.Fragment>
+                      )
+                    })
+                  }
                 </div>
                 <div className={styles.hand}>
-                  <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
                   {
                     resultTilesToRender.map((tile, j) => (
                       <img
@@ -89,4 +103,4 @@ const ResultSection: React.FC<ResultSectionProps> = ({ handState, tenpaiResults,
   );
 };
 
-export default ResultSection;
+export default SozuResultSection;

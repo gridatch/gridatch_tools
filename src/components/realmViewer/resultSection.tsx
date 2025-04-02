@@ -1,17 +1,17 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/realm.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, DoraBoss } from "../types/simulation";
-import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
-import ClearButton from "./clearButton";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/realm.module.css";
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, RealmBoss } from "../../types/simulation";
+import DynamicSVGTextSequence from "../dynamicSVGTextSequence";
+import ClearButton from "../clearButton";
 
-interface RealmResultSectionProps {
-  doraBoss: DoraBoss;
+interface RealmViewerResultSectionProps {
+  boss: RealmBoss;
   realmTileCounter: Map<SanmaTile, number>;
   clearAll: () => void;
 }
 
-const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realmTileCounter, clearAll }) => {
+const RealmViewerResultSection: React.FC<RealmViewerResultSectionProps> = ({ boss, realmTileCounter, clearAll }) => {
   const tileGroups: SanmaTile[][] = [
     [...PINZU_TILES],
     [...SOZU_TILES],
@@ -36,7 +36,7 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realm
         </div>
         <div className={`${styles.area} ${styles.realm_result}`}>
           <div className={styles.realm_result_warn}>
-            { doraBoss === "empty"
+            { boss === "empty"
             ? <>
                 <DynamicSVGText text={"ステージ効果を設定してください。"} />
                 <DynamicSVGText text={"※ドラ無効の事故防止で必須にしています。"} />
@@ -76,4 +76,4 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ doraBoss, realm
   );
 };
 
-export default RealmResultSection;
+export default RealmViewerResultSection;

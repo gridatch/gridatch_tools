@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { DoraBoss, SanmaTile } from "../types/simulation";
+import { RealmBoss, SanmaTile } from "../types/simulation";
 
 const MAX_DORA_INDICATORS = 10;
 
@@ -11,9 +11,9 @@ export interface UseDoraIndicatorsStateReturn {
   clearDoraIndicator: () => void;
 }
 
-export const useDoraIndicatorsState = (doraBoss: DoraBoss, initialDoraIndicators: SanmaTile[] = []): UseDoraIndicatorsStateReturn => {
+export const useDoraIndicatorsState = (boss: RealmBoss, initialDoraIndicators: SanmaTile[] = []): UseDoraIndicatorsStateReturn => {
   const [doraIndicators, setDoraIndicators] = useState(initialDoraIndicators);
-  const maxDoraIndicators = doraBoss === "dora_indicator" ? 3 : MAX_DORA_INDICATORS;
+  const maxDoraIndicators = boss === "dora_indicator" ? 3 : MAX_DORA_INDICATORS;
   
   useEffect(() => {
     setDoraIndicators((prev) => prev.slice(0, maxDoraIndicators));

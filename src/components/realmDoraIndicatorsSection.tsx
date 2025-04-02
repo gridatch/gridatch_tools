@@ -1,44 +1,46 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
-import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "../types/simulation";
+import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, RealmPhase, RealmEditPhase } from "../types/simulation";
+import { RealmProgressState } from "../hooks/useRealmProgressState";
+import { RealmDoraIndicatorsState } from "../hooks/useRealmDoraIndicatorsState";
 
-interface DoraIndicatorsSectionProps {
-  isEditing: boolean;
-  doraIndicators: SanmaTile[];
+interface RealmDoraIndicatorsSectionProps {
+  progressState: RealmProgressState;
+  doraIndicatorsState: RealmDoraIndicatorsState;
   remainingTiles: Record<SanmaTile, number>;
-  maxDoraIndicators: number;
-  addDoraIndicator: (tile: SanmaTile) => void;
-  removeDoraIndicatorAtIndex: (index: number) => void;
-  doraBossConfirmed: boolean;
-  doraIndicatorsConfirmed: boolean;
-  setDoraIndicatorsConfirmed: Dispatch<SetStateAction<boolean>>;
 }
 
-const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
-  isEditing,
-  doraIndicators,
+const RealmDoraIndicatorsSection: React.FC<RealmDoraIndicatorsSectionProps> = ({
+  progressState,
+  doraIndicatorsState,
   remainingTiles,
-  maxDoraIndicators,
-  addDoraIndicator,
-  removeDoraIndicatorAtIndex,
-  doraBossConfirmed,
-  doraIndicatorsConfirmed,
-  setDoraIndicatorsConfirmed,
 }) => {
-  if (!doraBossConfirmed) return;
-  if (doraIndicatorsConfirmed) return;
+  const { simulationProgress, editProgress } = progressState;
+  
+  const showDoraIndicatorsSection = (!editProgress.isEditing && simulationProgress.phase === RealmPhase.DoraIndicators)
+    || (editProgress.isEditing && editProgress.phase === RealmEditPhase.DoraIndicators);
+  if (!showDoraIndicatorsSection) return;
+  
+  const {
+    doraIndicators,
+    maxDoraIndicators,
+    addDoraIndicator,
+    removeDoraIndicatorAtIndex,
+    confirmDoraIndicators,
+  } = doraIndicatorsState;
+  
   const tileGroups: SanmaTile[][] = [
     [...PINZU_TILES],
     [...SOZU_TILES],
     [...NON_SEQUENTIAL_TILES],
   ];
-  const confirmButtonText = isEditing ? "修正" : "決定";
+  const confirmButtonText = editProgress.isEditing ? "修正" : "決定";
   return (
-    <section className={`${styles.dora_indicators_section} ${isEditing && styles.editing}`}>
+    <section className={`${styles.dora_indicators_section} ${editProgress.isEditing && styles.editing}`}>
       <div style={{position: "relative"}}>
         {
-          isEditing && 
+          editProgress.isEditing && 
           <div className={styles.editingTextWrapper}>
             <DynamicSVGText text={"修正中"} />  
           </div>
@@ -99,7 +101,7 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
             marginLeft: "auto",
             visibility: doraIndicators.length === maxDoraIndicators ? "visible" : "hidden",
           }}
-          onClick={() => setDoraIndicatorsConfirmed(true)}
+          onClick={confirmDoraIndicators}
         >
           <DynamicSVGText text={confirmButtonText} height="1.2em" />
         </button>
@@ -108,4 +110,4 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
   );
 };
 
-export default DoraIndicatorsSection;
+export default RealmDoraIndicatorsSection;

@@ -1,41 +1,44 @@
 import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
-import { DoraBoss, SanmaTile, WallTile } from "../types/simulation";
+import { RealmBoss, RealmEditPhase, RealmPhase, SanmaTile, WallTile } from "../types/simulation";
 import ClearButton from "./clearButton";
 import EditButton from "./editButton";
+import { RealmProgressState } from "../hooks/useRealmProgressState";
 
 interface RealmConfirmedSectionProps {
-  doraBoss: DoraBoss;
-  doraBossConfirmed: boolean;
+  progressState: RealmProgressState;
+  boss: RealmBoss;
   doraIndicators: SanmaTile[];
-  doraIndicatorsConfirmed: boolean;
   isRealmEachTile: Record<SanmaTile, boolean>;
   wall: WallTile[];
-  wallConfirmed: boolean;
-  editField: () => void;
   clearAll: () => void;
 }
 
 const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
-  doraBoss,
-  doraBossConfirmed,
+  progressState,
+  boss,
   doraIndicators,
-  doraIndicatorsConfirmed,
   isRealmEachTile,
   wall,
-  wallConfirmed,
-  editField,
   clearAll,
 }) => {
-  if (!doraBossConfirmed) return;
+  const { simulationProgress, editProgress } = progressState;
+  
+  const isBossConfirmed = (!editProgress.isEditing && simulationProgress.phase > RealmPhase.Boss)
+    || (editProgress.isEditing && editProgress.phase > RealmEditPhase.Boss);
+  const isDoraIndicatorsConfirmed = (!editProgress.isEditing && simulationProgress.phase > RealmPhase.DoraIndicators)
+    || (editProgress.isEditing && editProgress.phase > RealmEditPhase.DoraIndicators);
+  const isWallConfirmed = !editProgress.isEditing && simulationProgress.phase > RealmPhase.Wall;
+  
+  if (!isBossConfirmed) return;
   
   return (
     <section className={styles.confirmed_section}>
       <div style={{position: "relative"}}>
         <ClearButton onClick={clearAll} style={{ marginTop: "-5px" }} />
         {
-          wallConfirmed && <EditButton onClick={editField} />
+          isWallConfirmed && <EditButton onClick={progressState.enterEditMode} />
         }
         <div className={styles.area_title}>
           <span style={{position: "absolute"}}>
@@ -45,12 +48,12 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
         <div className={`${styles.area} ${styles.confirmed_dora}`}>
           <img
             className={styles.dora_boss_image}
-            src={`/boss/${doraBoss}.png`}
-            alt={doraBoss}
+            src={`/boss/${boss}.png`}
+            alt={boss}
           />
           <div className={styles.confirmed_dora_indicators}>
             {
-              doraIndicatorsConfirmed && doraIndicators.map((tile, i) => (
+              isDoraIndicatorsConfirmed && doraIndicators.map((tile, i) => (
                 <img
                   key={`dora_indicator_${i}`}
                   className={styles.confirmed_dora_indicator}
@@ -62,22 +65,24 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
           </div>
         </div>
         <div className={`${styles.area} ${styles.confirmed_wall}`}>
-          {wallConfirmed && wall.map((tile, i) => {
-            const isNotRealm = wall[i] !== "empty" && wall[i] !== "closed" && !isRealmEachTile[wall[i]];
-            return (
-              <React.Fragment key={`wall_${i}`}>
-                {
-                  wall[i] !== "empty" && (
-                    <img
-                      className={`${styles.confirmed_wall_tile} ${isNotRealm && styles.not_realm}`}
-                      src={`/tiles/${tile}.png`}
-                      alt={tile}
-                    />
-                  )
-                }
-              </React.Fragment>
-            )
-          })}
+          {
+            isWallConfirmed && wall.map((tile, i) => {
+              const isNotRealm = wall[i] !== "empty" && wall[i] !== "closed" && !isRealmEachTile[wall[i]];
+              return (
+                <React.Fragment key={`wall_${i}`}>
+                  {
+                    wall[i] !== "empty" && (
+                      <img
+                        className={`${styles.confirmed_wall_tile} ${isNotRealm && styles.not_realm}`}
+                        src={`/tiles/${tile}.png`}
+                        alt={tile}
+                      />
+                    )
+                  }
+                </React.Fragment>
+              )
+            })
+          }
         </div>
       </div>
     </section>

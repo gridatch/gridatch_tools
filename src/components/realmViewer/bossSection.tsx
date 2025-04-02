@@ -1,15 +1,15 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/realm.module.css";
-import { DORA_BOSSES, DoraBoss } from "../types/simulation";
-import { DORA_BOSS_DESCRIPTIONS } from "../constants/strings";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/realm.module.css";
+import { REALM_BOSSES, RealmBoss } from "../../types/simulation";
+import { DORA_BOSS_DESCRIPTIONS } from "../../constants/strings";
 
-interface DoraBossSectionProps {
-  doraBoss: DoraBoss;
-  setDoraBoss: (doraBoss: DoraBoss) => void;
+interface RealmViewerBossSectionProps {
+  boss: RealmBoss;
+  setBoss: (boss: RealmBoss) => void;
 }
 
-const DoraBossSection: React.FC<DoraBossSectionProps> = ({ doraBoss, setDoraBoss }) => {
+const RealmViewerBossSection: React.FC<RealmViewerBossSectionProps> = ({ boss, setBoss }) => {
   return (
     <section className={styles.dora_boss_section}>
       <div>
@@ -19,11 +19,11 @@ const DoraBossSection: React.FC<DoraBossSectionProps> = ({ doraBoss, setDoraBoss
         <div className={`${styles.area} ${styles.dora_boss}`}>
           <img
             className={styles.dora_boss_image}
-            src={`/boss/${doraBoss}.png`}
-            onClick={() => setDoraBoss("empty")}
-            alt={doraBoss}
+            src={`/boss/${boss}.png`}
+            onClick={() => setBoss("empty")}
+            alt={boss}
           />
-          <DynamicSVGText text={DORA_BOSS_DESCRIPTIONS[doraBoss]} />
+          <DynamicSVGText text={DORA_BOSS_DESCRIPTIONS[boss]} />
         </div>
       </div>
       <div>
@@ -31,13 +31,13 @@ const DoraBossSection: React.FC<DoraBossSectionProps> = ({ doraBoss, setDoraBoss
           <DynamicSVGText text={"ステージ効果選択"} />
         </div>
         <div className={`${styles.area} ${styles.dora_boss_choices}`}>
-          {DORA_BOSSES.map(boss => (
+          {REALM_BOSSES.map(boss => (
             boss === "empty" ? null
             : <img
               key={`boss_choice_${boss}`}
               className={styles.dora_boss_image}
               src={`/boss/${boss}.png`}
-              onClick={() => setDoraBoss(boss)}
+              onClick={() => setBoss(boss)}
               alt={boss}
             />
           ))}
@@ -47,4 +47,4 @@ const DoraBossSection: React.FC<DoraBossSectionProps> = ({ doraBoss, setDoraBoss
   );
 };
 
-export default DoraBossSection;
+export default RealmViewerBossSection;

@@ -1,36 +1,29 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES } from "../types/simulation";
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES, RealmPhase, RealmEditPhase } from "../types/simulation";
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
+import { RealmProgressState } from "../hooks/useRealmProgressState";
+import { RealmWallState } from "../hooks/useRealmWallState";
 
 interface RealmWallSectionProps {
-  isEditing: boolean;
-  setIsEditing: Dispatch<SetStateAction<boolean>>;
-  wall: WallTile[];
+  progressState: RealmProgressState;
+  wallState: RealmWallState;
   isRealmEachTile: Record<SanmaTile, boolean>;
   remainingTiles: Record<SanmaTile, number>;
-  addTileToWall: (tile: WallTile) => void;
-  removeTileFromWallAtIndex: (index: number) => void;
-  doraIndicatorsConfirmed: boolean;
-  wallConfirmed: boolean;
-  setWallConfirmed: Dispatch<SetStateAction<boolean>>;
 }
 
 const RealmWallSection: React.FC<RealmWallSectionProps> = ({
-  isEditing,
-  setIsEditing,
-  wall,
+  progressState,
+  wallState,
   isRealmEachTile,
   remainingTiles,
-  addTileToWall,
-  removeTileFromWallAtIndex,
-  doraIndicatorsConfirmed,
-  wallConfirmed,
-  setWallConfirmed,
 }) => {
-  if (!doraIndicatorsConfirmed) return;
-  if (wallConfirmed) return;
+  const { simulationProgress, editProgress } = progressState;
+  
+  const showWallSection = (!editProgress.isEditing && simulationProgress.phase === RealmPhase.Wall)
+    || (editProgress.isEditing && editProgress.phase === RealmEditPhase.Wall);
+  if (!showWallSection) return;
   
   const realmTileTypeCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).length;
   const remainingRealmTileCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).reduce((sum, tile) => sum + remainingTiles[tile], 0);
@@ -42,12 +35,12 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
     [...NON_SEQUENTIAL_TILES],
     ["closed"],
   ];
-  const confirmButtonText = isEditing ? "修正" : "決定";
+  const confirmButtonText = editProgress.isEditing ? "修正" : "決定";
   return (
-    <section className={`${styles.wall_section} ${isEditing && styles.editing}`}>
+    <section className={`${styles.wall_section} ${editProgress.isEditing && styles.editing}`}>
       <div style={{position: "relative"}}>
         {
-          isEditing && 
+          editProgress.isEditing && 
           <div className={styles.editingTextWrapper}>
             <DynamicSVGText text={"修正中"} />  
           </div>
@@ -56,7 +49,7 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
           <DynamicSVGText text={"牌山"} />
         </div>
         <div className={`${styles.area} ${styles.realm_wall}`}>
-          {wall.map((tile, i) => {
+          {wallState.wall.map((tile, i) => {
             const isNotRealm = tile !== "empty" && tile !== "closed" && !isRealmEachTile[tile];
             return (
               <React.Fragment key={`wall_${i}`}>
@@ -71,7 +64,7 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
                     <img
                       className={`${styles.realm_wall_tile} ${isNotRealm && styles.not_realm}`}
                       src={`/tiles/${tile}.png`}
-                      onClick={() => removeTileFromWallAtIndex(i)}
+                      onClick={() => wallState.removeTileFromWallAtIndex(i)}
                       alt={tile}
                     />
                   )
@@ -104,7 +97,7 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
                     <img
                       className={`${isNotRealm && styles.not_realm} ${soldOut && styles.sold_out}`}
                       src={`/tiles/${tile}.png`}
-                      onClick={() => addTileToWall(tile)}
+                      onClick={() => wallState.addTileToWall(tile)}
                       alt={tile}
                     />
                     { tile !== "empty" && tile !== "closed" &&
@@ -123,12 +116,9 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
             <button
               style={{
                 marginLeft: "auto",
-                visibility: wall.some(tile => tile == "empty") ? "hidden" : "visible",
+                visibility: wallState.wall.some(tile => tile == "empty") ? "hidden" : "visible",
               }}
-              onClick={() => {
-                setWallConfirmed(true);
-                setIsEditing(false);
-              }}
+              onClick={wallState.confirmWall}
             >
               <DynamicSVGText text={confirmButtonText} height="1.2em" />
             </button>

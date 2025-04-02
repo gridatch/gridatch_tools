@@ -5,13 +5,13 @@ import styles from "./manman.module.css"
 import DynamicSVGText from "../components/dynamicSVGText"
 import { useWallState } from "../hooks/useWallState";
 import { useHandState } from "../hooks/useHandState";
-import WallSection from "../components/wallSection";
-import HandSection from "../components/handSection";
+import SozuWallSection from "../components/sozu/wallSection";
+import SozuHandSection from "../components/sozu/handSection";
 import { loadSozuCsvData } from "../utils/csvLoader";
 import { computeOptimalSozuTenpais } from "../utils/tenpaiSimulator";
 import { PageProps } from "gatsby";
 import { SozuCsvData, SozuTenpaiResult } from "../types/simulation";
-import SozuResultSection from "../components/sozuResultSection";
+import SozuResultSection from "../components/sozu/sozuResultSection";
 
 // CSVファイル名に対応する索子牌の枚数
 const ALLOWED_SINGLE_COUNTS = [7, 8, 10, 11, 13];
@@ -47,8 +47,8 @@ const SozuPage: React.FC<PageProps> = () => {
       <div className={styles.container}>
         <DynamicSVGText text={"索子多面張シミュレーター"} />
         <div className={styles.contents}>
-          <WallSection wall={wall} maxWall={MAX_WALL} addTileToWall={addTileToWall} removeTileFromWallAtIndex={removeTileFromWallAtIndex} />
-          <HandSection 
+          <SozuWallSection wall={wall} maxWall={MAX_WALL} addTileToWall={addTileToWall} removeTileFromWallAtIndex={removeTileFromWallAtIndex} />
+          <SozuHandSection 
             hand={handState}
             maxHand={MAX_HAND}
             addComponentToHand={addComponentToHand}

@@ -1,9 +1,9 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/manman.module.css";
-import { SozuHand, HandComponent, SOZU_TILES } from "../types/simulation";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/manman.module.css";
+import { SozuHand, HandComponent, SOZU_TILES } from "../../types/simulation";
 
-interface HandSectionProps {
+interface SozuHandSectionProps {
   hand: SozuHand;
   maxHand: number;
   addComponentToHand: (component: HandComponent) => void;
@@ -16,7 +16,7 @@ interface TileToRender {
   onClick: (() => void) | null;
 }
 
-const HandSection: React.FC<HandSectionProps> = ({
+const SozuHandSection: React.FC<SozuHandSectionProps> = ({
   hand,
   maxHand,
   addComponentToHand,
@@ -112,4 +112,4 @@ const HandSection: React.FC<HandSectionProps> = ({
   );
 };
 
-export default HandSection;
+export default SozuHandSection;

@@ -3,10 +3,10 @@ import Layout from "../components/layout";
 import Seo from "../components/seo";
 import styles from "./realm-plus.module.css";
 import DynamicSVGText from "../components/dynamicSVGText";
-import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsStatePlus";
+import { useDoraIndicatorsState } from "../hooks/useRealmDoraIndicatorsState";
 import { PageProps } from "gatsby";
 import { 
-  DoraBoss, 
+  RealmPhase,
   SANMA_TILE_RECORD_0, 
   SANMA_TILE_RECORD_4, 
   SANMA_TILE_RECORD_NUMBER_ARRAY, 
@@ -20,8 +20,8 @@ import {
   calcNonRealmWinsByTenpaiTurnsPerSozu, 
   calcFirstDrawTurnByTiles
 } from "../utils/realmSimulator";
-import DoraBossSectionPlus from "../components/doraBossSectionPlus";
-import DoraIndicatorsSectionPlus from "../components/doraIndicatorsSectionPlus";
+import DoraBossSectionPlus from "../components/realmBossSection";
+import RealmDoraIndicatorsSection from "../components/realmDoraIndicatorsSection";
 import RealmConfirmedSection from "../components/realmConfirmedSection";
 import { useRealmWallState } from "../hooks/useRealmWallState";
 import RealmWallSection from "../components/realmWallSection";
@@ -29,120 +29,82 @@ import { useRealmHandState } from "../hooks/useRealmHandState";
 import RealmHandSection from "../components/realmHandSection";
 import RealmResultSectionPlus from "../components/realmResultSectionPlus";
 import "./realm-plus-variables.css"
+import { useRealmProgressState } from "../hooks/useRealmProgressState";
+import { useRealmBossState } from "../hooks/useRealmBossState";
 
 const RealmPage: React.FC<PageProps> = () => {
-  // 修正中かどうか
-  const [isEditing, setIsEditing] = useState(false);
+  /** 進行状況管理のフック */
+  const progressState = useRealmProgressState();
   
-  // ステージ効果関連の state
-  const [doraBoss, setDoraBoss] = useState<DoraBoss>("empty");
-  const [doraBossConfirmed, setDoraBossConfirmed] = useState(false);
+  // ステージ効果関連のフック
+  const bossState = useRealmBossState(progressState);
 
   // 残り牌（牌山の裏牌か交換牌）
   const [remainingTiles, setRemainingTiles] = useState({ ...SANMA_TILE_RECORD_4 });
 
   // ドラ表示牌関連のフック
-  const {
-    doraIndicators,
-    maxDoraIndicators,
-    addDoraIndicator,
-    removeDoraIndicatorAtIndex,
-    clearDoraIndicator,
-    doraIndicatorsConfirmed,
-    setDoraIndicatorsConfirmed,
-  } = useDoraIndicatorsState(doraBoss, remainingTiles);
+  const doraIndicatorsState = useDoraIndicatorsState(progressState, bossState.boss, remainingTiles);
 
   // 牌山関連のフック
-  const {
-    wall,
-    maxWall,
-    addTileToWall,
-    removeTileFromWallAtIndex,
-    clearWall,
-    wallConfirmed,
-    setWallConfirmed,
-  } = useRealmWallState(remainingTiles);
+  const wallState = useRealmWallState(progressState, remainingTiles);
 
   /** 各牌が領域牌かどうか */
   const isRealmEachTile = useMemo(
-    () => calcIsRealmEachTile(doraBoss, doraIndicators),
-    [doraBoss, doraIndicators]
+    () => calcIsRealmEachTile(bossState.boss, doraIndicatorsState.doraIndicators),
+    [bossState.boss, doraIndicatorsState.doraIndicators]
   );
 
   // 手牌関連のフック
-  const {
-    isDrawPhase,
-    handState,
-    discardedTiles,
-    maxHand,
-    draw,
-    cancelDraw,
-    confirmDraw,
-    toggleDiscard,
-    confirmDiscard,
-    canUndo,
-    canRedo,
-    undo,
-    redo,
-    clearHandState,
-  } = useRealmHandState(isRealmEachTile, remainingTiles);
+  const handState = useRealmHandState(progressState, isRealmEachTile, remainingTiles);
 
   // 残り牌の計算
   useEffect(() => {
-    setRemainingTiles(calcRemainingTiles(doraIndicators, wall, handState, discardedTiles));
-  }, [doraIndicators, wall, handState, discardedTiles]);
+    setRemainingTiles(calcRemainingTiles(doraIndicatorsState.doraIndicators, wallState.wall, handState.hand, handState.discardedTiles));
+  }, [doraIndicatorsState.doraIndicators, wallState.wall, handState.hand, handState.discardedTiles]);
 
   /** 聴牌巡目ごとの領域の和了回数 */
   const realmWinsByTenpaiTurns = useMemo(() => {
-    if (!wallConfirmed) return [];
-    return calcRealmWinsByTenpaiTurns(wall, maxWall, isRealmEachTile);
-  }, [wallConfirmed, wall, maxWall, isRealmEachTile]);
+    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return [];
+    if (progressState.editProgress.isEditing) return [];
+    return calcRealmWinsByTenpaiTurns(wallState.wall, wallState.maxWall, isRealmEachTile);
+  }, [progressState, wallState.wall, wallState.maxWall, isRealmEachTile]);
 
   /** 聴牌巡目ごとの各索子牌による非領域の和了回数 */
   const nonRealmWinsByTenpaiTurnsPerSozu = useMemo(() => {
-    if (!wallConfirmed) return [];
-    return calcNonRealmWinsByTenpaiTurnsPerSozu(wall, maxWall, isRealmEachTile);
-  }, [wallConfirmed, wall, maxWall, isRealmEachTile]);
+    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return [];
+    if (progressState.editProgress.isEditing) return [];
+    return calcNonRealmWinsByTenpaiTurnsPerSozu(wallState.wall, wallState.maxWall, isRealmEachTile);
+  }, [progressState, wallState.wall, wallState.maxWall, isRealmEachTile]);
 
   // 結果の計算（聴牌形シミュレーション）と、各牌のツモ巡目の補助値
   const result = useMemo(() => {
-    if (!wallConfirmed) return null;
-    return calcRealmTenpai(isDrawPhase, isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu);
-  }, [wallConfirmed, isDrawPhase, isRealmEachTile, handState, wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu]);
+    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return null;
+    if (progressState.editProgress.isEditing) return null;
+    return calcRealmTenpai(progressState.simulationProgress, isRealmEachTile, handState.hand, wallState.wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu);
+  }, [progressState, isRealmEachTile, handState.hand, wallState.wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu]);
 
   // 牌山から各牌を最初に引く巡目
   const firstDrawTurnByTiles = useMemo(() => {
-    if (!wallConfirmed) {
-      return { ...SANMA_TILE_RECORD_0 };
-    }
-    return calcFirstDrawTurnByTiles(wall);
-  }, [wallConfirmed, wall]);
+    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return { ...SANMA_TILE_RECORD_0 };
+    if (progressState.editProgress.isEditing) return { ...SANMA_TILE_RECORD_0 };
+    return calcFirstDrawTurnByTiles(wallState.wall);
+  }, [progressState.simulationProgress, progressState.editProgress, wallState.wall]);
 
   // 各牌を引く巡目（手牌にある牌は0巡目）
   const drawTurnsByTiles = useMemo(() => {
-    if (!wallConfirmed) {
-      return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
-    }
-    return calcDrawTurnsByTiles(handState, wall);
-  }, [wallConfirmed, wall, handState]);
-
-  /** 場の編集 */
-  const editField = useCallback(() => {
-    setIsEditing(true);
-    setDoraBossConfirmed(false);
-    setDoraIndicatorsConfirmed(false);
-    setWallConfirmed(false);
-  }, [setDoraBossConfirmed, setDoraIndicatorsConfirmed, setWallConfirmed]);
+    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
+    if (progressState.editProgress.isEditing) return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
+    return calcDrawTurnsByTiles(handState.hand, wallState.wall);
+  }, [progressState.simulationProgress, progressState.editProgress, wallState.wall, handState.hand]);
 
   /** 初期化 */
   const clearAll = useCallback(() => {
-    setIsEditing(false);
-    setDoraBoss("empty");
-    setDoraBossConfirmed(false);
-    clearDoraIndicator();
-    clearWall();
-    clearHandState();
-  }, [clearDoraIndicator, clearWall, clearHandState]);
+    progressState.clearRealmProgress();
+    bossState.clearBoss();
+    doraIndicatorsState.clearDoraIndicators();
+    wallState.clearWall();
+    handState.clearHandState();
+  }, [progressState, bossState, doraIndicatorsState, wallState, handState]);
 
   return (
     <Layout>
@@ -150,63 +112,34 @@ const RealmPage: React.FC<PageProps> = () => {
         <DynamicSVGText text={"領域和了シミュレーター"} />
         <div className={styles.contents}>
           <RealmConfirmedSection
-            editField={editField}
-            doraBoss={doraBoss}
-            doraBossConfirmed={doraBossConfirmed}
-            doraIndicators={doraIndicators}
-            doraIndicatorsConfirmed={doraIndicatorsConfirmed}
+            progressState={progressState}
+            boss={bossState.boss}
+            doraIndicators={doraIndicatorsState.doraIndicators}
             isRealmEachTile={isRealmEachTile}
-            wall={wall}
-            wallConfirmed={wallConfirmed}
+            wall={wallState.wall}
             clearAll={clearAll}
           />
           <DoraBossSectionPlus
-            isEditing={isEditing}
-            doraBoss={doraBoss}
-            setDoraBoss={setDoraBoss}
-            doraBossConfirmed={doraBossConfirmed}
-            setDoraBossConfirmed={setDoraBossConfirmed}
+            progressState={progressState}
+            bossState={bossState}
           />
-          <DoraIndicatorsSectionPlus
-            isEditing={isEditing}
-            doraIndicators={doraIndicators}
+          <RealmDoraIndicatorsSection
+            progressState={progressState}
+            doraIndicatorsState={doraIndicatorsState}
             remainingTiles={remainingTiles}
-            maxDoraIndicators={maxDoraIndicators}
-            addDoraIndicator={addDoraIndicator}
-            removeDoraIndicatorAtIndex={removeDoraIndicatorAtIndex}
-            doraBossConfirmed={doraBossConfirmed}
-            doraIndicatorsConfirmed={doraIndicatorsConfirmed}
-            setDoraIndicatorsConfirmed={setDoraIndicatorsConfirmed}
           />
           <RealmWallSection
-            isEditing={isEditing}
-            setIsEditing={setIsEditing}
-            wall={wall}
+            progressState={progressState}
+            wallState={wallState}
             isRealmEachTile={isRealmEachTile}
             remainingTiles={remainingTiles}
-            addTileToWall={addTileToWall}
-            removeTileFromWallAtIndex={removeTileFromWallAtIndex}
-            doraIndicatorsConfirmed={doraIndicatorsConfirmed}
-            wallConfirmed={wallConfirmed}
-            setWallConfirmed={setWallConfirmed}
           />
           <RealmHandSection
-            wallConfirmed={wallConfirmed}
+            progressState={progressState}
+            handState={handState}
             isRealmEachTile={isRealmEachTile}
             remainingTiles={remainingTiles}
-            isDrawPhase={isDrawPhase}
-            handState={handState}
-            maxHand={maxHand}
             firstDrawTurnByTiles={firstDrawTurnByTiles}
-            draw={draw}
-            cancelDraw={cancelDraw}
-            confirmDraw={confirmDraw}
-            toggleDiscard={toggleDiscard}
-            confirmDiscard={confirmDiscard}
-            canUndo={canUndo}
-            canRedo={canRedo}
-            undo={undo}
-            redo={redo}
           />
           <RealmResultSectionPlus
             results={result}

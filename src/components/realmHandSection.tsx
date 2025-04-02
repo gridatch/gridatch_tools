@@ -1,48 +1,33 @@
 import React from "react";
 import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, HandState, SANMA_TILES } from "../types/simulation";
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, SANMA_TILES, RealmPhase, RealmPhaseAction } from "../types/simulation";
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
+import { RealmProgressState } from "../hooks/useRealmProgressState";
+import { RealmHandState } from "../hooks/useRealmHandState";
 
 interface RealmHandSectionProps {
-  wallConfirmed: boolean;
+  progressState: RealmProgressState;
+  handState: RealmHandState;
   isRealmEachTile: Record<SanmaTile, boolean>;
   remainingTiles: Record<SanmaTile, number>;
-  isDrawPhase: boolean;
-  handState: HandState;
-  maxHand: number;
   firstDrawTurnByTiles: Record<SanmaTile, number>;
-  draw: (tile: SanmaTile) => void;
-  cancelDraw: (tile: SanmaTile, index: number) => void;
-  confirmDraw: () => void;
-  toggleDiscard: (tile: SanmaTile, index: number) => void;
-  confirmDiscard: () => void;
-  canUndo: boolean;
-  canRedo: boolean;
-  undo: () => void;
-  redo: () => void;
 }
 
 const RealmHandSection: React.FC<RealmHandSectionProps> = ({
-  wallConfirmed,
+  progressState,
+  handState,
   isRealmEachTile,
   remainingTiles,
-  isDrawPhase,
-  handState,
-  maxHand,
   firstDrawTurnByTiles,
-  draw,
-  cancelDraw,
-  confirmDraw,
-  toggleDiscard,
-  confirmDiscard,
-  canUndo,
-  canRedo,
-  undo,
-  redo,
 }) => {
-  if (!wallConfirmed) return;
-  const handTileCount = Object.values(handState.closed).reduce((acc, arr) => acc + arr.length, 0);
+  const {
+    simulationProgress,
+    editProgress,
+  } = progressState;
+
+  if (simulationProgress.phase <= RealmPhase.Wall) return;
+  if (editProgress.isEditing) return;
   
   const realmTileTypeCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).length;
   const remainingRealmTileCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).reduce((sum, tile) => sum + remainingTiles[tile], 0);
@@ -53,26 +38,26 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
     [...SOZU_TILES],
     [...NON_SEQUENTIAL_TILES],
   ];
-  const confirmButtonVisible = isDrawPhase
-    ? handTileCount === maxHand
-    : SANMA_TILES.some(tile => handState.closed[tile].some(status => status.isSelected));
+  const confirmButtonVisible = simulationProgress.action === RealmPhaseAction.Draw
+    ? handState.totalTileCount === handState.maxHand
+    : SANMA_TILES.some(tile => handState.hand.closed[tile].some(status => status.isSelected));
   
   return (
     <section className={styles.hand_section}>
       <div>
         <div className={styles.area_title} style={{ display: "flex", flexDirection: "row", alignItems: "center" }}>
           <DynamicSVGText text={"手牌"} />
-          <DynamicSVGText text={isDrawPhase ? "（ツモ牌選択中）" : "（捨て牌選択中）"} />
-          <button onClick={undo} disabled={!canUndo} >
+          <DynamicSVGText text={simulationProgress.action === RealmPhaseAction.Draw ? "（ツモ牌選択中）" : "（捨て牌選択中）"} />
+          <button onClick={handState.undo} disabled={!handState.canUndo} >
             <DynamicSVGText text="1手戻す" height="1.1em" />
           </button>
-          <button onClick={redo} disabled={!canRedo} >
+          <button onClick={handState.redo} disabled={!handState.canRedo} >
             <DynamicSVGText text="1手進む" height="1.1em" />
           </button>
         </div>
         <div className={`${styles.area} ${styles.hand}`}>
           {SANMA_TILES.map((tile) => (
-            handState.closed[tile].map((status, i) => {
+            handState.hand.closed[tile].map((status, i) => {
               const isSelected = status.isSelected;
               const isNotRealm = !isRealmEachTile[tile];
               const isInWall = firstDrawTurnByTiles[tile] !== -1;
@@ -81,7 +66,10 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                   <img
                     className={`${isSelected && styles.hand_tile_selected} ${isNotRealm && styles.not_realm}`}
                     src={`/tiles/${tile}.png`}
-                    onClick={() => isDrawPhase ? cancelDraw(tile, i) : toggleDiscard(tile, i)}
+                    onClick={() => simulationProgress.action === RealmPhaseAction.Draw
+                      ? handState.cancelDraw(tile, i)
+                      : handState.toggleDiscard(tile, i)
+                    }
                     alt={tile}
                   />
                   <span className={styles.hand_tile_counter_text}>
@@ -97,7 +85,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                   {
                     isSelected && <div className={styles.hand_tile_selected_icon_wrapper}>
                       {
-                        isDrawPhase
+                        simulationProgress.action === RealmPhaseAction.Draw
                           ? <DynamicSVGText text="+" className={`${styles.hand_tile_selected_icon} ${styles.hand_tile_selected_icon_draw}`} />
                           : <DynamicSVGText text="-" className={`${styles.hand_tile_selected_icon} ${styles.hand_tile_selected_icon_discard}`} />
                       }
@@ -107,7 +95,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
               )
             })
           ))}
-          {Array.from({ length: maxHand - handTileCount }).map((_, i) => (
+          {Array.from({ length: handState.maxHand - handState.totalTileCount }).map((_, i) => (
             <div key={`hand_empty_${i}`} className={styles.hand_tile_counter}>
               <img
                 src={`/tiles/empty.png`}
@@ -128,7 +116,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
       </div>
       <div>
         <div className={styles.area_title}>
-          <DynamicSVGText text={isDrawPhase ? "ツモ牌選択" : "領域牌表示"} />
+          <DynamicSVGText text={simulationProgress.action === RealmPhaseAction.Draw ? "ツモ牌選択" : "領域牌表示"} />
           <DynamicSVGTextSequence text={`（ ${realmTileTypeCount}種 ${remainingRealmTileCount}枚 ／ ${remainingTileCount}枚 ）`} />
         </div>
         <div className={`${styles.area} ${styles.draw_choices}`}>
@@ -143,7 +131,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                     <img
                       className={`${styles.tile_counter_image} ${isNotRealm && styles.not_realm} ${soldOut && styles.sold_out}`}
                       src={`/tiles/${tile}.png`}
-                      onClick={() => draw(tile)}
+                      onClick={() => handState.draw(tile)}
                       alt={tile}
                     />
                     <span className={`${styles.tile_counter_text} ${soldOut && styles.sold_out_text}`}>
@@ -164,9 +152,12 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
             marginLeft: "auto",
             visibility: confirmButtonVisible ? "visible" : "hidden",
           }}
-          onClick={isDrawPhase ? confirmDraw : confirmDiscard}
+          onClick={simulationProgress.action === RealmPhaseAction.Draw
+            ? handState.confirmDraw
+            : handState.confirmDiscard
+          }
         >
-          <DynamicSVGText text={isDrawPhase ? "ツモ牌決定" : "捨て牌決定"} height="1.2em" />
+          <DynamicSVGText text={simulationProgress.action === RealmPhaseAction.Draw ? "ツモ牌決定" : "捨て牌決定"} height="1.2em" />
         </button>
       </div>
       <div className={styles.toggle_phase_button_wrapper_portrait_relative}>
@@ -177,9 +168,12 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                 marginLeft: "auto",
                 visibility: confirmButtonVisible ? "visible" : "hidden",
               }}
-              onClick={isDrawPhase ? confirmDraw : confirmDiscard}
+              onClick={simulationProgress.action === RealmPhaseAction.Draw
+                ? handState.confirmDraw
+                : handState.confirmDiscard
+              }
             >
-              <DynamicSVGText text={isDrawPhase ? "ツモ牌決定" : "捨て牌決定"} height="1.2em" />
+              <DynamicSVGText text={simulationProgress.action === RealmPhaseAction.Draw ? "ツモ牌決定" : "捨て牌決定"} height="1.2em" />
             </button>
           </div>
         </div>

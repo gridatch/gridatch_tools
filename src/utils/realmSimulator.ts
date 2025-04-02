@@ -1,15 +1,15 @@
-import { DoraBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_4, SANMA_TILE_RECORD_FALSE, HandState, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, SOZU_RECORD_0, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS, SANMA_TILE_RECORD_MINUS_1 } from "../types/simulation";
+import { RealmBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_4, SANMA_TILE_RECORD_FALSE, Hand, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, SOZU_RECORD_0, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS, SANMA_TILE_RECORD_MINUS_1, RealmSimulationProgress, RealmPhaseAction } from "../types/simulation";
 import { decomposeTilesIntoBlocks, mergeDecomposedResult, ResultInternal } from "./blockDecomposer";
 
 /**
  * 領域牌の枚数を計算する
- * @param doraBoss ドラ関連のボス（ステージ効果）
+ * @param boss ボス（ステージ効果）
  * @param doraIndicators ドラ表示牌
  * @returns 各領域牌の枚数
  */
-export const calcRealmTiles = (doraBoss: DoraBoss, doraIndicators: SanmaTile[]): Map<SanmaTile, number> => {
+export const calcRealmTiles = (boss: RealmBoss, doraIndicators: SanmaTile[]): Map<SanmaTile, number> => {
   const realmTileCounter = new Map<SanmaTile, number>();
-  if (doraBoss === "empty") return realmTileCounter;
+  if (boss === "empty") return realmTileCounter;
   
   const isRealm: { [key in SanmaTile]: boolean } = Object.fromEntries(SANMA_TILES.map(tile => [tile, false])) as { [key in SanmaTile]: boolean };
   const tileCounter: { [key in SanmaTile]: number } = Object.fromEntries(SANMA_TILES.map(tile => [tile, 4])) as { [key in SanmaTile]: number };
@@ -18,10 +18,10 @@ export const calcRealmTiles = (doraBoss: DoraBoss, doraIndicators: SanmaTile[]):
     doraIndicator: SanmaTile,
     predicate: (tile: SanmaTile) => tile is T,
     tiles: readonly T[],
-    tBoss?: DoraBoss
+    tBoss?: RealmBoss
   ) => {
     if (!predicate(doraIndicator)) return;
-    if (tBoss && doraBoss === tBoss) return;
+    if (tBoss && boss === tBoss) return;
     isRealm[doraIndicator] = true;
     const tile = doraIndicator as T;
     const index = tiles.indexOf(tile);
@@ -46,22 +46,22 @@ export const calcRealmTiles = (doraBoss: DoraBoss, doraIndicators: SanmaTile[]):
 
 /**
  * 全ての牌について領域牌かどうかを判定する
- * @param doraBoss ドラ関連のボス（ステージ効果）
+ * @param boss ボス（ステージ効果）
  * @param doraIndicators ドラ表示牌
  * @returns 各牌が領域牌かどうか
  */
-export const calcIsRealmEachTile = (doraBoss: DoraBoss, doraIndicators: SanmaTile[]): Record<SanmaTile, boolean> => {
+export const calcIsRealmEachTile = (boss: RealmBoss, doraIndicators: SanmaTile[]): Record<SanmaTile, boolean> => {
   const isRealmEachTile = { ...SANMA_TILE_RECORD_FALSE };
-  if (doraBoss === "empty") return isRealmEachTile;
+  if (boss === "empty") return isRealmEachTile;
 
   const markRealmTileForGroup = <T extends SanmaTile>(
     doraIndicator: SanmaTile,
     predicate: (tile: SanmaTile) => tile is T,
     tiles: readonly T[],
-    tBoss?: DoraBoss
+    tBoss?: RealmBoss
   ) => {
     if (!predicate(doraIndicator)) return;
-    if (tBoss && doraBoss === tBoss) return;
+    if (tBoss && boss === tBoss) return;
     isRealmEachTile[doraIndicator] = true;
     const tile = doraIndicator as T;
     const index = tiles.indexOf(tile);
@@ -84,14 +84,14 @@ export const calcIsRealmEachTile = (doraBoss: DoraBoss, doraIndicators: SanmaTil
  * 各牌の残り枚数を計算する
  * @param doraIndicators ドラ表示牌
  * @param wall 牌山
- * @param handState 手牌の状態
+ * @param hand 手牌
  * @param discardedTiles 捨て牌
  * @returns 各牌の残り枚数
  */
 export const calcRemainingTiles = (
   doraIndicators: SanmaTile[],
   wall: WallTile[],
-  handState: HandState,
+  hand: Hand,
   discardedTiles: Record<SanmaTile, number>
 ): Record<SanmaTile, number> => {
   const remainingTiles = {...SANMA_TILE_RECORD_4};
@@ -106,7 +106,7 @@ export const calcRemainingTiles = (
   });
 
   SANMA_TILES.forEach((tile) => {
-    remainingTiles[tile] -= handState.closed[tile].length;
+    remainingTiles[tile] -= hand.closed[tile].length;
   });
 
   SANMA_TILES.forEach((tile) => {
@@ -137,7 +137,7 @@ export const calcFirstDrawTurnByTiles = (wall: WallTile[]): Record<SanmaTile, nu
  * @param wall 牌山
  * @returns 各牌を引く巡目
  */
-export const calcDrawTurnsByTiles = (handState: HandState, wall: WallTile[]): Record<SanmaTile, number[]> => {
+export const calcDrawTurnsByTiles = (handState: Hand, wall: WallTile[]): Record<SanmaTile, number[]> => {
   const result = structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
   for (const tile of SANMA_TILES) {
     for (let i = 0; i < handState.closed[tile].length; ++i) {
@@ -461,24 +461,30 @@ function createKokushiTenpai(pool: Record<SanmaTile, number>, nonRealmWinsPerSoz
  * 純粋な索子待ちのみを結果に含める
  * @param isDrawPhase ツモフェーズ or 打牌フェーズ
  * @param isRealmEachTile 各牌が領域牌かどうか
- * @param handState 手牌の状態
+ * @param hand 手牌
  * @param wall 牌山
+ * @param realmWinsByTenpaiTurns 聴牌巡目ごとの領域の和了回数
  * @param nonRealmWinsByTenpaiTurnsPerSozu 聴牌巡目ごとの各索子牌の非領域の和了回数
  * @returns 各聴牌形で索子待ちの聴牌をする最も早い巡目と聴牌時の手牌。聴牌しない場合は正の無限大の巡目と空の手牌を設定する。
  */
 export const calcRealmTenpai = (
-  isDrawPhase: boolean,
+  simulationProgress: RealmSimulationProgress,
   isRealmEachTile: Record<SanmaTile, boolean>,
-  handState: HandState,
+  hand: Hand,
   wall: WallTile[],
   realmWinsByTenpaiTurns: number[],
   nonRealmWinsByTenpaiTurnsPerSozu: Record<Sozu, number>[],
 ): RealmTenpaiResult[] => {
   const pool: Record<SanmaTile, number> = { ...SANMA_TILE_RECORD_0 };
   for (const tile of SANMA_TILES) {
+    if (!isRealmEachTile[tile]) continue;
     // ツモフェーズ時はツモ候補を牌プールに含める
     // 打牌フェーズ時は打牌候補を牌プールから除外する
-    pool[tile] = isRealmEachTile[tile] ? handState.closed[tile].filter(status => isDrawPhase ? true : !status.isSelected).length : 0;
+    pool[tile] = hand.closed[tile].filter(status =>
+      simulationProgress.action === RealmPhaseAction.Draw
+        ? true
+        : !status.isSelected
+    ).length;
   }
   
   const standardResult: RealmTenpaiResult = {

@@ -1,6 +1,6 @@
-import { DoraBoss } from "../types/simulation";
+import { RealmBoss } from "../types/simulation";
 
-export const DORA_BOSS_DESCRIPTIONS: Record<DoraBoss, string> = {
+export const DORA_BOSS_DESCRIPTIONS: Record<RealmBoss, string> = {
   dora_indicator: "ドラ表示牌が最大3枚。",
   dora_manzu: "「萬子」のドラ・魂牌が無効化。",
   dora_pinzu: "「筒子」のドラ・魂牌が無効化。",

@@ -1,16 +1,21 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/manman.module.css";
-import { Sozu, SOZU_TILES } from "../types/simulation";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/manman.module.css";
+import { Sozu, SOZU_TILES } from "../../types/simulation";
 
-interface WallSectionProps {
+interface SozuWallSectionProps {
   wall: string[];
   maxWall: number;
   addTileToWall: (tile: Sozu) => void;
   removeTileFromWallAtIndex: (index: number) => void;
 }
 
-const WallSection: React.FC<WallSectionProps> = ({ wall, maxWall, addTileToWall, removeTileFromWallAtIndex }) => {
+const SozuWallSection: React.FC<SozuWallSectionProps> = ({
+  wall,
+  maxWall,
+  addTileToWall,
+  removeTileFromWallAtIndex,
+}) => {
   return (
     <section className={styles.wall_section}>
       <div>
@@ -58,4 +63,4 @@ const WallSection: React.FC<WallSectionProps> = ({ wall, maxWall, addTileToWall,
   );
 };
 
-export default WallSection;
+export default SozuWallSection;

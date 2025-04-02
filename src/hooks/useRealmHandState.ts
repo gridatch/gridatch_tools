@@ -1,20 +1,21 @@
-import { useState } from "react";
-import { HandState, INITIAL_HAND_STATE, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile, TileStatus } from "../types/simulation";
+import { useCallback, useMemo, useState } from "react";
+import { Hand, INITIAL_HAND, RealmPhaseAction, RealmSimulationProgress, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile, TileStatus } from "../types/simulation";
+import { RealmProgressState } from "./useRealmProgressState";
 
 const MAX_HAND = 13;
 
 /** 
  * 手牌とその操作関数をまとめたオブジェクト
  */
-export interface UseRealmHandStateReturn {
-  /** ツモフェーズ or 打牌フェーズ */
-  isDrawPhase: boolean;
+export interface RealmHandState {
   /** 手牌 */
-  handState: HandState;
+  hand: Hand;
   /** 捨て牌 */
   discardedTiles: Record<SanmaTile, number>;
   /** 手牌の最大枚数 */
   maxHand: number;
+  /** 手牌の枚数 */
+  totalTileCount: number;
   /** ツモフェーズ：指定した牌をツモ牌候補に加える。 */
   draw: (tile: SanmaTile) => void;
   /** ツモフェーズ：指定の牌のうち、index 番目の牌のツモ牌候補を取り消す。 */
@@ -38,84 +39,95 @@ export interface UseRealmHandStateReturn {
 }
 
 /** 手牌履歴のスナップショット */
-interface HandStateSnapshot {
-  handState: HandState;
+interface HandSnapshot {
+  progress: RealmSimulationProgress;
+  hand: Hand;
   discardedTiles: Record<SanmaTile, number>;
-  isDrawPhase: boolean;
 }
 
 /**
  * 領域の手牌のカスタムフック
  * @param {Record<SanmaTile, boolean>} isRealmEachTile 各牌が領域牌かどうか
  * @param {Record<SanmaTile, number>} remainingTiles 各牌の残り枚数
- * @param {HandState} [initialHandState] 初期手牌
- * @returns {UseRealmHandStateReturn} 手牌とその操作関数をまとめたオブジェクト
+ * @param {Hand} [initialHand] 初期手牌
+ * @returns {RealmHandState} 手牌とその操作関数をまとめたオブジェクト
  */
 export const useRealmHandState = (
+  progressState: RealmProgressState,
   isRealmEachTile: Record<SanmaTile, boolean>,
   remainingTiles: Record<SanmaTile, number>,
-  initialHandState?: HandState
-): UseRealmHandStateReturn => {
-  const initialState: HandState = initialHandState ? initialHandState : structuredClone(INITIAL_HAND_STATE);
-
-  const [handState, setHandState] = useState<HandState>(initialState);
+  initialHand: Hand = structuredClone(INITIAL_HAND),
+): RealmHandState => {
+  const {
+    simulationProgress: progress,
+    setSimulationProgress,
+    updatePhaseAction,
+  } = progressState;
+  
+  const [hand, setHand] = useState<Hand>(initialHand);
   const [discardedTiles, setDiscardedTiles] = useState<Record<SanmaTile, number>>({ ...SANMA_TILE_RECORD_0 });
-  const [isDrawPhase, setIsDrawPhase] = useState<boolean>(true);
 
   // 履歴の初期化
-  const initialSnapshot: HandStateSnapshot = {
-    handState: initialState,
+  const initialSnapshot: HandSnapshot = {
+    progress,
+    hand: initialHand,
     discardedTiles: { ...SANMA_TILE_RECORD_0 },
-    isDrawPhase: true,
   };
-  const [history, setHistory] = useState<HandStateSnapshot[]>([initialSnapshot]);
+  const [history, setHistory] = useState<HandSnapshot[]>([initialSnapshot]);
   const [historyIndex, setHistoryIndex] = useState<number>(0);
 
   /**
    * 履歴にスナップショットを追加する
    * 現在のスナップショットより新しいものは破棄する
    */
-  const pushHistory = (snapshot: HandStateSnapshot) => {
-    setHistory((prev) => {
-      const newHistory = prev.slice(0, historyIndex + 1);
-      return [...newHistory, snapshot];
-    });
+  const pushHistory = useCallback((snapshot: HandSnapshot) => {
+    setHistory((prev) => prev.slice(0, historyIndex + 1).concat(snapshot));
     setHistoryIndex((prev) => prev + 1);
-  };
+  }, [historyIndex]);
   
   /**
    * 現在のスナップショット以降のスナップショットを破棄する
    */
-  const popHistory = () => {
+  const popHistory = useCallback(() => {
     setHistory((prev) => prev.slice(0, historyIndex));
     setHistoryIndex((prev) => (prev >= 0 ? prev - 1 : -1));
-  };
+  }, [historyIndex]);
+  
+  /**
+   * 現在のスナップショットを更新する
+   * 現在のスナップショットより新しいものは破棄する
+   */
+  const updateCurrentHistory = useCallback(() => {
+    popHistory();
+    pushHistory({ progress, hand, discardedTiles });
+  }, [progress, hand, discardedTiles, pushHistory, popHistory]);
 
-  const getTotalTileCount = (): number =>
-    Object.values(handState.closed).reduce((acc, arr) => acc + arr.length, 0);
+  const totalTileCount = useMemo(() => (
+    Object.values(hand.closed).reduce((acc, arr) => acc + arr.length, 0)
+  ), [hand.closed]);
 
   /** 
    * ツモフェーズ：指定した牌をツモ牌候補に加える。
    */
-  const draw = (tile: SanmaTile) => {
-    if (!isDrawPhase) return;
+  const draw = useCallback((tile: SanmaTile) => {
+    if (progress.action !== RealmPhaseAction.Draw) return;
     if (remainingTiles[tile] <= 0) return;
-    if (getTotalTileCount() >= MAX_HAND) return;
-    setHandState(prev => ({
+    if (totalTileCount >= MAX_HAND) return;
+    setHand(prev => ({
       ...prev,
       closed: {
         ...prev.closed,
         [tile]: [...prev.closed[tile], { isSelected: true }]
       },
     }));
-  };
+  }, [progress.action, remainingTiles, totalTileCount]);
 
   /** 
    * ツモフェーズ：指定の牌のうち、index 番目の牌のツモ牌候補を取り消す。
    */
-  const cancelDraw = (tile: SanmaTile, index: number) => {
-    if (!isDrawPhase) return;
-    setHandState(prev => {
+  const cancelDraw = useCallback((tile: SanmaTile, index: number) => {
+    if (progress.action !== RealmPhaseAction.Draw) return;
+    setHand(prev => {
       const statuses = prev.closed[tile];
       if (index < 0 || index >= statuses.length) return prev;
       if (!statuses[index].isSelected) return prev;
@@ -125,51 +137,43 @@ export const useRealmHandState = (
         closed: { ...prev.closed, [tile]: newStatuses },
       };
     });
-  };
+  }, [progress.action]);
 
   /** 
    * ツモフェーズ：打牌フェーズへ移行する。ツモ牌候補のうち、領域牌は手牌として確定し、非領域牌は自動的に打牌候補とする。
    */
-  const confirmDraw = () => {
-    if (!isDrawPhase) return;
-    // 履歴から現在のindexのスナップショットを削除
-    popHistory();
-
-    // 履歴に確定前のスナップショットを追加
-    const pendingSnapshot: HandStateSnapshot = {
-      handState: handState,
-      discardedTiles: { ...discardedTiles },
-      isDrawPhase: true,
-    };
-    pushHistory(pendingSnapshot);
+  const confirmDraw = useCallback(() => {
+    if (progress.action !== RealmPhaseAction.Draw) return;
+    
+    updateCurrentHistory();
 
     const newClosed = {} as Record<SanmaTile, TileStatus[]>;
     SANMA_TILES.forEach(tile => {
-      newClosed[tile] = handState.closed[tile].map(() => {
+      newClosed[tile] = hand.closed[tile].map(() => {
         return { isSelected: !isRealmEachTile[tile] }
       });
     });
-    const newHandState: HandState = {
-      ...handState,
+    const newHand: Hand = {
+      ...hand,
       closed: newClosed,
     };
-    setHandState(newHandState);
-    setIsDrawPhase(false);
-    const confirmedSnapshot: HandStateSnapshot = {
-      handState: newHandState,
-      discardedTiles: { ...discardedTiles },
-      isDrawPhase: false,
+    setHand(newHand);
+    const newProgress = updatePhaseAction(RealmPhaseAction.Discard);
+    const newSnapshot: HandSnapshot = {
+      hand: newHand,
+      discardedTiles,
+      progress: newProgress,
     };
-    // 履歴に確定後のスナップショットを追加
-    pushHistory(confirmedSnapshot);
-  };
+    
+    pushHistory(newSnapshot);
+  }, [progress.action, updatePhaseAction, isRealmEachTile, hand, discardedTiles, pushHistory, updateCurrentHistory]);
 
   /** 
    * 打牌フェーズ：指定の牌のうち、index 番目の牌について打牌候補かどうかを切り替える。
    */
-  const toggleDiscard = (tile: SanmaTile, index: number) => {
-    if (isDrawPhase) return;
-    setHandState(prev => {
+  const toggleDiscard = useCallback((tile: SanmaTile, index: number) => {
+    if (progress.action !== RealmPhaseAction.Discard) return;
+    setHand(prev => {
       const statuses = prev.closed[tile];
       if (index < 0 || index >= statuses.length) return prev;
       const newStatuses = statuses.map((status, i) =>
@@ -180,51 +184,40 @@ export const useRealmHandState = (
         closed: { ...prev.closed, [tile]: newStatuses },
       };
     });
-  };
+  }, [progress.action]);
 
   /** 
    * 打牌フェーズ：ツモフェーズへ移行する。打牌候補を手牌から捨て、捨て牌に加える。
    */
-  const confirmDiscard = () => {
-    if (isDrawPhase) return;
-    // 履歴から現在のindexのスナップショットを削除
-    popHistory();
-
-    // 履歴に確定前のスナップショットを追加
-    const pendingSnapshot: HandStateSnapshot = {
-      handState: handState,
-      discardedTiles: { ...discardedTiles },
-      isDrawPhase: false,
-    };
-    pushHistory(pendingSnapshot);
-
-    const selectedCounts: Record<SanmaTile, number> = {} as Record<SanmaTile, number>;
-    SANMA_TILES.forEach((tile) => {
-      selectedCounts[tile] = handState.closed[tile].filter((status) => status.isSelected).length;
-    });
+  const confirmDiscard = useCallback(() => {
+    if (progress.action !== RealmPhaseAction.Discard) return;
+    
+    updateCurrentHistory();
+    
     const newDiscarded: Record<SanmaTile, number> = { ...discardedTiles };
     SANMA_TILES.forEach((tile) => {
-      newDiscarded[tile] = (newDiscarded[tile] || 0) + selectedCounts[tile];
+      newDiscarded[tile] += hand.closed[tile].filter((status) => status.isSelected).length;
     });
+    
     const newClosed: Record<SanmaTile, TileStatus[]> = {} as Record<SanmaTile, TileStatus[]>;
     SANMA_TILES.forEach(tile => {
-      newClosed[tile] = handState.closed[tile].filter(status => !status.isSelected);
+      newClosed[tile] = hand.closed[tile].filter(status => !status.isSelected);
     });
-    const newHandState: HandState = {
-      ...handState,
+    const newHand: Hand = {
+      ...hand,
       closed: newClosed,
     };
     setDiscardedTiles(newDiscarded);
-    setHandState(newHandState);
-    setIsDrawPhase(true);
-    const confirmedSnapshot: HandStateSnapshot = {
-      handState: newHandState,
+    setHand(newHand);
+    const newProgress = updatePhaseAction(RealmPhaseAction.Draw);
+    const newSnapshot: HandSnapshot = {
+      progress: newProgress,
+      hand: newHand,
       discardedTiles: newDiscarded,
-      isDrawPhase: true,
     };
     // 履歴に確定後のスナップショットを追加
-    pushHistory(confirmedSnapshot);
-  };
+    pushHistory(newSnapshot);
+  }, [progress.action, updatePhaseAction, hand, discardedTiles, pushHistory, updateCurrentHistory]);
   
 
   /** undo が可能かどうか */
@@ -234,50 +227,48 @@ export const useRealmHandState = (
   const canRedo = historyIndex < history.length - 1;
 
   /** 履歴を一つ前に戻す */
-  const undo = () => {
+  const undo = useCallback(() => {
     if (historyIndex <= 0) return;
     const newIndex = historyIndex - 1;
     const snapshot = history[newIndex];
-    setHandState(snapshot.handState);
+    setSimulationProgress(snapshot.progress);
+    setHand(snapshot.hand);
     setDiscardedTiles(snapshot.discardedTiles);
-    setIsDrawPhase(snapshot.isDrawPhase);
     setHistoryIndex(newIndex);
-  };
+  }, [history, historyIndex, setSimulationProgress]);
 
   /** 履歴を一つ先に進める */
-  const redo = () => {
+  const redo = useCallback(() => {
     if (historyIndex >= history.length - 1) return;
     const newIndex = historyIndex + 1;
     const snapshot = history[newIndex];
-    setHandState(snapshot.handState);
+    setSimulationProgress(snapshot.progress);
+    setHand(snapshot.hand);
     setDiscardedTiles(snapshot.discardedTiles);
-    setIsDrawPhase(snapshot.isDrawPhase);
     setHistoryIndex(newIndex);
-  };
+  }, [history, historyIndex, setSimulationProgress]);
 
   /** 
    * 手牌、捨て牌、フェーズをリセットする
    */
-  const clearHandState = () => {
-    const clearedState = structuredClone(INITIAL_HAND_STATE);
+  const clearHandState = useCallback(() => {
+    const clearedState = structuredClone(INITIAL_HAND);
     const clearedDiscarded = { ...SANMA_TILE_RECORD_0 };
-    setHandState(clearedState);
+    setHand(clearedState);
     setDiscardedTiles(clearedDiscarded);
-    setIsDrawPhase(true);
-    const initialSnapshot: HandStateSnapshot = {
-      handState: clearedState,
+    setHistory([{
+      progress,
+      hand: clearedState,
       discardedTiles: clearedDiscarded,
-      isDrawPhase: true,
-    };
-    setHistory([initialSnapshot]);
+    }]);
     setHistoryIndex(0);
-  };
+  }, [progress]);
 
   return {
-    isDrawPhase,
-    handState,
+    hand,
     discardedTiles,
     maxHand: MAX_HAND,
+    totalTileCount,
     draw,
     cancelDraw,
     confirmDraw,

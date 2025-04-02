@@ -1,16 +1,21 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/realm.module.css";
-import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "../types/simulation";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/realm.module.css";
+import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "../../types/simulation";
 
-interface DoraIndicatorsSectionProps {
+interface RealmViewerDoraIndicatorsSectionProps {
   doraIndicators: SanmaTile[];
   maxDoraIndicators: number;
   addDoraIndicator: (tile: SanmaTile) => void;
   removeDoraIndicatorAtIndex: (index: number) => void;
 }
 
-const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({ doraIndicators, maxDoraIndicators, addDoraIndicator, removeDoraIndicatorAtIndex }) => {
+const RealmViewerDoraIndicatorsSection: React.FC<RealmViewerDoraIndicatorsSectionProps> = ({
+  doraIndicators,
+  maxDoraIndicators,
+  addDoraIndicator,
+  removeDoraIndicatorAtIndex,
+}) => {
   const tileGroups: SanmaTile[][] = [
     [...PINZU_TILES],
     [...SOZU_TILES],
@@ -68,4 +73,4 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({ doraIndic
   );
 };
 
-export default DoraIndicatorsSection;
+export default RealmViewerDoraIndicatorsSection;
