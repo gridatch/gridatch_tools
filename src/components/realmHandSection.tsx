@@ -59,6 +59,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
           {SANMA_TILES.map((tile) => (
             handState.hand.closed[tile].map((status, i) => {
               const isSelected = status.isSelected;
+              const isRealm = isRealmEachTile[tile];
               const isNotRealm = !isRealmEachTile[tile];
               const isInWall = firstDrawTurnByTiles[tile] !== -1;
               return (
@@ -73,11 +74,16 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                     alt={tile}
                   />
                   <span className={styles.hand_tile_counter_text}>
-                    <span style={{ visibility: isInWall ? "visible" : "hidden", marginBottom: "-0.5em", fontSize: "var(--font-sx)" }}>
+                    <span style={{
+                      visibility: isRealm && isInWall ? "visible" : "hidden",
+                      fontSize: "var(--font-sx)",
+                      display: "flex",
+                      alignItems: "flex-end",
+                    }}>
                       <DynamicSVGTextSequence text={`${firstDrawTurnByTiles[tile]}`} className={styles.tile_counter_text_negative_margin_right} />
-                      <DynamicSVGText text="巡" />
+                      <DynamicSVGText text="巡" style={{ fontSize: "var(--font-xxs)" }} />
                     </span>
-                    <span>
+                    <span style={{ visibility: isRealm ? "visible" : "hidden", display: "flex" }}>
                       <DynamicSVGText text={"×"} />
                       <DynamicSVGText text={`${remainingTiles[tile]}`} />
                     </span>

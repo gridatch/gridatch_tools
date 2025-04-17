@@ -27,7 +27,7 @@ import { useRealmWallState } from "../hooks/useRealmWallState";
 import RealmWallSection from "../components/realmWallSection";
 import { useRealmHandState } from "../hooks/useRealmHandState";
 import RealmHandSection from "../components/realmHandSection";
-import RealmResultSectionPlus from "../components/realmResultSectionPlus";
+import RealmResultSection from "../components/realmResultSection";
 import "./realm-plus-variables.css"
 import { useRealmProgressState } from "../hooks/useRealmProgressState";
 import { useRealmBossState } from "../hooks/useRealmBossState";
@@ -77,7 +77,7 @@ const RealmPage: React.FC<PageProps> = () => {
   }, [progressState, wallState.wall, wallState.maxWall, isRealmEachTile]);
 
   // 結果の計算（聴牌形シミュレーション）と、各牌のツモ巡目の補助値
-  const result = useMemo(() => {
+  const results = useMemo(() => {
     if (progressState.simulationProgress.phase <= RealmPhase.Wall) return null;
     if (progressState.editProgress.isEditing) return null;
     return calcRealmTenpai(progressState.simulationProgress, isRealmEachTile, handState.hand, wallState.wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu);
@@ -141,8 +141,8 @@ const RealmPage: React.FC<PageProps> = () => {
             remainingTiles={remainingTiles}
             firstDrawTurnByTiles={firstDrawTurnByTiles}
           />
-          <RealmResultSectionPlus
-            results={result}
+          <RealmResultSection
+            results={results}
             drawTurnsByTiles={drawTurnsByTiles}
           />
         </div>
