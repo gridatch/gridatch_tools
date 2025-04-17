@@ -5,11 +5,13 @@ import { SANMA_TILES, RealmTenpaiResult, SanmaTile, SOZU_TILES } from "../types/
 import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
 
 interface RealmResultSectionProps {
+  isEditing: boolean;
   results: RealmTenpaiResult[] | null;
   drawTurnsByTiles: Record<SanmaTile, number[]>;
 }
 
-const RealmResultSectionPlus: React.FC<RealmResultSectionProps> = ({ results, drawTurnsByTiles }) => {
+const RealmResultSection: React.FC<RealmResultSectionProps> = ({ isEditing, results, drawTurnsByTiles }) => {
+  if (isEditing) return;
   if (!results) return;
   return (
     <section className={styles.realm_result_section}>
@@ -80,7 +82,7 @@ const RealmResultSectionPlus: React.FC<RealmResultSectionProps> = ({ results, dr
                             {
                               drawTurnsByTiles[tile][i] > 0 && <>
                                 <DynamicSVGTextSequence text={`${drawTurnsByTiles[tile][i]}`} className={styles.tile_counter_text_negative_margin_right} />
-                                <DynamicSVGText text="巡" />
+                                <DynamicSVGText text="巡" style={{ fontSize: "var(--font-xxs)" }} />
                               </>
                             }
                           </span>
@@ -98,4 +100,4 @@ const RealmResultSectionPlus: React.FC<RealmResultSectionProps> = ({ results, dr
   );
 };
 
-export default RealmResultSectionPlus;
+export default RealmResultSection;

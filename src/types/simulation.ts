@@ -153,8 +153,8 @@ export interface TileStatus {
 }
 
 export interface DrawnTile {
-  isClosed: boolean;
   tile: WallTile;
+  isClosed: boolean;
   isSelected: boolean;
 }
 
@@ -165,7 +165,7 @@ export interface Hand {
 
 export const INITIAL_HAND: Hand = deepFreeze({
   closed: Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as TileStatus[]])) as Record<SanmaTile, TileStatus[]>,
-  drawn: { isClosed: false, tile: "empty", isSelected: false }
+  drawn: { tile: "empty", isClosed: false, isSelected: false }
 })
 
 // --- 手牌のブロック分解 ---
@@ -212,3 +212,13 @@ export const DECOMPOSER_TILE_SET_IDS = {
   sozu: 'SZ'
 } as const;
 export type DecomposerTileSetId = (typeof DECOMPOSER_TILE_SET_IDS)[keyof typeof DECOMPOSER_TILE_SET_IDS];
+
+export const SANMA_TILES_OR_NON_REALM = [...SANMA_TILES, "nonRealm"] as const;
+export type SanmaTileOrNonRealm = (typeof SANMA_TILES_OR_NON_REALM)[number];
+export const isSanmaTileOrNonRealm = (tile: string): tile is SanmaTileOrNonRealm => (SANMA_TILES_OR_NON_REALM as readonly string[]).includes(tile);
+export const SANMA_TILES_OR_NON_REALM_RECORD_0: Record<SanmaTileOrNonRealm, number> = Object.freeze(Object.fromEntries(SANMA_TILES_OR_NON_REALM.map(tile => [tile, 0])) as Record<SanmaTileOrNonRealm, number>);
+
+export interface MultisetPermutation<T> {
+  tiles: T[];
+  probability: number;
+}

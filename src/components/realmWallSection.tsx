@@ -51,18 +51,21 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
         <div className={`${styles.area} ${styles.realm_wall}`}>
           {wallState.wall.map((tile, i) => {
             const isNotRealm = tile !== "empty" && tile !== "closed" && !isRealmEachTile[tile];
+            const isDrawn = i <= simulationProgress.turn - 1;
             return (
               <React.Fragment key={`wall_${i}`}>
                 {
                   tile === "empty" ? (
                     <img
                       className={styles.realm_wall_tile}
+                      style={{ visibility: !isDrawn ? "visible" : "hidden" }}
                       src={`/tiles/empty.png`}
                       alt={"empty"}
                     />
                   ) : (
                     <img
                       className={`${styles.realm_wall_tile} ${isNotRealm && styles.not_realm}`}
+                      style={{ visibility: !isDrawn ? "visible" : "hidden" }}
                       src={`/tiles/${tile}.png`}
                       onClick={() => wallState.removeTileFromWallAtIndex(i)}
                       alt={tile}

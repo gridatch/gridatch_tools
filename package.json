@@ -2,7 +2,7 @@
   "name": "gridatch-tools",
   "private": true,
   "description": "gridatch-tools",
-  "version": "4.3.0",
+  "version": "4.4.0",
   "author": "gridatch",
   "dependencies": {
     "@eslint/compat": "^1.2.7",
@@ -16,9 +16,11 @@
     "gatsby-source-filesystem": "^5.14.0",
     "gatsby-transformer-sharp": "^5.14.0",
     "html-react-parser": "^5.2.2",
+    "immer": "^10.1.1",
     "opentype.js": "^1.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-responsive-modal": "^6.4.2",
     "sanitize-filename": "^1.6.3"
   },
   "devDependencies": {

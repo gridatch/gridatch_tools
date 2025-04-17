@@ -68,12 +68,14 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
           {
             isWallConfirmed && wall.map((tile, i) => {
               const isNotRealm = wall[i] !== "empty" && wall[i] !== "closed" && !isRealmEachTile[wall[i]];
+              const visible = i > simulationProgress.turn - 1;
               return (
                 <React.Fragment key={`wall_${i}`}>
                   {
                     wall[i] !== "empty" && (
                       <img
                         className={`${styles.confirmed_wall_tile} ${isNotRealm && styles.not_realm}`}
+                        style={{ visibility: visible ? "visible" : "hidden" }}
                         src={`/tiles/${tile}.png`}
                         alt={tile}
                       />

@@ -381,7 +381,7 @@ section.editing {
 .result_tile_counter_text {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-end;
   font-size: var(--font-sx);
 }
 
