@@ -19,7 +19,8 @@
     "opentype.js": "^1.3.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "sanitize-filename": "^1.6.3"
+    "sanitize-filename": "^1.6.3",
+    "xxhash-wasm": "^1.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.5",

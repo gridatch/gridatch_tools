@@ -2,6 +2,7 @@ import React, { SVGAttributes, useEffect, useState } from 'react';
 import sanitize from 'sanitize-filename';
 import parse from 'html-react-parser';
 import styles from './dynamicSVGText.module.css';
+import { hash32 } from '../utils/hash32';
 
 interface DynamicSVGTextProps extends SVGAttributes<SVGElement> {
   text: string;
@@ -29,8 +30,10 @@ const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, className = '', h
   useEffect(() => {
     let aborted = false;
     
-    const sanitizedText = sanitize(text);
-    const src = `/generated_svgs/${sanitizedText}.svg`;
+    const base = sanitize(text);
+    const hash = hash32(text);
+    const filename = `${base}_${hash}.svg`;
+    const src = `/generated_svgs/${filename}`;
 
     if (!text.trim()) {
       setSvgContent(text);
@@ -49,12 +52,12 @@ const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, className = '', h
         }
 
         // rawSVGのキャッシュ
-        let rawSVG: string | undefined = svgRawCache.get(sanitizedText);
+        let rawSVG: string | undefined = svgRawCache.get(filename);
         if (!rawSVG) {
           const response = await fetch(src);
           if (!response.ok) return;
           rawSVG = await response.text();
-          svgRawCache.set(sanitizedText, rawSVG);
+          svgRawCache.set(filename, rawSVG);
         }
 
         const domParser = new DOMParser();

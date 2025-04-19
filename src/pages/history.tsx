@@ -70,7 +70,7 @@ const ImageCreditsPage: React.FC<PageProps> = () => (
       {
         history.map((revision) => (
           <section key={revision.version} style={{width: "100%", maxWidth: 680}}>
-            <h4><DynamicSVGText text={revision.version} /></h4>
+            <h4><DynamicSVGTextSequence text={revision.version} /></h4>
             {
               revision.messages.map((message, i) => (
                 <p key={`${revision.version}_${i}`}><DynamicSVGTextSequence text={message}/></p>
