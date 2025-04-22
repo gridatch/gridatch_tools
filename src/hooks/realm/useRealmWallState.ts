@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { SanmaTile, WallTile } from "../types/simulation";
+import { SanmaTile, WallTile } from "../../types/simulation";
 import { RealmProgressState } from "./useRealmProgressState";
 
 const MAX_WALL = 36;

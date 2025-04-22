@@ -57,7 +57,7 @@ declare const styles:
   & Readonly<{ "toggle_phase_button_portrait_background": string }>
   & Readonly<{ "toggle_phase_button_portrait_background": string }>
   & Readonly<{ "realm_results": string }>
-  & Readonly<{ "realm_result": string }>
+  & Readonly<{ "realm_result_text": string }>
   & Readonly<{ "result_non_realm_tile": string }>
   & Readonly<{ "realm_result_hand": string }>
   & Readonly<{ "result_tile_counter": string }>

@@ -1,13 +1,12 @@
-import React from 'react';
+import React, { SVGAttributes } from 'react';
 import DynamicSVGText from './dynamicSVGText';
 
-interface DynamicSVGTextSequenceProps {
+interface DynamicSVGTextSequenceProps extends SVGAttributes<SVGElement> {
   text: string | string[];
-  className?: string;
   height?: string;
 }
 
-const DynamicSVGTextSequence: React.FC<DynamicSVGTextSequenceProps> = ({ text, className = '', height = '1.2em' }) => {
+const DynamicSVGTextSequence: React.FC<DynamicSVGTextSequenceProps> = ({ text, height = '1.2em', className = '', style }) => {
   let items: string[];
 
   if (typeof text === 'string') {
@@ -17,14 +16,14 @@ const DynamicSVGTextSequence: React.FC<DynamicSVGTextSequenceProps> = ({ text, c
     // 文字列の配列の場合はそのまま使用
     items = text;
   } else {
-    console.error('DynamicSVGTextSequence には文字列または文字列の配列を渡してにゃ。');
+    console.error('[DynamicSVGTextSequence] Unexpected text format.');
     items = [];
   }
 
   return (
     <>
       {items.map((item, index) => (
-        <DynamicSVGText key={index} text={item} className={className} height={height} />
+        <DynamicSVGText key={index} text={item} height={height} className={className} style={style} />
       ))}
     </>
   );

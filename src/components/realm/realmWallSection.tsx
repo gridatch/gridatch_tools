@@ -1,33 +1,33 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/realm-plus.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES, RealmPhase, RealmEditPhase } from "../types/simulation";
-import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
-import { RealmProgressState } from "../hooks/useRealmProgressState";
-import { RealmWallState } from "../hooks/useRealmWallState";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/realm-plus.module.css";
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES, RealmPhase, RealmEditPhase } from "../../types/simulation";
+import DynamicSVGTextSequence from "../dynamicSVGTextSequence";
+import { RealmProgressState } from "../../hooks/realm/useRealmProgressState";
+import { RealmWallState } from "../../hooks/realm/useRealmWallState";
+import { RealmRemainingTilesLogic } from "../../hooks/realm/useRealmRemainingTilesLogic";
 
 interface RealmWallSectionProps {
   progressState: RealmProgressState;
   wallState: RealmWallState;
   isRealmEachTile: Record<SanmaTile, boolean>;
-  remainingTiles: Record<SanmaTile, number>;
+  remainingTilesLogic: RealmRemainingTilesLogic;
 }
 
 const RealmWallSection: React.FC<RealmWallSectionProps> = ({
   progressState,
   wallState,
   isRealmEachTile,
-  remainingTiles,
+  remainingTilesLogic,
 }) => {
   const { simulationProgress, editProgress } = progressState;
+  const { remainingTiles, totalRealmRemainingCount, totalRemainingCount } = remainingTilesLogic;
   
   const showWallSection = (!editProgress.isEditing && simulationProgress.phase === RealmPhase.Wall)
     || (editProgress.isEditing && editProgress.phase === RealmEditPhase.Wall);
   if (!showWallSection) return;
   
   const realmTileTypeCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).length;
-  const remainingRealmTileCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).reduce((sum, tile) => sum + remainingTiles[tile], 0);
-  const remainingTileCount = SANMA_TILES.reduce((sum, tile) => sum + remainingTiles[tile], 0);
   
   const tileGroups: WallTile[][] = [
     [...PINZU_TILES],
@@ -51,18 +51,21 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
         <div className={`${styles.area} ${styles.realm_wall}`}>
           {wallState.wall.map((tile, i) => {
             const isNotRealm = tile !== "empty" && tile !== "closed" && !isRealmEachTile[tile];
+            const isDrawn = i <= simulationProgress.turn - 1;
             return (
               <React.Fragment key={`wall_${i}`}>
                 {
                   tile === "empty" ? (
                     <img
                       className={styles.realm_wall_tile}
+                      style={{ visibility: !isDrawn ? "visible" : "hidden" }}
                       src={`/tiles/empty.png`}
                       alt={"empty"}
                     />
                   ) : (
                     <img
                       className={`${styles.realm_wall_tile} ${isNotRealm && styles.not_realm}`}
+                      style={{ visibility: !isDrawn ? "visible" : "hidden" }}
                       src={`/tiles/${tile}.png`}
                       onClick={() => wallState.removeTileFromWallAtIndex(i)}
                       alt={tile}
@@ -77,7 +80,7 @@ const RealmWallSection: React.FC<RealmWallSectionProps> = ({
       <div>
         <div className={styles.area_title}>
           <DynamicSVGText text={"牌山選択"} />
-          <DynamicSVGTextSequence text={`（ ${realmTileTypeCount}種 ${remainingRealmTileCount}枚 ／ ${remainingTileCount}枚 ）`} />
+          <DynamicSVGTextSequence text={`（ ${realmTileTypeCount}種 ${totalRealmRemainingCount}枚 ／ ${totalRemainingCount}枚 ）`} />
         </div>
         <div className={`${styles.area} ${styles.realm_wall_tile_choices} ${styles.realm_warn_wrapper}`}>
           { !SOZU_TILES.some(tile => isRealmEachTile[tile]) &&

@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react";
-import { RealmBoss } from "../types/simulation";
+import { RealmBoss } from "../../types/simulation";
 import { RealmProgressState } from "./useRealmProgressState";
 
 

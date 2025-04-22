@@ -1,36 +1,38 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import Layout from "../components/layout";
 import Seo from "../components/seo";
 import styles from "./realm-plus.module.css";
 import DynamicSVGText from "../components/dynamicSVGText";
-import { useDoraIndicatorsState } from "../hooks/useRealmDoraIndicatorsState";
+import { useDoraIndicatorsState } from "../hooks/realm/useRealmDoraIndicatorsState";
 import { PageProps } from "gatsby";
 import { 
+  RealmEditPhase,
   RealmPhase,
-  SANMA_TILE_RECORD_0, 
   SANMA_TILE_RECORD_4, 
-  SANMA_TILE_RECORD_NUMBER_ARRAY, 
+  SANMA_TILE_RECORD_NUMBER_ARRAY,
+  SanmaTile, 
 } from "../types/simulation";
 import { 
   calcDrawTurnsByTiles, 
   calcIsRealmEachTile, 
   calcRealmTenpai, 
-  calcRemainingTiles, 
-  calcRealmWinsByTenpaiTurns, 
-  calcNonRealmWinsByTenpaiTurnsPerSozu, 
-  calcFirstDrawTurnByTiles
+  calcFirstDrawTurnByTilesByTurns
 } from "../utils/realmSimulator";
 import DoraBossSectionPlus from "../components/realmBossSection";
-import RealmDoraIndicatorsSection from "../components/realmDoraIndicatorsSection";
-import RealmConfirmedSection from "../components/realmConfirmedSection";
-import { useRealmWallState } from "../hooks/useRealmWallState";
-import RealmWallSection from "../components/realmWallSection";
-import { useRealmHandState } from "../hooks/useRealmHandState";
-import RealmHandSection from "../components/realmHandSection";
-import RealmResultSection from "../components/realmResultSection";
+import RealmDoraIndicatorsSection from "../components/realm/realmDoraIndicatorsSection";
+import RealmConfirmedSection from "../components/realm/realmConfirmedSection";
+import { useRealmWallState } from "../hooks/realm/useRealmWallState";
+import RealmWallSection from "../components/realm/realmWallSection";
+import { useRealmHandState } from "../hooks/realm/useRealmHandState";
+import RealmHandSection from "../components/realm/realmHandSection";
+import RealmResultSection from "../components/realm/realmResultSection";
 import "./realm-plus-variables.css"
-import { useRealmProgressState } from "../hooks/useRealmProgressState";
-import { useRealmBossState } from "../hooks/useRealmBossState";
+import { useRealmProgressState } from "../hooks/realm/useRealmProgressState";
+import { useRealmBossState } from "../hooks/realm/useRealmBossState";
+import { useRealmHandAction } from "../hooks/realm/useRealmHandAction";
+import ProcessingModal from "../components/processingModal";
+import { useRealmWinsLogic } from "../hooks/realm/useRealmWinsLogic";
+import { useRealmRemainingTilesLogic } from "../hooks/realm/useRealmRemainingTilesLogic";
 
 const RealmPage: React.FC<PageProps> = () => {
   /** 進行状況管理のフック */
@@ -55,47 +57,53 @@ const RealmPage: React.FC<PageProps> = () => {
   );
 
   // 手牌関連のフック
-  const handState = useRealmHandState(progressState, isRealmEachTile, remainingTiles);
+  const handState = useRealmHandState(progressState);
 
   // 残り牌の計算
-  useEffect(() => {
-    setRemainingTiles(calcRemainingTiles(doraIndicatorsState.doraIndicators, wallState.wall, handState.hand, handState.discardedTiles));
-  }, [doraIndicatorsState.doraIndicators, wallState.wall, handState.hand, handState.discardedTiles]);
+  const remainingTilesLogic = useRealmRemainingTilesLogic(
+    progressState.simulationProgress.turn,
+    doraIndicatorsState.doraIndicators,
+    isRealmEachTile,
+    wallState.wall,
+    handState.hand, 
+    handState.discardedTiles,
+    remainingTiles,
+    setRemainingTiles,
+  );
 
-  /** 聴牌巡目ごとの領域の和了回数 */
-  const realmWinsByTenpaiTurns = useMemo(() => {
-    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return [];
-    if (progressState.editProgress.isEditing) return [];
-    return calcRealmWinsByTenpaiTurns(wallState.wall, wallState.maxWall, isRealmEachTile);
-  }, [progressState, wallState.wall, wallState.maxWall, isRealmEachTile]);
-
-  /** 聴牌巡目ごとの各索子牌による非領域の和了回数 */
-  const nonRealmWinsByTenpaiTurnsPerSozu = useMemo(() => {
-    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return [];
-    if (progressState.editProgress.isEditing) return [];
-    return calcNonRealmWinsByTenpaiTurnsPerSozu(wallState.wall, wallState.maxWall, isRealmEachTile);
-  }, [progressState, wallState.wall, wallState.maxWall, isRealmEachTile]);
+  const winsLogic = useRealmWinsLogic(progressState, isRealmEachTile, wallState, remainingTilesLogic);
 
   // 結果の計算（聴牌形シミュレーション）と、各牌のツモ巡目の補助値
   const results = useMemo(() => {
     if (progressState.simulationProgress.phase <= RealmPhase.Wall) return null;
-    if (progressState.editProgress.isEditing) return null;
-    return calcRealmTenpai(progressState.simulationProgress, isRealmEachTile, handState.hand, wallState.wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu);
-  }, [progressState, isRealmEachTile, handState.hand, wallState.wall, realmWinsByTenpaiTurns, nonRealmWinsByTenpaiTurnsPerSozu]);
+    if (progressState.editProgress.isEditing) {
+      if (progressState.editProgress.phase !== RealmEditPhase.Wall) return null;
+      if (wallState.wall.some(tile => tile === "empty")) return null;
+    }
+    return calcRealmTenpai(
+      progressState.simulationProgress,
+      isRealmEachTile,
+      handState.hand,
+      wallState.wall,
+      winsLogic,
+    );
+  }, [progressState, isRealmEachTile, handState.hand, wallState.wall, winsLogic]);
 
-  // 牌山から各牌を最初に引く巡目
-  const firstDrawTurnByTiles = useMemo(() => {
-    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return { ...SANMA_TILE_RECORD_0 };
-    if (progressState.editProgress.isEditing) return { ...SANMA_TILE_RECORD_0 };
-    return calcFirstDrawTurnByTiles(wallState.wall);
-  }, [progressState.simulationProgress, progressState.editProgress, wallState.wall]);
+  // 巡目ごとの牌山から各牌を最初に引く巡目
+  const firstDrawTurnByTilesByTurns: Record<SanmaTile, number>[] = useMemo(() => {
+    if (progressState.simulationProgress.phase <= RealmPhase.Wall) return [];
+    if (progressState.editProgress.isEditing) return [];
+    return calcFirstDrawTurnByTilesByTurns(wallState.wall, wallState.maxWall);
+  }, [progressState.simulationProgress.phase, progressState.editProgress.isEditing, wallState.wall, wallState.maxWall]);
 
   // 各牌を引く巡目（手牌にある牌は0巡目）
   const drawTurnsByTiles = useMemo(() => {
     if (progressState.simulationProgress.phase <= RealmPhase.Wall) return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
     if (progressState.editProgress.isEditing) return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
-    return calcDrawTurnsByTiles(handState.hand, wallState.wall);
-  }, [progressState.simulationProgress, progressState.editProgress, wallState.wall, handState.hand]);
+    return calcDrawTurnsByTiles(progressState.simulationProgress, handState.hand, wallState.wall);
+  }, [progressState.simulationProgress, progressState.editProgress.isEditing, wallState.wall, handState.hand]);
+
+  const handAction = useRealmHandAction(progressState, isRealmEachTile, remainingTiles, wallState.wall, handState, results, winsLogic);
 
   /** 初期化 */
   const clearAll = useCallback(() => {
@@ -108,6 +116,7 @@ const RealmPage: React.FC<PageProps> = () => {
 
   return (
     <Layout>
+      <ProcessingModal processingState={progressState.processingState} />
       <div className={styles.container}>
         <DynamicSVGText text={"領域和了シミュレーター"} />
         <div className={styles.contents}>
@@ -132,16 +141,18 @@ const RealmPage: React.FC<PageProps> = () => {
             progressState={progressState}
             wallState={wallState}
             isRealmEachTile={isRealmEachTile}
-            remainingTiles={remainingTiles}
+            remainingTilesLogic={remainingTilesLogic}
           />
           <RealmHandSection
             progressState={progressState}
             handState={handState}
+            handAction={handAction}
             isRealmEachTile={isRealmEachTile}
-            remainingTiles={remainingTiles}
-            firstDrawTurnByTiles={firstDrawTurnByTiles}
+            remainingTilesLogic={remainingTilesLogic}
+            firstDrawTurnByTiles={firstDrawTurnByTilesByTurns[progressState.simulationProgress.turn]}
           />
           <RealmResultSection
+            isEditing={progressState.editProgress.isEditing}
             results={results}
             drawTurnsByTiles={drawTurnsByTiles}
           />

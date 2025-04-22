@@ -1,4 +1,4 @@
-import { Block, BlockType, DecomposedResult, DecomposerTileSetId } from "../types/simulation";
+import { Block, BlockType, DecomposedResult, DecomposerTileSetId, SOZU_RECORD_0, SOZU_TILES } from "../types/simulation";
 
 // 内部では牌の種類を区別せず、整数で牌を管理する。
 // 整数で管理することで、牌の種類に依らず共通の牌姿になった際に共通のmemoを使うことができる。
@@ -21,36 +21,6 @@ export interface ResultInternal {
   nonRealmWins: number[],
 }
 
-/**
- * ブロック分解結果をマージする
- * @param results ブロック分解結果（可変長）
- * @returns マージされたブロック分解結果
- */
-export function mergeDecomposedResult<T extends readonly string[]>(
-  ...results: { [K in keyof T]: DecomposedResult<T[K]> }
-): DecomposedResult<T[number]> {
-  type U = T[number];
-  const merged: DecomposedResult<U> = {
-    count: 0,
-    blocks: [],
-    remaining: {} as Record<U, number>,
-    nonRealmWinsPerTiles: {} as Record<U, number>,
-  };
-  
-  for (const res of results) {
-    merged.count += res.count;
-    merged.blocks.push(
-      ...res.blocks.map(block => ({ ...block, tiles: block.tiles as U[] }))
-    );
-    for (const key in res.remaining) {
-      merged.remaining[key as U] = (merged.remaining[key as U] || 0) + res.remaining[key as U];
-    }
-    for (const key in res.remaining) {
-      merged.nonRealmWinsPerTiles[key as U] = (merged.nonRealmWinsPerTiles[key as U] || 0) + res.nonRealmWinsPerTiles[key as U];
-    }
-  }
-  return merged;
-}
 
 /**
  * 牌プール内の指定した牌をブロック分解する関数
@@ -62,11 +32,11 @@ export function mergeDecomposedResult<T extends readonly string[]>(
  * @param requiredTaatsuCount 必要な塔子の数（超過も不可）
  * @param allowKotsuAsToitsu 刻子を対子扱いできるケースを許可するか
  * @param isSequential 対象の牌が連続している（索子や筒子）かどうか
- * @param nonRealmWinsPerTiles 各牌の非領域の和了回数
+ * @param nonRealmWinsEachSozu 各牌の非領域の和了回数
  * @returns 分解結果
  */
 export function decomposeTilesIntoBlocks<T extends string>(
-  memo: Map<string, ResultInternal>,
+  memo: Map<number, ResultInternal>,
   pool: Record<T, number>,
   tileSetId: DecomposerTileSetId,
   tiles: readonly T[],
@@ -74,7 +44,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
   requiredTaatsuCount: number,
   allowKotsuAsToitsu: boolean,
   isSequential: boolean,
-  nonRealmWinsPerTiles?: Record<T, number>,
+  nonRealmWinsEachSozu?: Record<T, number>,
 ): DecomposedResult<T> {
   const n = tiles.length;
   
@@ -88,21 +58,10 @@ export function decomposeTilesIntoBlocks<T extends string>(
   }
 
   // int型牌姿（対象の牌の数をint配列化したもの）
-  const initialTileCounts: number[] = tiles.map(tile => {
-    if (!(tile in pool)) {
-      throw new Error(`pool is missing key: ${tile}`);
-    }
-    return pool[tile];
-  });
+  const initialTileCounts: number[] = tiles.map(tile =>  pool[tile]);
   
   // int型非領域牌の和了回数
-  const nonRealmWins: number[] = tiles.map(tile => {
-    if (!nonRealmWinsPerTiles) return 0;
-    if (!(tile in nonRealmWinsPerTiles)) {
-      throw new Error(`nonRealmWinsPerTiles is missing key: ${tile}`);
-    }
-    return nonRealmWinsPerTiles[tile];
-  });
+  const nonRealmWins: number[] = tiles.map(tile => nonRealmWinsEachSozu ? nonRealmWinsEachSozu[tile] : 0);
 
   // int型牌姿を一意な整数にエンコードする関数
   function encode(tileCounts: number[]): number {
@@ -122,7 +81,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
    * 必要なブロックを確保出来なかった場合 分解結果.count = -Infinity
    */
   function dfs(tileCounts: number[], requiredToitsuCount: number, requiredTaatsuCount: number): ResultInternal {
-    const key = `${tileSetId}_${n}_${encode(tileCounts)}_${requiredToitsuCount}_${requiredTaatsuCount}_${allowKotsuAsToitsu ? 1 : 0}`;
+    const key = tileSetId + (allowKotsuAsToitsu ? 1 : 0) * 10 + requiredTaatsuCount * 100 + requiredToitsuCount * 1000 + encode(tileCounts) * 10000;
     if (memo.has(key)) return memo.get(key)!;
 
     let best: ResultInternal = {
@@ -252,8 +211,8 @@ export function decomposeTilesIntoBlocks<T extends string>(
           const candidateWithBlock: ResultInternal = {
             count: candidate.count + 1,
             blocks: [block].concat(candidate.blocks),
-            remaining: candidate.remaining,
-            nonRealmWins: candidate.nonRealmWins,
+            remaining: candidate.remaining.slice(),
+            nonRealmWins: candidate.nonRealmWins.slice(),
           };
           setNonRealmWins(candidateWithBlock);
           if (allowKotsuAsToitsu || !canUseKotsuAsToitsu(candidateWithBlock)) {
@@ -282,8 +241,8 @@ export function decomposeTilesIntoBlocks<T extends string>(
           const candidateWithBlock: ResultInternal = {
             count: candidate.count + 1,
             blocks: [block].concat(candidate.blocks),
-            remaining: candidate.remaining,
-            nonRealmWins: candidate.nonRealmWins,
+            remaining: candidate.remaining.slice(),
+            nonRealmWins: candidate.nonRealmWins.slice(),
           };
           setNonRealmWins(candidateWithBlock);
           if (allowKotsuAsToitsu || !canUseKotsuAsToitsu(candidateWithBlock)) {
@@ -312,8 +271,8 @@ export function decomposeTilesIntoBlocks<T extends string>(
             const candidateWithBlock: ResultInternal = {
               count: candidate.count + 1,
               blocks: [block].concat(candidate.blocks),
-              remaining: candidate.remaining,
-              nonRealmWins: candidate.nonRealmWins,
+              remaining: candidate.remaining.slice(),
+              nonRealmWins: candidate.nonRealmWins.slice(),
             };
             setNonRealmWins(candidateWithBlock);
             if (allowKotsuAsToitsu || !canUseKotsuAsToitsu(candidateWithBlock)) {
@@ -344,8 +303,8 @@ export function decomposeTilesIntoBlocks<T extends string>(
             const candidateWithBlock: ResultInternal = {
               count: candidate.count + 1,
               blocks: [block].concat(candidate.blocks),
-              remaining: candidate.remaining,
-              nonRealmWins: candidate.nonRealmWins,
+              remaining: candidate.remaining.slice(),
+              nonRealmWins: candidate.nonRealmWins.slice(),
             };
             setNonRealmWins(candidateWithBlock);
             if (allowKotsuAsToitsu || !canUseKotsuAsToitsu(candidateWithBlock)) {
@@ -374,8 +333,8 @@ export function decomposeTilesIntoBlocks<T extends string>(
             const candidateWithBlock: ResultInternal = {
               count: candidate.count + 1,
               blocks: [block].concat(candidate.blocks),
-              remaining: candidate.remaining,
-              nonRealmWins: candidate.nonRealmWins,
+              remaining: candidate.remaining.slice(),
+              nonRealmWins: candidate.nonRealmWins.slice(),
             };
             setNonRealmWins(candidateWithBlock);
             if (allowKotsuAsToitsu || !canUseKotsuAsToitsu(candidateWithBlock)) {
@@ -421,20 +380,22 @@ export function decomposeTilesIntoBlocks<T extends string>(
 
   // int型管理の残り牌を牌名に変換
   const convertedRemaining = {} as Record<T, number>;
-  for (let i = 0; i < n; i++) {
+  for (let i = 0; i < n; ++i) {
     convertedRemaining[tiles[i]] = resultInternal.remaining[i];
   }
 
   // int型管理の非領域牌の和了回数を牌名に変換
-  const convertedNonRealmWins = {} as Record<T, number>;
-  for (let i = 0; i < n; i++) {
-    convertedNonRealmWins[tiles[i]] = resultInternal.nonRealmWins[i];
+  const convertedNonRealmWins = { ...SOZU_RECORD_0 };
+  if (nonRealmWinsEachSozu) {
+    for (let i = 0; i < n; ++i) {
+      convertedNonRealmWins[SOZU_TILES[i]] = resultInternal.nonRealmWins[i];
+    }
   }
 
   return {
     count: resultInternal.count,
     blocks: convertedBlocks,
     remaining: convertedRemaining,
-    nonRealmWinsPerTiles: convertedNonRealmWins,
+    nonRealmWinsEachTiles: convertedNonRealmWins,
   };
 }

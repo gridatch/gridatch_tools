@@ -3,8 +3,8 @@ import DynamicSVGText from "./dynamicSVGText";
 import styles from "../pages/realm-plus.module.css";
 import { REALM_BOSSES, RealmEditPhase, RealmPhase } from "../types/simulation";
 import { DORA_BOSS_DESCRIPTIONS } from "../constants/strings";
-import { RealmProgressState } from "../hooks/useRealmProgressState";
-import { RealmBossState } from "../hooks/useRealmBossState";
+import { RealmProgressState } from "../hooks/realm/useRealmProgressState";
+import { RealmBossState } from "../hooks/realm/useRealmBossState";
 
 interface RealmBossSectionProps {
   progressState: RealmProgressState;

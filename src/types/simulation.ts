@@ -153,8 +153,8 @@ export interface TileStatus {
 }
 
 export interface DrawnTile {
-  isClosed: boolean;
   tile: WallTile;
+  isClosed: boolean;
   isSelected: boolean;
 }
 
@@ -165,7 +165,7 @@ export interface Hand {
 
 export const INITIAL_HAND: Hand = deepFreeze({
   closed: Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as TileStatus[]])) as Record<SanmaTile, TileStatus[]>,
-  drawn: { isClosed: false, tile: "empty", isSelected: false }
+  drawn: { tile: "empty", isClosed: false, isSelected: false }
 })
 
 // --- 手牌のブロック分解 ---
@@ -188,14 +188,19 @@ export interface DecomposedResult<T extends string> {
   count: number;
   blocks: Block<T>[];
   remaining: Record<T, number>;
-  nonRealmWinsPerTiles: Record<T, number>;
+  nonRealmWinsEachTiles: Record<Sozu, number>;
 }
 
 export interface RealmTenpai {
   hand: Record<SanmaTile, number>;
   totalNonRealmWins: number;
-  nonRealmWinsPerTiles: Record<SanmaTile, number>;
+  nonRealmWinsEachTiles: Record<Sozu, number>;
 }
+export const EMPTY_REALM_TENPAI: RealmTenpai = deepFreeze({
+  hand: { ...SANMA_TILE_RECORD_0 },
+  totalNonRealmWins: Number.NEGATIVE_INFINITY,
+  nonRealmWinsEachTiles: { ...SOZU_RECORD_0 },
+});
 
 export type WinningHandType = "standard" | "sevenPairs" | "kokushi";
 export interface RealmTenpaiResult {
@@ -204,11 +209,21 @@ export interface RealmTenpaiResult {
   hand: Record<SanmaTile, number>;
   totalWins: number;
   totalNonRealmWins: number;
-  nonRealmWinsPerTiles: Record<SanmaTile, number>;
+  nonRealmWinsEachTiles: Record<Sozu, number>;
 }
 export const DECOMPOSER_TILE_SET_IDS = {
-  nonSequential: 'NS',
-  pinzu: 'PZ',
-  sozu: 'SZ'
+  nonSequential: 1,
+  pinzu: 2,
+  sozu: 3,
 } as const;
 export type DecomposerTileSetId = (typeof DECOMPOSER_TILE_SET_IDS)[keyof typeof DECOMPOSER_TILE_SET_IDS];
+
+export const SANMA_TILES_OR_NON_REALM = [...SANMA_TILES, "nonRealm"] as const;
+export type SanmaTileOrNonRealm = (typeof SANMA_TILES_OR_NON_REALM)[number];
+export const isSanmaTileOrNonRealm = (tile: string): tile is SanmaTileOrNonRealm => (SANMA_TILES_OR_NON_REALM as readonly string[]).includes(tile);
+export const SANMA_TILES_OR_NON_REALM_RECORD_0: Record<SanmaTileOrNonRealm, number> = Object.freeze(Object.fromEntries(SANMA_TILES_OR_NON_REALM.map(tile => [tile, 0])) as Record<SanmaTileOrNonRealm, number>);
+
+export interface MultisetPermutation<T> {
+  tiles: T[];
+  probability: number;
+}

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { RealmBoss, SanmaTile } from "../types/simulation";
+import { RealmBoss, SanmaTile } from "../../types/simulation";
 import { RealmProgressState } from "./useRealmProgressState";
 
 const MAX_DORA_INDICATORS = 10;

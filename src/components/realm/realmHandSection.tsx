@@ -1,46 +1,43 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/realm-plus.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, SANMA_TILES, RealmPhase, RealmPhaseAction } from "../types/simulation";
-import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
-import { RealmProgressState } from "../hooks/useRealmProgressState";
-import { RealmHandState } from "../hooks/useRealmHandState";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/realm-plus.module.css";
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, SANMA_TILES, RealmPhase, RealmPhaseAction } from "../../types/simulation";
+import DynamicSVGTextSequence from "../dynamicSVGTextSequence";
+import { RealmProgressState } from "../../hooks/realm/useRealmProgressState";
+import { RealmHandState } from "../../hooks/realm/useRealmHandState";
+import { RealmHandAction } from "../../hooks/realm/useRealmHandAction";
+import { RealmRemainingTilesLogic } from "../../hooks/realm/useRealmRemainingTilesLogic";
 
 interface RealmHandSectionProps {
   progressState: RealmProgressState;
   handState: RealmHandState;
+  handAction: RealmHandAction
   isRealmEachTile: Record<SanmaTile, boolean>;
-  remainingTiles: Record<SanmaTile, number>;
+  remainingTilesLogic: RealmRemainingTilesLogic;
   firstDrawTurnByTiles: Record<SanmaTile, number>;
 }
 
 const RealmHandSection: React.FC<RealmHandSectionProps> = ({
   progressState,
   handState,
+  handAction,
   isRealmEachTile,
-  remainingTiles,
+  remainingTilesLogic,
   firstDrawTurnByTiles,
 }) => {
-  const {
-    simulationProgress,
-    editProgress,
-  } = progressState;
+  const { simulationProgress, editProgress } = progressState;
+  const { remainingTiles, totalRealmRemainingCount, totalRemainingCount } = remainingTilesLogic;
 
   if (simulationProgress.phase <= RealmPhase.Wall) return;
   if (editProgress.isEditing) return;
   
   const realmTileTypeCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).length;
-  const remainingRealmTileCount = SANMA_TILES.filter(tile => isRealmEachTile[tile]).reduce((sum, tile) => sum + remainingTiles[tile], 0);
-  const remainingTileCount = SANMA_TILES.reduce((sum, tile) => sum + remainingTiles[tile], 0);
   
   const tileGroups: SanmaTile[][] = [
     [...PINZU_TILES],
     [...SOZU_TILES],
     [...NON_SEQUENTIAL_TILES],
   ];
-  const confirmButtonVisible = simulationProgress.action === RealmPhaseAction.Draw
-    ? handState.totalTileCount === handState.maxHand
-    : SANMA_TILES.some(tile => handState.hand.closed[tile].some(status => status.isSelected));
   
   return (
     <section className={styles.hand_section}>
@@ -68,8 +65,8 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                     className={`${isSelected && styles.hand_tile_selected} ${isNotRealm && styles.not_realm}`}
                     src={`/tiles/${tile}.png`}
                     onClick={() => simulationProgress.action === RealmPhaseAction.Draw
-                      ? handState.cancelDraw(tile, i)
-                      : handState.toggleDiscard(tile, i)
+                      ? handAction.cancelDraw(tile, i)
+                      : handAction.toggleDiscard(tile, i)
                     }
                     alt={tile}
                   />
@@ -101,7 +98,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
               )
             })
           ))}
-          {Array.from({ length: handState.maxHand - handState.totalTileCount }).map((_, i) => (
+          {Array.from({ length: handState.maxHand - handState.handTileCount }).map((_, i) => (
             <div key={`hand_empty_${i}`} className={styles.hand_tile_counter}>
               <img
                 src={`/tiles/empty.png`}
@@ -109,6 +106,57 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
               />
             </div>
           ))}
+          {
+            (() => {
+              if (simulationProgress.phase < RealmPhase.Main) return;
+              // メインフェーズのツモ牌
+              const tile = handState.hand.drawn.tile;
+              const isSelected = handState.hand.drawn.isSelected;
+              const isRealm = tile !== "empty" && tile !== "closed" && isRealmEachTile[tile];
+              const isNotRealm = tile !== "empty" && tile !== "closed" && !isRealmEachTile[tile];
+              const isInWall = tile !== "empty" && tile !== "closed" && firstDrawTurnByTiles[tile] !== -1;
+              return (
+                <div className={styles.hand_tile_counter} style={{ marginLeft: "2%" }}>
+                  <img
+                    className={`${isSelected && styles.hand_tile_selected} ${isNotRealm && styles.not_realm}`}
+                    src={`/tiles/${tile}.png`}
+                    onClick={() => tile !== "empty" && tile !== "closed"
+                      && (simulationProgress.action === RealmPhaseAction.Draw
+                      ? handAction.cancelDraw(tile, -1)
+                      : handAction.toggleDiscard(tile, -1))
+                    }
+                    alt={tile}
+                  />
+                  <span className={styles.hand_tile_counter_text}>
+                    <span style={{
+                      visibility: isRealm && isInWall ? "visible" : "hidden",
+                      fontSize: "var(--font-sx)",
+                      display: "flex",
+                      alignItems: "flex-end",
+                    }}>
+                      <DynamicSVGTextSequence text={`${isInWall ? firstDrawTurnByTiles[tile] : ""}`} className={styles.tile_counter_text_negative_margin_right} />
+                      <DynamicSVGText text="巡" style={{ fontSize: "var(--font-xxs)" }} />
+                    </span>
+                    <span style={{
+                      visibility: isRealm ? "visible" : "hidden",
+                    }}>
+                      <DynamicSVGText text={"×"} />
+                      <DynamicSVGText text={`${(tile !== "empty" && tile !== "closed") ? remainingTiles[tile] : ""}`} />
+                    </span>
+                  </span>
+                  {
+                    isSelected && <div className={styles.hand_tile_selected_icon_wrapper}>
+                      {
+                        simulationProgress.action === RealmPhaseAction.Draw
+                          ? <DynamicSVGText text="+" className={`${styles.hand_tile_selected_icon} ${styles.hand_tile_selected_icon_draw}`} />
+                          : <DynamicSVGText text="-" className={`${styles.hand_tile_selected_icon} ${styles.hand_tile_selected_icon_discard}`} />
+                      }
+                    </div>
+                  }
+                </div>
+              );
+            })()
+          }
         </div>
         <div className={styles.under_hand_line} />
         <span className={styles.result_tile_counter_text_spacing} >
@@ -123,7 +171,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
       <div>
         <div className={styles.area_title}>
           <DynamicSVGText text={simulationProgress.action === RealmPhaseAction.Draw ? "ツモ牌選択" : "領域牌表示"} />
-          <DynamicSVGTextSequence text={`（ ${realmTileTypeCount}種 ${remainingRealmTileCount}枚 ／ ${remainingTileCount}枚 ）`} />
+          <DynamicSVGTextSequence text={`（ ${realmTileTypeCount}種 ${totalRealmRemainingCount}枚 ／ ${totalRemainingCount}枚 ）`} />
         </div>
         <div className={`${styles.area} ${styles.draw_choices}`}>
           {tileGroups.map((group, groupIndex) => (
@@ -137,7 +185,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
                     <img
                       className={`${styles.tile_counter_image} ${isNotRealm && styles.not_realm} ${soldOut && styles.sold_out}`}
                       src={`/tiles/${tile}.png`}
-                      onClick={() => handState.draw(tile)}
+                      onClick={() => handAction.draw(tile)}
                       alt={tile}
                     />
                     <span className={`${styles.tile_counter_text} ${soldOut && styles.sold_out_text}`}>
@@ -156,11 +204,20 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
         <button
           style={{
             marginLeft: "auto",
-            visibility: confirmButtonVisible ? "visible" : "hidden",
+            visibility: handAction.canConfirmExchangePhase ? "visible" : "hidden",
+          }}
+          onClick={handAction.confirmExchangePhase}
+        >
+          <DynamicSVGText text={"入替終了"} height="1.2em" />
+        </button>
+        <button
+          style={{
+            marginLeft: "auto",
+            visibility: handAction.canConfirmAction ? "visible" : "hidden",
           }}
           onClick={simulationProgress.action === RealmPhaseAction.Draw
-            ? handState.confirmDraw
-            : handState.confirmDiscard
+            ? handAction.confirmDraw
+            : handAction.confirmDiscard
           }
         >
           <DynamicSVGText text={simulationProgress.action === RealmPhaseAction.Draw ? "ツモ牌決定" : "捨て牌決定"} height="1.2em" />
@@ -172,11 +229,20 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
             <button
               style={{
                 marginLeft: "auto",
-                visibility: confirmButtonVisible ? "visible" : "hidden",
+                visibility: handAction.canConfirmExchangePhase ? "visible" : "hidden",
+              }}
+              onClick={handAction.confirmExchangePhase}
+            >
+              <DynamicSVGText text={"入替終了"} height="1.2em" />
+            </button>
+            <button
+              style={{
+                marginLeft: "auto",
+                visibility: handAction.canConfirmAction ? "visible" : "hidden",
               }}
               onClick={simulationProgress.action === RealmPhaseAction.Draw
-                ? handState.confirmDraw
-                : handState.confirmDiscard
+                ? handAction.confirmDraw
+                : handAction.confirmDiscard
               }
             >
               <DynamicSVGText text={simulationProgress.action === RealmPhaseAction.Draw ? "ツモ牌決定" : "捨て牌決定"} height="1.2em" />

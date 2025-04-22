@@ -65,7 +65,6 @@ const xxhash = require('xxhash-wasm');
     const textsContent = await fs.readFile(SVG_TEXTS_FILE, 'utf-8');
     const texts = textsContent
       .split(/\r?\n/)
-      .map(line => line.trim())
       .filter(line => line.length > 0);
 
     for (const text of texts) {

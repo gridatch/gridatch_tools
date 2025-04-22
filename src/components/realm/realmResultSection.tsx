@@ -1,15 +1,17 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/realm-plus.module.css";
-import { SANMA_TILES, RealmTenpaiResult, SanmaTile, SOZU_TILES } from "../types/simulation";
-import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/realm-plus.module.css";
+import { SANMA_TILES, RealmTenpaiResult, SanmaTile, SOZU_TILES } from "../../types/simulation";
+import DynamicSVGTextSequence from "../dynamicSVGTextSequence";
 
 interface RealmResultSectionProps {
+  isEditing: boolean;
   results: RealmTenpaiResult[] | null;
   drawTurnsByTiles: Record<SanmaTile, number[]>;
 }
 
-const RealmResultSection: React.FC<RealmResultSectionProps> = ({ results, drawTurnsByTiles }) => {
+const RealmResultSection: React.FC<RealmResultSectionProps> = ({ isEditing, results, drawTurnsByTiles }) => {
+  if (isEditing) return;
   if (!results) return;
   return (
     <section className={styles.realm_result_section}>
@@ -36,12 +38,19 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ results, drawTu
             
             return (
               <React.Fragment key={`result_${result.type}`}>
-                <span>
+                <span className={styles.realm_result_text}>
                   <DynamicSVGText text={typeName} />
                   {
                     result.turn === Number.POSITIVE_INFINITY
                       ? <DynamicSVGTextSequence text={"：聴牌しません"} />
-                      : <DynamicSVGTextSequence text={`：${result.turn}巡目聴牌、${result.totalWins}和了`} />
+                      : (
+                        <>
+                          <DynamicSVGTextSequence text={`：${result.turn}`} />
+                          <DynamicSVGTextSequence text={`巡目聴牌 `} style={{ fontSize: "var(--font-sx)" }} />
+                          <DynamicSVGTextSequence text={`${result.totalWins.toFixed(1)}`} />
+                          <DynamicSVGTextSequence text={`和了`} style={{ fontSize: "var(--font-sx)" }} />
+                        </>
+                      )
                   }
                   {
                     result.totalNonRealmWins > 0 
@@ -49,17 +58,16 @@ const RealmResultSection: React.FC<RealmResultSectionProps> = ({ results, drawTu
                         <DynamicSVGText text={"（"} />
                           {
                             SOZU_TILES
-                              .filter(tile => result.nonRealmWinsPerTiles[tile] > 0)
-                              .map(tile => (
+                              .filter(tile => result.nonRealmWinsEachTiles[tile] > 0)
+                              .map((tile, i) => (
                                 <React.Fragment key={`non_realm_${tile}`}>
+                                  { i !== 0 && <DynamicSVGText text=" " /> }
                                   <img
                                     className={styles.result_non_realm_tile}
                                     src={`/tiles/${tile}.png`}
                                     alt={tile}
                                   />
-                                  <span style={{fontSize: "var(--font-sm)"}}>
-                                    <DynamicSVGTextSequence text={`×${result.nonRealmWinsPerTiles[tile]}和了`} />
-                                  </span>
+                                  <DynamicSVGTextSequence text={`×${result.nonRealmWinsEachTiles[tile].toFixed(1)}`} style={{fontSize: "var(--font-sm)"}} />
                                 </React.Fragment>
                               ))
                           }

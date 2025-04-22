@@ -6,7 +6,6 @@ import { hash32 } from '../utils/hash32';
 
 interface DynamicSVGTextProps extends SVGAttributes<SVGElement> {
   text: string;
-  className?: string;
   height?: string;
 }
 
@@ -24,21 +23,21 @@ const serializeStyle = (style?: React.CSSProperties) => {
     .join(';');
 };
 
-const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, className = '', height = '1.2em', style }) => {
+const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, height = '1.2em', className = '', style }) => {
   const [svgContent, setSvgContent] = useState<React.ReactNode | null>(null);
 
   useEffect(() => {
     let aborted = false;
     
-    const base = sanitize(text);
-    const hash = hash32(text);
-    const filename = `${base}_${hash}.svg`;
-    const src = `/generated_svgs/${filename}`;
-
-    if (!text.trim()) {
-      setSvgContent(text);
+    if (text.length === 0) {
+      setSvgContent(null);
       return;
     }
+    
+    const base = sanitize(text);
+    const hash = hash32(text);
+    const filename = encodeURIComponent(`${base}_${hash}.svg`);
+    const src = `/generated_svgs/${filename}`;
 
     const fetchAndCacheSVG = async () => {
       try {
@@ -55,7 +54,10 @@ const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, className = '', h
         let rawSVG: string | undefined = svgRawCache.get(filename);
         if (!rawSVG) {
           const response = await fetch(src);
-          if (!response.ok) return;
+          if (!response.ok) {
+            console.error(`[fetchAndCacheSVG] Failed to load SVG: "${text}"`);
+            return;
+          }
           rawSVG = await response.text();
           svgRawCache.set(filename, rawSVG);
         }
@@ -84,7 +86,7 @@ const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, className = '', h
         if (!aborted) setSvgContent(parsed);
 
       } catch (error) {
-        console.error(`Failed to load or process SVG: ${src}`, error);
+        console.error(`[fetchAndCacheSVG] Failed to load or process SVG: "${text}"`, error);
       }
     };
 
