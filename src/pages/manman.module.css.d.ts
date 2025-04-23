@@ -2,6 +2,7 @@ declare const styles:
   & Readonly<{ "flex_br": string }>
   & Readonly<{ "container": string }>
   & Readonly<{ "container": string }>
+  & Readonly<{ "container": string }>
   & Readonly<{ "contents": string }>
   & Readonly<{ "contents": string }>
   & Readonly<{ "wall_section": string }>

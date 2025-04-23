@@ -26,7 +26,6 @@ import RealmWallSection from "../components/realm/realmWallSection";
 import { useRealmHandState } from "../hooks/realm/useRealmHandState";
 import RealmHandSection from "../components/realm/realmHandSection";
 import RealmResultSection from "../components/realm/realmResultSection";
-import "./realm-plus-variables.css"
 import { useRealmProgressState } from "../hooks/realm/useRealmProgressState";
 import { useRealmBossState } from "../hooks/realm/useRealmBossState";
 import { useRealmHandAction } from "../hooks/realm/useRealmHandAction";
@@ -116,8 +115,8 @@ const RealmPage: React.FC<PageProps> = () => {
 
   return (
     <Layout>
-      <ProcessingModal processingState={progressState.processingState} />
       <div className={styles.container}>
+        <ProcessingModal processingState={progressState.processingState} />
         <DynamicSVGText text={"領域和了シミュレーター"} />
         <div className={styles.contents}>
           <RealmConfirmedSection

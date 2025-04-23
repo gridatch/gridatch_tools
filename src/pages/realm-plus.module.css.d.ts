@@ -1,6 +1,7 @@
 declare const styles:
   & Readonly<{ "container": string }>
   & Readonly<{ "container": string }>
+  & Readonly<{ "container": string }>
   & Readonly<{ "contents": string }>
   & Readonly<{ "contents": string }>
   & Readonly<{ "confirmed_section": string }>
