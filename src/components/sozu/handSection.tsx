@@ -8,6 +8,7 @@ interface SozuHandSectionProps {
   maxHand: number;
   addComponentToHand: (component: HandComponent) => void;
   removeComponentFromHand: (component: HandComponent) => void;
+  draw: () => void;
 }
 
 interface TileToRender {
@@ -21,42 +22,43 @@ const SozuHandSection: React.FC<SozuHandSectionProps> = ({
   maxHand,
   addComponentToHand,
   removeComponentFromHand,
+  draw,
 }) => {
   const handTilesToRender: TileToRender[] = [];
   
   // 順子の表示：1セット目は 1p,2p,3p; 2セット目は 4p,5p,6p
-  if (hand.sequence >= 1) {
-      handTilesToRender.push({ key: `seq0_1`, tile: "1p", onClick: () => removeComponentFromHand("sequence") });
-      handTilesToRender.push({ key: `seq0_2`, tile: "2p", onClick: () => removeComponentFromHand("sequence") });
-      handTilesToRender.push({ key: `seq0_3`, tile: "3p", onClick: () => removeComponentFromHand("sequence") });
+  if (hand.closed.sequence >= 1) {
+    handTilesToRender.push({ key: `seq0_1`, tile: "1p", onClick: () => removeComponentFromHand("sequence") });
+    handTilesToRender.push({ key: `seq0_2`, tile: "2p", onClick: () => removeComponentFromHand("sequence") });
+    handTilesToRender.push({ key: `seq0_3`, tile: "3p", onClick: () => removeComponentFromHand("sequence") });
   }
-  if (hand.sequence >= 2) {
+  if (hand.closed.sequence >= 2) {
     handTilesToRender.push({ key: `seq1_1`, tile: "4p", onClick: () => removeComponentFromHand("sequence") });
     handTilesToRender.push({ key: `seq1_2`, tile: "5p", onClick: () => removeComponentFromHand("sequence") });
     handTilesToRender.push({ key: `seq1_3`, tile: "6p", onClick: () => removeComponentFromHand("sequence") });
   }
   
   // 刻子の表示：1セット目は 7p,7p,7p; 2セット目は 8p,8p,8p
-  if (hand.triplet >= 1) {
+  if (hand.closed.triplet >= 1) {
     handTilesToRender.push({ key: `trip0_1`, tile: "7p", onClick: () => removeComponentFromHand("triplet") });
     handTilesToRender.push({ key: `trip0_2`, tile: "7p", onClick: () => removeComponentFromHand("triplet") });
     handTilesToRender.push({ key: `trip0_3`, tile: "7p", onClick: () => removeComponentFromHand("triplet") });
   }
-  if (hand.triplet >= 2) {
+  if (hand.closed.triplet >= 2) {
     handTilesToRender.push({ key: `trip1_1`, tile: "8p", onClick: () => removeComponentFromHand("triplet") });
     handTilesToRender.push({ key: `trip1_2`, tile: "8p", onClick: () => removeComponentFromHand("triplet") });
     handTilesToRender.push({ key: `trip1_3`, tile: "8p", onClick: () => removeComponentFromHand("triplet") });
   }
   
   // 対子の表示：9p,9p
-  if (hand.pair >= 1) {
+  if (hand.closed.pair >= 1) {
     handTilesToRender.push({ key: `pair_1`, tile: "9p", onClick: () => removeComponentFromHand("pair") });
     handTilesToRender.push({ key: `pair_2`, tile: "9p", onClick: () => removeComponentFromHand("pair") });
   }
   
   // 索子の表示（1s～9sの昇順）
   SOZU_TILES.forEach(tile => {
-    for (let i = 0; i < hand[tile]; ++i) {
+    for (let i = 0; i < hand.closed[tile]; ++i) {
       handTilesToRender.push({ key: `sozu_${tile}_${i}`, tile, onClick: () => removeComponentFromHand(tile) });
     }
   });
@@ -67,19 +69,30 @@ const SozuHandSection: React.FC<SozuHandSectionProps> = ({
   }
   
   return (
-    <section className={styles.hand_section}>
+    <section className={styles.hand_section} style={{ paddingTop: "5px" }}>
       <div>
-        <div className={styles.area_title}>
+        <div className={styles.area_title} style={{ justifyContent: "space-between", marginBottom: "5px" }}>
           <DynamicSVGText text={"手牌"} />
+          <div>
+            <button type="button" onClick={draw}><DynamicSVGText text={"↓ツモる"} height="1.1em" /></button>
+          </div>
+          <div></div>
         </div>
         <div id="hand" className={`${styles.area} ${styles.hand}`}>
           {
             maxHand === 12 &&
             <img className={styles.hand_tile} src={`/tiles/wild.png`} alt="万象牌" />
           }
-          {handTilesToRender.map(item => (
-            <img key={item.key} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} onClick={item.onClick ? item.onClick : undefined} alt={item.tile} />
+          {handTilesToRender.map((item, i) => (
+            <img key={`hand_${i}`} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} onClick={item.onClick ? item.onClick : undefined} alt={item.tile} />
           ))}
+          <img
+            className={styles.hand_tile}
+            style={{ marginLeft: "2%" }}
+            src={`/tiles/${hand.drawn}.png`}
+            onClick={ () => { if (hand.drawn !== "empty") removeComponentFromHand(hand.drawn) } }
+            alt={hand.drawn}
+          />
         </div>
       </div>
       <div>

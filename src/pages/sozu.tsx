@@ -20,7 +20,7 @@ const MAX_HAND = 13;
 
 const SozuPage: React.FC<PageProps> = () => {
   const { wall, addTileToWall, removeTileFromWallAtIndex, clearWall } = useWallState(MAX_WALL);
-  const { handState, addComponentToHand, removeComponentFromHand, clearHand } = useHandState(MAX_HAND);
+  const { hand, addComponentToHand, removeComponentFromHand, draw, clearHand } = useHandState(MAX_HAND, wall, removeTileFromWallAtIndex);
 
   const clearAll = () => {
     clearWall();
@@ -39,8 +39,8 @@ const SozuPage: React.FC<PageProps> = () => {
   
   const [tenpaiResults, setTenpaiResults] = useState<SozuTenpaiResult[]>([]);
   useEffect(() => {
-    setTenpaiResults(computeOptimalSozuTenpais(handState, wall, MAX_HAND, csvData));
-  }, [handState, wall, csvData]);
+    setTenpaiResults(computeOptimalSozuTenpais(hand, wall, MAX_HAND, csvData));
+  }, [hand, wall, csvData]);
 
   return (
     <Layout>
@@ -49,12 +49,13 @@ const SozuPage: React.FC<PageProps> = () => {
         <div className={styles.contents}>
           <SozuWallSection wall={wall} maxWall={MAX_WALL} addTileToWall={addTileToWall} removeTileFromWallAtIndex={removeTileFromWallAtIndex} />
           <SozuHandSection 
-            hand={handState}
+            hand={hand}
             maxHand={MAX_HAND}
             addComponentToHand={addComponentToHand}
             removeComponentFromHand={removeComponentFromHand}
+            draw={draw}
           />
-          <SozuResultSection handState={handState} tenpaiResults={tenpaiResults} clearAll={clearAll} />
+          <SozuResultSection hand={hand} tenpaiResults={tenpaiResults} clearAll={clearAll} />
         </div>
       </div>
     </Layout>

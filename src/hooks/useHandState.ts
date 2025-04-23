@@ -1,45 +1,79 @@
 import { useState } from "react";
-import { INITIAL_SOZU_HAND, SozuHand, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, HandComponent, PINZU_BLOCKS, SOZU_TILES } from "../types/simulation";
+import { INITIAL_SOZU_HAND, SozuHand, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, HandComponent, PINZU_BLOCKS, isSozuTile, Sozu } from "../types/simulation";
+import { produce } from "immer";
 
 export interface UseHandStateReturn {
-  handState: SozuHand;
+  hand: SozuHand;
   addComponentToHand: (component: HandComponent) => void;
   removeComponentFromHand: (component: HandComponent) => void;
+  draw: () => void;
   clearHand: () => void;
 }
 
-export const useHandState = (maxHand: number, initialHand: SozuHand = INITIAL_SOZU_HAND): UseHandStateReturn => {
-  const [handState, setHandState] = useState(initialHand);
+export const useHandState = (
+  maxHand: number,
+  wall: Sozu[],
+  removeTileFromWallAtIndex: (index: number) => void,
+  initialHand: SozuHand = INITIAL_SOZU_HAND,
+): UseHandStateReturn => {
+  const [hand, setHand] = useState(initialHand);
   
-  const getTotalHandCount = (hand: SozuHand) => {
-    return HAND_COMPONENTS.reduce((sum, component) => sum + HAND_COMPONENTS_TILE_COUNT[component] * hand[component], 0);
+  const getClosedHandCount = (hand: SozuHand) => {
+    return HAND_COMPONENTS.reduce((sum, component) => sum + HAND_COMPONENTS_TILE_COUNT[component] * hand.closed[component], 0);
+
   };
   
   const addComponentToHand = (component: HandComponent) => {
     const tileCount = HAND_COMPONENTS_TILE_COUNT[component];
-    setHandState((prev) => {
-      if (getTotalHandCount(prev) + tileCount > maxHand) return prev;
-      
-      if (PINZU_BLOCKS.some(block => block === component)) {
-        if (handState.sequence + handState.triplet + handState.pair >= 2) return prev;
-        if (component === "pair" && handState.pair >= 1) return prev;
-      }
-      
-      if (SOZU_TILES.some(tile => tile === component) && prev[component] >= 4)  return prev;
-      return { ...prev, [component]: prev[component] + 1 };
-    });
+    setHand((prev) => (
+      produce(prev, draft => {
+        const closedCount = getClosedHandCount(prev);
+        if (PINZU_BLOCKS.some(block => block === component)) {
+          if (closedCount + tileCount > maxHand) return;
+          if (draft.closed.sequence + draft.closed.triplet + draft.closed.pair >= 2) return;
+          if (component === "pair" && draft.closed.pair >= 1) return;
+          ++draft.closed[component];
+        }
+        if (isSozuTile(component)) {
+          if (draft.closed[component] >= 4) return;
+          if (draft.drawn !== "empty") return;
+          if (closedCount === maxHand) {
+            draft.drawn = component;
+          } else {
+            ++draft.closed[component];
+          }
+        }
+      })
+    ));
   };
   
   const removeComponentFromHand = (component: HandComponent) => {
-    setHandState((prev) => {
-      if (prev[component] === 0) return prev;
-      return { ...prev, [component]: prev[component] - 1 };
-    });
+    setHand((prev) => (
+      produce(prev, draft => {
+        if (draft.drawn === component) {
+          draft.drawn = "empty";
+          return;
+        } 
+        if (draft.closed[component] === 0) return;
+        --draft.closed[component];
+        if (draft.drawn !== "empty") {
+          ++draft.closed[draft.drawn];
+          draft.drawn = "empty";
+        }
+      })
+    ));
+  };
+
+  const draw = () => {
+    if (wall.length === 0) return;
+    if (hand.drawn !== "empty") return;
+    addComponentToHand(wall[0]);
+    removeTileFromWallAtIndex(0);
   };
   
   const clearHand = () => {
-    setHandState(INITIAL_SOZU_HAND);
+    setHand(INITIAL_SOZU_HAND);
   };
   
-  return { handState, addComponentToHand, removeComponentFromHand, clearHand };
+  return { hand, addComponentToHand, removeComponentFromHand, draw, clearHand };
 };

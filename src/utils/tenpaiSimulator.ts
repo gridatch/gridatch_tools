@@ -1,16 +1,17 @@
-import { SozuHand, INITIAL_SOZU_HAND, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult } from "../types/simulation";
+import { SozuHand, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult, HandComponent, HAND_COMPONENT_RECORD_0 } from "../types/simulation";
 
 // CSVファイルに記載されているロス数の最大値
 const MAX_LOSS = 12;
 
 /**
  * 手牌と牌山を混ぜて（手牌パーツの数を合計して）手牌パーツのプールを生成する関数
- * @param handState 手牌
+ * @param hand 手牌
  * @param wall 牌山
  * @returns プール
  */
-const generateHandComponentPool = (handState: SozuHand, wall: Sozu[]): SozuHand => {
-  const pool: SozuHand = { ...handState };
+const generateHandComponentPool = (hand: SozuHand, wall: Sozu[]): Record<HandComponent, number> => {
+  const pool: Record<HandComponent, number> = { ...hand.closed };
+  if (hand.drawn !== "empty") ++pool[hand.drawn];
   
   wall.forEach(tile => {
     if (pool[tile] < 4) ++pool[tile];
@@ -29,12 +30,12 @@ const generateHandComponentPool = (handState: SozuHand, wall: Sozu[]): SozuHand 
  * @param results 結果を格納する配列
  */
 const enumerateAllHands = (
-  pool: SozuHand,
+  pool: Record<HandComponent, number>,
   componentIndex: number,
-  currentHand: SozuHand,
+  currentHand: Record<HandComponent, number>,
   currentTileCount: number,
   targetTileCount: number,
-  results: SozuHand[]
+  results: Record<HandComponent, number>[]
 ): void => {
   if (currentTileCount === targetTileCount) {
     results.push({ ...currentHand });
@@ -74,7 +75,7 @@ const enumerateAllHands = (
  * @param hand 手牌
  * @returns キー文字列
  */
-const getCsvKeyFromHand = (hand: SozuHand): string => {
+const getCsvKeyFromHand = (hand: Record<HandComponent, number>): string => {
   let csvKey = "";
   SOZU_TILES.forEach((tile) => {
     const digitStr = tile.replace("s", "");
@@ -103,11 +104,11 @@ export const computeOptimalManmanTenpais = (
   
   const pool = generateHandComponentPool(handState, wall);
   
-  let allHands: SozuHand[] = [];
-  enumerateAllHands(pool, 0, INITIAL_SOZU_HAND, 0, maxHand, allHands);
+  let allHands: Record<HandComponent, number>[] = [];
+  enumerateAllHands(pool, 0, { ...HAND_COMPONENT_RECORD_0 }, 0, maxHand, allHands);
   
   // 単体牌が一致している手牌を重複排除する
-  const allHandMap: { [key: string]: SozuHand } = {};
+  const allHandMap: { [key: string]: Record<HandComponent, number> } = {};
   allHands.forEach(hand => {
     const key = getCsvKeyFromHand(hand);
     allHandMap[key] = hand;
@@ -159,11 +160,11 @@ export const computeOptimalSozuTenpais = (
   
   const pool = generateHandComponentPool(handState, wall);
   
-  let allHands: SozuHand[] = [];
-  enumerateAllHands(pool, 0, INITIAL_SOZU_HAND, 0, maxHand, allHands);
+  let allHands: Record<HandComponent, number>[] = [];
+  enumerateAllHands(pool, 0, { ...HAND_COMPONENT_RECORD_0 }, 0, maxHand, allHands);
   
   // 単体牌が一致している手牌を重複排除する
-  const allHandMap: { [key: string]: SozuHand } = {};
+  const allHandMap: { [key: string]: Record<HandComponent, number> } = {};
   allHands.forEach(hand => {
     const key = getCsvKeyFromHand(hand);
     allHandMap[key] = hand;

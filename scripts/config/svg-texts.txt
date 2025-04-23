@@ -71,3 +71,5 @@ https://mahjongsoul.com/
 1手進む
 入替終了
 計算中…
+↓ツモる
+↑戻す

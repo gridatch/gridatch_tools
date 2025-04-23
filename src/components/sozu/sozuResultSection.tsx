@@ -6,12 +6,12 @@ import { SozuHand, SOZU_TILES, SozuTenpaiResult } from "../../types/simulation";
 import ClearButton from "../clearButton";
 
 interface SozuResultSectionProps {
-  handState: SozuHand;
+  hand: SozuHand;
   tenpaiResults: SozuTenpaiResult[];
   clearAll: () => void;
 }
 
-const SozuResultSection: React.FC<SozuResultSectionProps> = ({ handState, tenpaiResults, clearAll }) => {
+const SozuResultSection: React.FC<SozuResultSectionProps> = ({ hand, tenpaiResults, clearAll }) => {
   return (
     <section className={styles.result_section}>
       <div className={styles.area_title} style={{position: "relative"}}>
@@ -41,10 +41,10 @@ const SozuResultSection: React.FC<SozuResultSectionProps> = ({ handState, tenpai
             
             // 対子の表示：9p,9p
             if (tenpai.hand.pair >= 1) {
-              if (handState.pair) {
+              if (hand.closed.pair) {
                 resultTilesToRender.push(...["9p", "9p"]);
               } else {
-                if (handState.triplet === 2) {
+                if (hand.closed.triplet === 2) {
                   resultTilesToRender.push(...["8p", "8p"]);
                 } else {
                   resultTilesToRender.push(...["7p", "7p"]);
