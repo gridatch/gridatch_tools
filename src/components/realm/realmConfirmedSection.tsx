@@ -1,17 +1,18 @@
 import React from "react";
 import DynamicSVGText from "../dynamicSVGText";
 import styles from "../../pages/realm-plus.module.css";
-import { RealmBoss, RealmEditPhase, RealmPhase, SanmaTile, WallTile } from "../../types/simulation";
+import { RealmBoss, RealmEditPhase, RealmPhase, SanmaTile } from "../../types/simulation";
 import ClearButton from "../clearButton";
 import EditButton from "../editButton";
 import { RealmProgressState } from "../../hooks/realm/useRealmProgressState";
+import { RealmWallState } from "../../hooks/realm/useRealmWallState";
 
 interface RealmConfirmedSectionProps {
   progressState: RealmProgressState;
   boss: RealmBoss;
   doraIndicators: SanmaTile[];
   isRealmEachTile: Record<SanmaTile, boolean>;
-  wall: WallTile[];
+  wallState: RealmWallState;
   clearAll: () => void;
 }
 
@@ -20,10 +21,11 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
   boss,
   doraIndicators,
   isRealmEachTile,
-  wall,
+  wallState,
   clearAll,
 }) => {
   const { simulationProgress, editProgress } = progressState;
+  const { wall, usableWallCount } = wallState;
   
   const isBossConfirmed = (!editProgress.isEditing && simulationProgress.phase > RealmPhase.Boss)
     || (editProgress.isEditing && editProgress.phase > RealmEditPhase.Boss);
@@ -65,16 +67,36 @@ const RealmConfirmedSection: React.FC<RealmConfirmedSectionProps> = ({
           </div>
         </div>
         <div className={`${styles.area} ${styles.confirmed_wall}`}>
+          <div className={styles.lock_container}>
+            {
+              isWallConfirmed && Array.from({ length: 4 }).map((_, i) => {
+                const rowUsableCount = Math.min(9, usableWallCount - 9 * i);
+                const rowUsablePercentage = rowUsableCount / 9 * 100;
+                const visibility = rowUsableCount < 9 ? "visible" : "hidden";
+                return (
+                  <img
+                    key={`lock_${i}`}
+                    className={styles.lock_effect}
+                    style={{ visibility, clipPath: `inset(0 0 0 ${rowUsablePercentage}%)` }}
+                    src="/effects/lock.png"
+                    alt="lock"
+                  />
+                );
+              })
+            }
+            
+          </div>
           {
             isWallConfirmed && wall.map((tile, i) => {
               const isNotRealm = wall[i] !== "empty" && wall[i] !== "closed" && !isRealmEachTile[wall[i]];
               const visible = i > simulationProgress.turn - 1;
+              const isLocked = i >= usableWallCount;
               return (
                 <React.Fragment key={`wall_${i}`}>
                   {
                     wall[i] !== "empty" && (
                       <img
-                        className={`${styles.confirmed_wall_tile} ${isNotRealm && styles.not_realm}`}
+                        className={`${styles.confirmed_wall_tile} ${isNotRealm && styles.not_realm} ${isLocked && styles.locked}`}
                         style={{ visibility: visible ? "visible" : "hidden" }}
                         src={`/tiles/${tile}.png`}
                         alt={tile}

@@ -135,7 +135,7 @@ export type RealmEditProgress = {
   phase?: never;
 };
 
-export const REALM_BOSSES = ["dora_indicator", "dora_manzu", "dora_pinzu", "dora_sozu", "others", "empty"] as const;
+export const REALM_BOSSES = ["dora_indicator", "dora_manzu", "dora_pinzu", "dora_sozu", "exchange_amount", "lock", "others", "empty"] as const;
 export type RealmBoss = (typeof REALM_BOSSES)[number];
 
 export const SANMA_TILE_RECORD_FALSE: Record<SanmaTile, boolean> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, false])) as Record<SanmaTile, boolean>);

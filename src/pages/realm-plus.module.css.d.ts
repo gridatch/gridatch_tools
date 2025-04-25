@@ -15,6 +15,7 @@ declare const styles:
   & Readonly<{ "area": string }>
   & Readonly<{ "editingTextWrapper": string }>
   & Readonly<{ "not_realm": string }>
+  & Readonly<{ "locked": string }>
   & Readonly<{ "tile_counter": string }>
   & Readonly<{ "tile_counter_realm": string }>
   & Readonly<{ "tile_counter_image": string }>
@@ -25,6 +26,8 @@ declare const styles:
   & Readonly<{ "confirmed_dora_indicators": string }>
   & Readonly<{ "confirmed_dora_indicator": string }>
   & Readonly<{ "confirmed_wall": string }>
+  & Readonly<{ "lock_container": string }>
+  & Readonly<{ "lock_effect": string }>
   & Readonly<{ "confirmed_wall_tile": string }>
   & Readonly<{ "dora_boss": string }>
   & Readonly<{ "dora_boss_image": string }>

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { SanmaTile, WallTile } from "../../types/simulation";
+import { RealmBoss, SanmaTile, WallTile } from "../../types/simulation";
 import { RealmProgressState } from "./useRealmProgressState";
 
 const MAX_WALL = 36;
@@ -8,6 +8,7 @@ const DEFAULT_INITIAL_WALL: readonly WallTile[] = Object.freeze(new Array(MAX_WA
 export interface RealmWallState {
   wall: WallTile[];
   maxWall: number;
+  usableWallCount: number;
   addTileToWall: (tile: WallTile) => void;
   removeTileFromWallAtIndex: (index: number) => void;
   confirmWall: () => void;
@@ -16,10 +17,15 @@ export interface RealmWallState {
 
 export const useRealmWallState = (
   progressState: RealmProgressState,
+  boss: RealmBoss,
   remainingTiles: Record<SanmaTile, number>,
   initialWall: WallTile[] = [...DEFAULT_INITIAL_WALL],
 ): RealmWallState => {
   const [wall, setWall] = useState(initialWall);
+  
+  const lockCount = boss === "lock" ? 3 : 0;
+  
+  const usableWallCount = MAX_WALL - lockCount;
   
   const addTileToWall = useCallback((tile: WallTile) => {
     if (tile !== "empty" && tile !== "closed" && remainingTiles[tile] === 0) return;
@@ -58,12 +64,14 @@ export const useRealmWallState = (
   return useMemo(() => ({
     wall,
     maxWall: MAX_WALL,
+    usableWallCount,
     addTileToWall,
     removeTileFromWallAtIndex,
     confirmWall,
     clearWall,
   }), [
     wall,
+    usableWallCount,
     addTileToWall,
     removeTileFromWallAtIndex,
     confirmWall,

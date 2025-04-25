@@ -16,7 +16,7 @@ export interface RealmProgressState {
   goToNextEditPhase: () => void;
   goToNextSimulationPhase: (wall?: WallTile[]) => RealmSimulationProgress;
   updatePhaseAction: (action: RealmPhaseAction) => RealmSimulationProgress;
-  goToNextTurn: (wall: WallTile[]) => RealmSimulationProgress;
+  goToNextTurn: (wall: WallTile[], usableWallCount: number) => RealmSimulationProgress;
   clearRealmProgress: () => void;
   processingState: ProcessingState;
 }
@@ -139,17 +139,13 @@ export const useRealmProgressState = (): RealmProgressState => {
   /**
    * メインフェーズで次の巡目に進み、ツモ牌が表牌の場合は打牌アクション、裏牌の場合はツモアクションに設定する
    */
-  const goToNextTurn = useCallback((wall: WallTile[]): RealmSimulationProgress => {
+  const goToNextTurn = useCallback((wall: WallTile[], usableWallCount: number): RealmSimulationProgress => {
     if (simulationProgress.phase !== RealmPhase.Main) {
       console.error("[goToNextTurn] Unexpected phase.", simulationProgress.phase);
       return simulationProgress;
     }
-    if (!wall) {
-      console.error("[goToNextTurn] Wall required.");
-      return simulationProgress;
-    }
     const newTurn = simulationProgress.turn + 1;
-    if (newTurn - 1 >= wall.length) {
+    if (newTurn - 1 >= usableWallCount) {
       console.error("[goToNextTurn] No wall tiles left.");
       return simulationProgress;
     }

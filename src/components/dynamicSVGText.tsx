@@ -24,13 +24,13 @@ const serializeStyle = (style?: React.CSSProperties) => {
 };
 
 const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, height = '1.2em', className = '', style }) => {
-  const [svgContent, setSvgContent] = useState<React.ReactNode | null>(null);
+  const [svgContent, setSvgContent] = useState<React.ReactNode>(<span />);
 
   useEffect(() => {
     let aborted = false;
     
     if (text.length === 0) {
-      setSvgContent(null);
+      setSvgContent(<span />);
       return;
     }
     

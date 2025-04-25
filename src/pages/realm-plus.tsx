@@ -18,7 +18,7 @@ import {
   calcRealmTenpai, 
   calcFirstDrawTurnByTilesByTurns
 } from "../utils/realmSimulator";
-import DoraBossSectionPlus from "../components/realmBossSection";
+import DoraBossSectionPlus from "../components/realm/realmBossSection";
 import RealmDoraIndicatorsSection from "../components/realm/realmDoraIndicatorsSection";
 import RealmConfirmedSection from "../components/realm/realmConfirmedSection";
 import { useRealmWallState } from "../hooks/realm/useRealmWallState";
@@ -47,7 +47,7 @@ const RealmPage: React.FC<PageProps> = () => {
   const doraIndicatorsState = useDoraIndicatorsState(progressState, bossState.boss, remainingTiles);
 
   // 牌山関連のフック
-  const wallState = useRealmWallState(progressState, remainingTiles);
+  const wallState = useRealmWallState(progressState, bossState.boss, remainingTiles);
 
   /** 各牌が領域牌かどうか */
   const isRealmEachTile = useMemo(
@@ -84,25 +84,26 @@ const RealmPage: React.FC<PageProps> = () => {
       isRealmEachTile,
       handState.hand,
       wallState.wall,
+      wallState.usableWallCount,
       winsLogic,
     );
-  }, [progressState, isRealmEachTile, handState.hand, wallState.wall, winsLogic]);
+  }, [progressState.simulationProgress, progressState.editProgress.isEditing, progressState.editProgress.phase, isRealmEachTile, handState.hand, wallState.wall, wallState.usableWallCount, winsLogic]);
 
   // 巡目ごとの牌山から各牌を最初に引く巡目
   const firstDrawTurnByTilesByTurns: Record<SanmaTile, number>[] = useMemo(() => {
     if (progressState.simulationProgress.phase <= RealmPhase.Wall) return [];
     if (progressState.editProgress.isEditing) return [];
-    return calcFirstDrawTurnByTilesByTurns(wallState.wall, wallState.maxWall);
-  }, [progressState.simulationProgress.phase, progressState.editProgress.isEditing, wallState.wall, wallState.maxWall]);
+    return calcFirstDrawTurnByTilesByTurns(wallState.wall, wallState.maxWall, wallState.usableWallCount);
+  }, [progressState.simulationProgress.phase, progressState.editProgress.isEditing, wallState]);
 
   // 各牌を引く巡目（手牌にある牌は0巡目）
   const drawTurnsByTiles = useMemo(() => {
     if (progressState.simulationProgress.phase <= RealmPhase.Wall) return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
     if (progressState.editProgress.isEditing) return structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
-    return calcDrawTurnsByTiles(progressState.simulationProgress, handState.hand, wallState.wall);
-  }, [progressState.simulationProgress, progressState.editProgress.isEditing, wallState.wall, handState.hand]);
+    return calcDrawTurnsByTiles(progressState.simulationProgress, handState.hand, wallState.wall, wallState.usableWallCount);
+  }, [progressState.simulationProgress, progressState.editProgress.isEditing, handState.hand, wallState.wall, wallState.usableWallCount]);
 
-  const handAction = useRealmHandAction(progressState, isRealmEachTile, remainingTiles, wallState.wall, handState, results, winsLogic);
+  const handAction = useRealmHandAction(progressState, bossState.boss, isRealmEachTile, remainingTiles, wallState.wall, wallState.usableWallCount, handState, results, winsLogic);
 
   /** 初期化 */
   const clearAll = useCallback(() => {
@@ -124,7 +125,7 @@ const RealmPage: React.FC<PageProps> = () => {
             boss={bossState.boss}
             doraIndicators={doraIndicatorsState.doraIndicators}
             isRealmEachTile={isRealmEachTile}
-            wall={wallState.wall}
+            wallState={wallState}
             clearAll={clearAll}
           />
           <DoraBossSectionPlus

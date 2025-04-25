@@ -53,12 +53,14 @@ export const useRealmWinsLogic = (
         console.error("[realmWinsByTenpaiTurnsEachVisibility] Unexpected empty wall tile", nextTileAfterTenpai);
         return emptyResult;
       }
-      if (nextTileAfterTenpai === "closed") {
-        // 裏牌
-        closedWins += totalRealmRemainingCount / totalRemainingCount;
-      } else {
-        // 表牌
-        if (isRealmEachTile[nextTileAfterTenpai]) ++openWins;
+      if (tenpaiTurn < wallState.usableWallCount) {
+        if (nextTileAfterTenpai === "closed") {
+          // 裏牌
+          closedWins += totalRealmRemainingCount / totalRemainingCount;
+        } else {
+          // 表牌
+          if (isRealmEachTile[nextTileAfterTenpai]) ++openWins;
+        }
       }
       result.open[tenpaiTurn] = openWins;
       result.closed[tenpaiTurn] = closedWins;
@@ -69,6 +71,7 @@ export const useRealmWinsLogic = (
     shouldCalcWins,
     wallState.wall,
     wallState.maxWall,
+    wallState.usableWallCount,
     isRealmEachTile,
     totalRealmRemainingCount,
     totalRemainingCount,
@@ -105,19 +108,21 @@ export const useRealmWinsLogic = (
         console.error("[nonRealmWinsEachSozuByTenpaiTurnEachVisibility] Unexpected empty wall tile", nextTileAfterTenpai);
         return emptyResult;
       }
-      if (nextTileAfterTenpai === "closed") {
-        // 裏牌
-        SOZU_TILES.forEach(tile => {
-          if (!isRealmEachTile[tile]) {
-            closedWinsEachSozu[tile] += remainingTiles[tile] / totalRemainingCount;
-            winsEachSozu[tile] += remainingTiles[tile] / totalRemainingCount;
+      if (tenpaiTurn < wallState.usableWallCount) {
+        if (nextTileAfterTenpai === "closed") {
+          // 裏牌
+          SOZU_TILES.forEach(tile => {
+            if (!isRealmEachTile[tile]) {
+              closedWinsEachSozu[tile] += remainingTiles[tile] / totalRemainingCount;
+              winsEachSozu[tile] += remainingTiles[tile] / totalRemainingCount;
+            }
+          });
+        } else {
+          // 表牌
+          if (!isRealmEachTile[nextTileAfterTenpai] && isSozuTile(nextTileAfterTenpai)) {
+            ++openWinsEachSozu[nextTileAfterTenpai];
+            ++winsEachSozu[nextTileAfterTenpai];
           }
-        });
-      } else {
-        // 表牌
-        if (!isRealmEachTile[nextTileAfterTenpai] && isSozuTile(nextTileAfterTenpai)) {
-          ++openWinsEachSozu[nextTileAfterTenpai];
-          ++winsEachSozu[nextTileAfterTenpai];
         }
       }
       result.open[tenpaiTurn] = { ...openWinsEachSozu };
@@ -129,6 +134,7 @@ export const useRealmWinsLogic = (
     shouldCalcWins,
     wallState.wall,
     wallState.maxWall,
+    wallState.usableWallCount,
     isRealmEachTile,
     remainingTiles,
     totalRemainingCount,
@@ -245,7 +251,13 @@ export const useRealmWinsLogic = (
       result.total[tenpaiTurn] = maxPossibleWins.open + maxPossibleWins.closed;
     }
     return result;
-  }, [nonRealmWinsEachSozuByTenpaiTurnEachVisibility.closed, nonRealmWinsEachSozuByTenpaiTurnEachVisibility.open, shouldCalcWins, sozuNonRealmWaitsList, wallState.maxWall]);
+  }, [
+    nonRealmWinsEachSozuByTenpaiTurnEachVisibility.closed,
+    nonRealmWinsEachSozuByTenpaiTurnEachVisibility.open,
+    shouldCalcWins,
+    sozuNonRealmWaitsList,
+    wallState.maxWall
+  ]);
   
   /** 列挙した裏牌により補正された領域牌の和了回数を計算する */
   const calcAdjustedRealmWinsForClosedPermutation = useCallback((turn: number, permutation: SanmaTileOrNonRealm[]) => {

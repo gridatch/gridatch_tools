@@ -87,21 +87,23 @@ export const calcIsRealmEachTile = (boss: RealmBoss, doraIndicators: SanmaTile[]
 /**
  * 巡目ごとの牌山から各牌を最初に引く巡目を計算する（存在しない場合は-1巡目）
  * @param wall 牌山
- * @param wall 牌山の最大枚数
+ * @param usableWallCount 使用可能な牌山の枚数
  * @returns 巡目ごとの牌山から各牌を最初に引く巡目
  */
-export const calcFirstDrawTurnByTilesByTurns = (wall: WallTile[], maxWall: number): Record<SanmaTile, number>[] => {
-  const result: Record<SanmaTile, number>[] = new Array(maxWall + 1);
+export const calcFirstDrawTurnByTilesByTurns = (wall: WallTile[], maxWall: number, usableWallCount: number): Record<SanmaTile, number>[] => {
+  const result: Record<SanmaTile, number>[] = new Array(usableWallCount + 1);
   
   const firstDrawTurnByTiles = { ...SANMA_TILE_RECORD_MINUS_1 };
   result[maxWall] = { ...firstDrawTurnByTiles };
   
-  for (let i = maxWall - 1; i >= 0; --i) {
-    const tile = wall[i];
-    if (tile !== "empty" && tile !== "closed") {
-      firstDrawTurnByTiles[tile] = i + 1;
+  for (let turn = maxWall - 1; turn >= 0; --turn) {
+    if (turn < usableWallCount) {
+      const nextTile = wall[turn];
+      if (nextTile !== "empty" && nextTile !== "closed") {
+        firstDrawTurnByTiles[nextTile] = turn + 1;
+      }
     }
-    result[i] = { ...firstDrawTurnByTiles };
+    result[turn] = { ...firstDrawTurnByTiles };
   }
   
   return result;
@@ -112,23 +114,25 @@ export const calcFirstDrawTurnByTilesByTurns = (wall: WallTile[], maxWall: numbe
  * @param progress シミュレーションの進行状況
  * @param hand 手牌
  * @param wall 牌山
+ * @param usableWallCount 使用可能な牌山の枚数
  * @returns 各牌を引く巡目
  */
-export const calcDrawTurnsByTiles = (progress: RealmSimulationProgress, hand: Hand, wall: WallTile[]): Record<SanmaTile, number[]> => {
+export const calcDrawTurnsByTiles = (progress: RealmSimulationProgress, hand: Hand, wall: WallTile[], usableWallCount: number): Record<SanmaTile, number[]> => {
   const result = structuredClone(SANMA_TILE_RECORD_NUMBER_ARRAY);
   for (const tile of SANMA_TILES) {
-    for (let i = 0; i < hand.closed[tile].length; ++i) {
+    for (const status of hand.closed[tile]) {
       // 打牌候補は除外
-      if (progress.action === RealmPhaseAction.Discard && hand.closed[tile][i].isSelected) continue;
+      if (progress.action === RealmPhaseAction.Discard && status.isSelected) continue;
       result[tile].push(0);
     }
   }
-  if (hand.drawn.tile !== "empty" && hand.drawn.tile !== "closed" && !hand.drawn.isSelected) result[hand.drawn.tile].push(0);
-  wall.forEach((tile, i) => {
-    if (i <= progress.turn - 1) return;
-    if (tile === "closed" || tile === "empty") return;
-    result[tile].push(i + 1);
-  })
+  if (isSanmaTile(hand.drawn.tile) && !(progress.action === RealmPhaseAction.Discard && hand.drawn.isSelected)) result[hand.drawn.tile].push(0);
+
+  for (let turn = progress.turn + 1; turn <= usableWallCount; ++turn) {
+    const tile = wall[turn - 1];
+    if (!isSanmaTile(tile)) continue;
+    result[tile].push(turn);
+  }
   
   return result;
 };
@@ -400,6 +404,7 @@ function createKokushiTenpai(pool: Record<SanmaTile, number>, nonRealmWinsEachSo
  * @param isRealmEachTile 各牌が領域牌かどうか
  * @param hand 手牌
  * @param wall 牌山
+ * @param usableWallCount 使用可能な牌山の枚数
  * @param winsLogic 和了回数計算ロジック
  * @returns 各聴牌形で索子待ちの聴牌をする最も早い巡目と聴牌時の手牌。聴牌しない場合は正の無限大の巡目と空の手牌を設定する。
  */
@@ -408,6 +413,7 @@ export const calcRealmTenpai = (
   isRealmEachTile: Record<SanmaTile, boolean>,
   hand: Hand,
   wall: WallTile[],
+  usableWallCount: number,
   winsLogic: RealmWinsLogic,
 ): RealmTenpaiResult[] => {
   const pool: Record<SanmaTile, number> = { ...SANMA_TILE_RECORD_0 };
@@ -456,7 +462,7 @@ export const calcRealmTenpai = (
   
   const results: RealmTenpaiResult[] = [];
   
-  for (let turn = progress.turn; turn <= wall.length; ++turn) {
+  for (let turn = progress.turn; turn <= usableWallCount; ++turn) {
     // 現在ターン（progress.turn）の牌は手牌のツモ牌に含まれているため牌プールに加算しない
     if (turn > progress.turn) {
       const tile = wall[turn - 1];
@@ -530,6 +536,7 @@ export const calcRealmTenpai = (
  * @param remainingTiles 残り牌
  * @param hand 手牌
  * @param wall 牌山
+ * @param usableWallCount 使用可能な牌山の枚数
  * @param realmWinsByTenpaiTurns 聴牌巡目ごとの領域の和了回数
  * @param openNonRealmWinsByTenpaiTurnsPerSozu 聴牌巡目ごとの各索子牌の非領域の和了回数
  * @param maxClosedTilesToEnumerate 裏牌を総当たり列挙する数（2以上だと先の裏牌が見えている前提の打牌になってしまったため1に修正）
@@ -542,6 +549,7 @@ export const calcRealmWinsAverageByDiscard = async (
   remainingTiles: Record<SanmaTile, number>,
   hand: Hand,
   wall: WallTile[],
+  usableWallCount: number,
   winsLogic: RealmWinsLogic,
   maxClosedTilesToEnumerate: number = 1,
 ): Promise<Record<SanmaTile, number> | null> => {
@@ -598,7 +606,7 @@ export const calcRealmWinsAverageByDiscard = async (
   processingState.setIsBusy(true);
 
   const startTurn = progress.turn;
-  const endTurn = wall.length;
+  const endTurn = usableWallCount;
   const totalTurns = endTurn - startTurn + 1;
 
   const updatePercent = async (turn: number) => {

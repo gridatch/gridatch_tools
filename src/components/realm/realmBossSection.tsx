@@ -1,10 +1,10 @@
 import React from "react";
-import DynamicSVGText from "./dynamicSVGText";
-import styles from "../pages/realm-plus.module.css";
-import { REALM_BOSSES, RealmEditPhase, RealmPhase } from "../types/simulation";
-import { DORA_BOSS_DESCRIPTIONS } from "../constants/strings";
-import { RealmProgressState } from "../hooks/realm/useRealmProgressState";
-import { RealmBossState } from "../hooks/realm/useRealmBossState";
+import DynamicSVGText from "../dynamicSVGText";
+import styles from "../../pages/realm-plus.module.css";
+import { REALM_BOSSES, RealmEditPhase, RealmPhase } from "../../types/simulation";
+import { REALM_BOSS_DESCRIPTIONS } from "../../constants/strings";
+import { RealmProgressState } from "../../hooks/realm/useRealmProgressState";
+import { RealmBossState } from "../../hooks/realm/useRealmBossState";
 
 interface RealmBossSectionProps {
   progressState: RealmProgressState;
@@ -23,7 +23,7 @@ const RealmBossSection: React.FC<RealmBossSectionProps> = ({ progressState, boss
   const confirmButtonText = editProgress.isEditing ? "修正" : "決定";
   return (
     <section className={`${styles.dora_boss_section} ${editProgress.isEditing && styles.editing}`}>
-      <div style={{position: "relative"}}>
+      <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
         {
           editProgress.isEditing && 
           <div className={styles.editingTextWrapper}>
@@ -33,30 +33,29 @@ const RealmBossSection: React.FC<RealmBossSectionProps> = ({ progressState, boss
         <div className={styles.area_title}>
           <DynamicSVGText text={"ステージ効果"} />
         </div>
-        <div className={`${styles.area} ${styles.dora_boss}`}>
+        <div className={`${styles.area} ${styles.dora_boss}`} onClick={() => setBoss("empty")}>
           <img
             className={styles.dora_boss_image}
             src={`/boss/${boss}.png`}
-            onClick={() => setBoss("empty")}
             alt={boss}
           />
-          <DynamicSVGText text={DORA_BOSS_DESCRIPTIONS[boss]} />
+          <DynamicSVGText text={REALM_BOSS_DESCRIPTIONS[boss]} />
         </div>
       </div>
-      <div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
         <div className={styles.area_title}>
           <DynamicSVGText text={"ステージ効果選択"} />
         </div>
         <div className={`${styles.area} ${styles.dora_boss_choices}`}>
           {REALM_BOSSES.map(boss => (
-            boss === "empty" ? null
-            : <img
-              key={`boss_choice_${boss}`}
-              className={styles.dora_boss_image}
-              src={`/boss/${boss}.png`}
-              onClick={() => setBoss(boss)}
-              alt={boss}
-            />
+            boss !== "empty" && <div key={`boss_choice_${boss}`} className={styles.dora_boss} onClick={() => setBoss(boss)}>
+              <img
+                className={styles.dora_boss_image}
+                src={`/boss/${boss}.png`}
+                alt={boss}
+              />
+              <DynamicSVGText text={REALM_BOSS_DESCRIPTIONS[boss]} />
+            </div>
           ))}
         </div>
       </div>

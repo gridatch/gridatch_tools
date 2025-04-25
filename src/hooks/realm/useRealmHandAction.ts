@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { RealmPhase, RealmPhaseAction, RealmTenpaiResult, SANMA_TILES, SanmaTile, WallTile } from "../../types/simulation";
+import { RealmBoss, RealmPhase, RealmPhaseAction, RealmTenpaiResult, SANMA_TILES, SanmaTile, WallTile } from "../../types/simulation";
 import { RealmProgressState } from "./useRealmProgressState";
 import { useExchangePhaseActions } from "./useRealmExchangePhaseAction";
 import { useMainPhaseActions } from "./useRealmMainPhaseAction";
@@ -32,9 +32,11 @@ export interface RealmHandAction {
  */
 export const useRealmHandAction = (
   progressState: RealmProgressState,
+  boss: RealmBoss,
   isRealmEachTile: Record<SanmaTile, boolean>,
   remainingTiles: Record<SanmaTile, number>,
   wall: WallTile[],
+  usableWallCount: number,
   handState: RealmHandState,
   results: readonly RealmTenpaiResult[] | null,
   winsLogic: RealmWinsLogic,
@@ -46,6 +48,7 @@ export const useRealmHandAction = (
 
   const exchangePhaseAction = useExchangePhaseActions(
     progressState,
+    boss,
     isRealmEachTile,
     remainingTiles,
     handState,
@@ -56,6 +59,7 @@ export const useRealmHandAction = (
     isRealmEachTile,
     remainingTiles,
     wall,
+    usableWallCount,
     handState,
     results,
     winsLogic,

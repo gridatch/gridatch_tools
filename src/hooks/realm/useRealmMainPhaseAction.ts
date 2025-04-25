@@ -22,6 +22,7 @@ export const useMainPhaseActions = (
   isRealmEachTile: Record<SanmaTile, boolean>,
   remainingTiles: Record<SanmaTile, number>,
   wall: WallTile[],
+  usableWallCount: number,
   handState: RealmHandState,
   results: readonly RealmTenpaiResult[] | null,
   winsLogic: RealmWinsLogic,
@@ -144,7 +145,7 @@ export const useMainPhaseActions = (
     const tenpaiTurn = results[0].turn;
 
     let closedCount = 0;
-    for (let turn = newProgress.turn + 1; turn < Math.min(tenpaiTurn, wall.length); ++turn) {
+    for (let turn = newProgress.turn + 1; turn < Math.min(tenpaiTurn, usableWallCount); ++turn) {
       if (wall[turn - 1] === "closed") ++closedCount;
     }
 
@@ -174,6 +175,7 @@ export const useMainPhaseActions = (
       isRealmEachTile, remainingTiles,
       draft,
       wall,
+      usableWallCount,
       winsLogic,
     );
     if (!winsAverageByDiscard) return;
@@ -190,7 +192,7 @@ export const useMainPhaseActions = (
       selectTile(tileToSelect);
       return;
     }
-  }, [categorizeRealmTiles, isRealmEachTile, progressState.processingState, remainingTiles, results, wall, winsLogic]);
+  }, [categorizeRealmTiles, isRealmEachTile, progressState.processingState, remainingTiles, results, wall, usableWallCount, winsLogic]);
   
   /** メインフェーズ：ツモ・打牌の決定ができるかどうか */
   const canConfirmMainAction: boolean = useMemo(() => {
@@ -348,14 +350,14 @@ export const useMainPhaseActions = (
       return;
     }
     
-    if (progress.turn === wall.length) {
+    if (progress.turn >= usableWallCount) {
       // TODO: 結果表示など
       return;
     }
     
     updateCurrentHistory({ progress, hand, discardedTiles });
     
-    const newProgress = goToNextTurn(wall);
+    const newProgress = goToNextTurn(wall, usableWallCount);
     const nextDrawnTile = wall[newProgress.turn - 1];
     
     const handDraft = createDraft(hand);
@@ -390,7 +392,7 @@ export const useMainPhaseActions = (
     setHand(newHand);
     setDiscardedTiles(newDiscarded);
     pushHistory({ progress: newProgress, hand: newHand, discardedTiles: newDiscarded });
-  }, [discardedTiles, goToNextTurn, hand, progress, pushHistory, selectBestDiscardInDraft, setDiscardedTiles, setHand, updateCurrentHistory, wall]);
+  }, [discardedTiles, goToNextTurn, hand, progress, pushHistory, selectBestDiscardInDraft, setDiscardedTiles, setHand, updateCurrentHistory, usableWallCount, wall]);
 
   const refreshMainHandAfterEditMode = useCallback(async () => {
     if (progress.action === RealmPhaseAction.Draw) {

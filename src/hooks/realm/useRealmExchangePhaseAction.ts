@@ -1,7 +1,8 @@
 import { useCallback, useMemo } from "react";
-import { RealmPhaseAction, SANMA_TILES, SanmaTile, TileStatus } from "../../types/simulation";
+import { RealmBoss, RealmPhaseAction, SANMA_TILES, SanmaTile, TileStatus } from "../../types/simulation";
 import { RealmProgressState } from "./useRealmProgressState";
 import { RealmHandState } from "./useRealmHandState";
+import { produce } from "immer";
 
 export interface ExchangePhaseActions {
   canConfirmExchangeAction: boolean;
@@ -16,6 +17,7 @@ export interface ExchangePhaseActions {
 
 export const useExchangePhaseActions = (
   progressState: RealmProgressState,
+  boss: RealmBoss,
   isRealmEachTile: Record<SanmaTile, boolean>,
   remainingTiles: Record<SanmaTile, number>,
   handState: RealmHandState,
@@ -83,31 +85,51 @@ export const useExchangePhaseActions = (
   const confirmExchangeDraw = useCallback(() => {
     if (progress.action !== RealmPhaseAction.Draw) return;
     
-    updateCurrentHistory({ progress, hand, discardedTiles });
+    updateCurrentHistory();
     
     const newProgress = updatePhaseAction(RealmPhaseAction.Discard);
-    
-    const newClosed: Record<SanmaTile, TileStatus[]> = {} as Record<SanmaTile, TileStatus[]>;
-    SANMA_TILES.forEach(tile => {
-      newClosed[tile] = hand.closed[tile].map(() => ({ isSelected: !isRealmEachTile[tile] }));
+
+    const newHand = produce(hand, draft => {
+      let selectedCount = 0;
+  
+      for (const tile of SANMA_TILES) {
+        const statuses = draft.closed[tile];
+        for (let i = 0; i < statuses.length; ++i) {
+          // 入れ替え3枚制限のステージ効果
+          if (isRealmEachTile[tile] || (boss === "exchange_amount" && selectedCount >= 3)) {
+            statuses[i].isSelected = false;
+          } else {
+            statuses[i].isSelected = true;
+            ++selectedCount;
+          }
+        }
+      }
     });
-    const newHand = { ...hand, closed: newClosed };
     setHand(newHand);
     
     pushHistory({ progress: newProgress, hand: newHand, discardedTiles });
-  }, [discardedTiles, hand, isRealmEachTile, progress, pushHistory, setHand, updateCurrentHistory, updatePhaseAction]);
+  }, [boss, discardedTiles, hand, isRealmEachTile, progress.action, pushHistory, setHand, updateCurrentHistory, updatePhaseAction]);
 
   /** 牌交換フェーズ > 打牌アクション：指定の牌について打牌候補かどうかの選択を切り替える。 */
   const toggleExchangeDiscard = useCallback((tile: SanmaTile, index: number) => {
     if (progress.action !== RealmPhaseAction.Discard) return;
 
-    setHand(prev => {
-      const statuses = prev.closed[tile];
-      if (index < 0 || index >= statuses.length) return prev;
-      const newStatuses = statuses.map((status, i) => i === index ? { isSelected: !status.isSelected } : status);
-      return { ...prev, closed: { ...prev.closed, [tile]: newStatuses } };
-    });
-  }, [progress.action, setHand]);
+    setHand( 
+      produce(draft => {
+        const statuses = draft.closed[tile];
+        if (index < 0 || index >= statuses.length) return;
+
+        const status = statuses[index];
+
+        // 入れ替え3枚制限のステージ効果
+        if (!status.isSelected && boss === "exchange_amount") {
+          const selectedCount = Object.values(draft.closed).flat().filter(s => s.isSelected).length;
+          if (selectedCount >= 3) return;
+        }
+        status.isSelected = !status.isSelected;
+      })
+    );
+  }, [boss, progress.action, setHand]);
 
   /** 牌交換フェーズ > 打牌アクション：打牌候補を手牌から捨て、捨て牌に加える。ツモアクションへ移行する。 */
   const confirmExchangeDiscard = useCallback(() => {

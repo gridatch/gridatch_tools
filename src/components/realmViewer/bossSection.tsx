@@ -2,7 +2,7 @@ import React from "react";
 import DynamicSVGText from "../dynamicSVGText";
 import styles from "../../pages/realm.module.css";
 import { REALM_BOSSES, RealmBoss } from "../../types/simulation";
-import { DORA_BOSS_DESCRIPTIONS } from "../../constants/strings";
+import { REALM_BOSS_DESCRIPTIONS } from "../../constants/strings";
 
 interface RealmViewerBossSectionProps {
   boss: RealmBoss;
@@ -23,7 +23,7 @@ const RealmViewerBossSection: React.FC<RealmViewerBossSectionProps> = ({ boss, s
             onClick={() => setBoss("empty")}
             alt={boss}
           />
-          <DynamicSVGText text={DORA_BOSS_DESCRIPTIONS[boss]} />
+          <DynamicSVGText text={REALM_BOSS_DESCRIPTIONS[boss]} />
         </div>
       </div>
       <div>
