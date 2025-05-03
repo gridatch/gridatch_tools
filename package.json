@@ -6,6 +6,7 @@
   "author": "gridatch",
   "dependencies": {
     "@eslint/compat": "^1.2.7",
+    "@techstark/opencv-js": "^4.10.0-release.1",
     "browserify-fs": "^1.0.0",
     "gatsby": "^5.14.1",
     "gatsby-plugin-image": "^3.14.0",

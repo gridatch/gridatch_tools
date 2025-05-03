@@ -8,7 +8,7 @@ export const WIND_TILES = ["E", "S", "W", "N"] as const;
 export const DRAGON_TILES = ["P", "F", "C"] as const;
 export const SANMA_TILES = [...SANMA_MANZU_TILES, ...PINZU_TILES, ...SOZU_TILES, ...WIND_TILES, ...DRAGON_TILES] as const;
 export const WALL_TILES = [...SANMA_TILES, "closed", "empty"] as const;
-export const NON_SEQUENTIAL_TILES  = [...SANMA_MANZU_TILES, ...WIND_TILES, ...DRAGON_TILES] as const;
+export const NON_SEQUENTIAL_TILES = [...SANMA_MANZU_TILES, ...WIND_TILES, ...DRAGON_TILES] as const;
 
 export type SanmaManzu = (typeof SANMA_MANZU_TILES)[number];
 export type Pinzu = (typeof PINZU_TILES)[number];
@@ -27,6 +27,21 @@ export const isDragonTile = (tile: string): tile is Dragon => (DRAGON_TILES as r
 export const isSanmaTile = (tile: string): tile is SanmaTile => (SANMA_TILES as readonly string[]).includes(tile);
 export const isWallTile = (tile: string): tile is WallTile => (WALL_TILES as readonly string[]).includes(tile);
 export const isNonSequentialTile = (tile: string): tile is NonSequentialTile => (NON_SEQUENTIAL_TILES as readonly string[]).includes(tile);
+
+export const TILE_FACES = ["default", "cat_saint"] as const;
+export const TILE_BACKS = ["orange", "red", "shuriken", "orientation", "cat_saint", "happy_orange", "small_cosmos", "meeting_the_butterfly", "tranquil_night_lights"] as const;
+
+export type TileFace = (typeof TILE_FACES)[number];
+export type TileBack = (typeof TILE_BACKS)[number];
+
+export const PLAIN_TILES: WallTile[] = ["P"] as const;
+export const PLAIN_TILE_BACKS: TileBack[] = ["orange", "red"] as const;
+
+export const SANMA_RED_TILES = ["5pr", "5sr"] as const;
+export type SanmaRedTile = (typeof SANMA_RED_TILES)[number];
+export const isSanmaRedTile = (tile: string): tile is SanmaRedTile => (SANMA_RED_TILES as readonly string[]).includes(tile);
+
+export const SANMA_RED_TO_BLACK: Record<SanmaRedTile, SanmaTile> = { "5pr": "5p", "5sr": "5s" };
 
 // --- 待ち牌シミュレーター（万万、索子） ---
 export const PINZU_BLOCKS = ["sequence", "triplet", "pair"] as const;
