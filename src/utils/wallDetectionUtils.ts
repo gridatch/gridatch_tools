@@ -1,10 +1,6 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
 import cv, { MatVector } from "@techstark/opencv-js"
-import { SANMA_TILES, TILE_FACES, TILE_BACKS, TileFace, TileBack, WallTile, SANMA_RED_TILES, SANMA_RED_TO_BLACK, PLAIN_TILES, PLAIN_TILE_BACKS } from '../types/simulation';
-
-interface Template { skin: TileFace | TileBack, tile: WallTile; isRed: boolean; mat: cv.Mat; }
-const faceTemplates: Record<TileFace, Template[]> = {} as Record<TileFace, Template[]>;
-const backTemplates: Record<TileBack, Template> = {} as Record<TileBack, Template>;
+import { TILE_FACES, TILE_BACKS, TileFace, TileBack, WallTile, PLAIN_TILES, PLAIN_TILE_BACKS } from '../types/simulation';
+import { backTemplates, faceTemplates } from "./tileTemplates";
 
 interface MatchingResult { skin?: TileFace | TileBack, tile: WallTile; isRed: boolean; score: number }
 
@@ -29,168 +25,6 @@ interface RotatedBoundingBox {
   angle: number;
   width: number;
   height: number;
-}
-
-/**
- * キャンバスに画像のMatを描画する
- * @param ref キャンバスのref
- * @param mat 画像のMat
- */
-function drawMatToCanvas(ref: React.RefObject<HTMLCanvasElement | null>, mat: cv.Mat) {
-  if (ref.current) {
-    ref.current.width = mat.cols;
-    ref.current.height = mat.rows;
-    cv.imshow(ref.current, mat);
-  }
-};
-
-/**
- * キャンバスに画像と全ての輪郭を重ねたMatを描画する
- * @param ref キャンバスのref
- * @param origImage 元画像
- * @param contour 輪郭
- * @param thickness 描画する輪郭の太さ、負の値の場合は内側を塗りつぶす
- */
-function drawMatWithAllContoursToCanvas(ref: React.RefObject<HTMLCanvasElement | null>, origImage: cv.Mat, edges: cv.Mat, thickness: number = 2) {
-  const image = origImage.clone();
-  
-  const contours = new cv.MatVector();
-  const hierarchy = new cv.Mat();
-  // RETR_EXTERNAL: 最も外側の輪郭のみを抽出する
-  // CHAIN_APPROX_SIMPLE: 直線部分の中間点を削除する
-  cv.findContours(edges, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
-  hierarchy.delete();
-  
-  cv.drawContours(image, contours, -1, new cv.Scalar(255, 0, 255, 255), thickness);
-  drawMatToCanvas(ref, image);
-  
-  contours.delete();
-  image.delete();
-};
-
-/**
- * キャンバスに画像と輪郭を重ねたMatを描画する
- * @param ref キャンバスのref
- * @param origImage 元画像
- * @param contour 輪郭
- * @param thickness 描画する輪郭の太さ、負の値の場合は内側を塗りつぶす
- */
-function drawMatWithContourToCanvas(ref: React.RefObject<HTMLCanvasElement | null>, origImage: cv.Mat, contour: cv.Mat, thickness: number = 2) {
-  const image = origImage.clone();
-  
-  const vec = new cv.MatVector();
-  vec.push_back(contour);
-  cv.drawContours(image, vec, 0, new cv.Scalar(255, 0, 255, 255), thickness);
-  drawMatToCanvas(ref, image);
-  
-  image.delete();
-  vec.delete();
-};
-
-/**
- * キャンバスに画像と直線を重ねたMatを描画する
- * @param ref キャンバスのref
- * @param origImage 元画像
- * @param lines 直線
- */
-function drawMatWithLinesToCanvas(ref: React.RefObject<HTMLCanvasElement | null>, origImage: cv.Mat, lines: cv.Mat) {
-  const image = origImage.clone();
-  for (let i = 0; i < lines.rows; i++) {
-    const [x1, y1, x2, y2] = lines.intPtr(i, 0);
-    cv.line(
-      image,
-      new cv.Point(x1, y1),
-      new cv.Point(x2, y2),
-      new cv.Scalar(0, 0, 255, 255),
-      2
-    );
-  }
-
-  drawMatToCanvas(ref, image);
-  image.delete();
-};
-
-/**
- * キャンバスに画像と多角形を重ねたMatを描画する
- * @param ref キャンバスのref
- * @param origImage 元画像
- * @param polygon 多角形
- * @param thickness 描画する輪郭の太さ、負の値の場合は内側を塗りつぶす
- */
-function drawMatWithPolygonToCanvas(ref: React.RefObject<HTMLCanvasElement | null>, origImage: cv.Mat, polygon: cv.Mat, thickness: number = 2) {
-  const image = origImage.clone();
-
-  const vec = new cv.MatVector();
-  const matPoints = cv.matFromArray(4, 1, cv.CV_32SC2, [...polygon.data32F]);
-  vec.push_back(matPoints);
-
-  cv.polylines(image, vec, true, new cv.Scalar(0, 255, 0, 255), thickness);
-
-  drawMatToCanvas(ref, image);
-
-  matPoints.delete();
-  vec.delete();
-  image.delete();
-}
-
-/**
- * キャンバスに画像と直線を重ねたMatを描画する
- * @param origImage 元画像
- * @param lines 直線
- */
-function drawTilesToCanvases(ref: React.RefObject<HTMLCanvasElement[]>, mat: cv.Mat) {
-  const rows = 4, cols = 9;
-  const cellW = Math.round(mat.cols / cols);
-  const cellH = Math.round(mat.rows / rows);
-
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      const roi = mat.roi(new cv.Rect(j * cellW, i * cellH, cellW, cellH));
-      
-      const index = i * cols + j;
-      const canvas = ref.current[index];
-      if (canvas) {
-        canvas.width = roi.cols;
-        canvas.height = roi.rows;
-        cv.imshow(canvas, roi);
-      }
-      roi.delete();
-    }
-  }
-};
-
-/**
- * テンプレートを読み込む
- */
-async function loadTemplates() {
-  await Promise.all([
-    ...TILE_FACES.map(async face => {
-      faceTemplates[face] = await Promise.all([
-        ...SANMA_TILES.map(async tile => {
-          const img = new Image();
-          img.src = `/templates/tile_faces/${face}/${tile}.png`;
-          await img.decode();
-          const mat = cv.imread(img); cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY);
-          return { skin: face, tile, isRed: false, mat };
-        }),
-        ...SANMA_RED_TILES.map(async redTile => {
-          const img = new Image();
-          img.src = `/templates/tile_faces/${face}/${redTile}.png`;
-          await img.decode();
-          const mat = cv.imread(img); cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY);
-          const tile = SANMA_RED_TO_BLACK[redTile];
-          return { skin: face, tile, isRed: true, mat };
-        }),
-      ]);
-    }),
-    ...TILE_BACKS.map(async back => {
-      const img = new Image();
-      img.src = `/templates/tile_backs/${back}.png`;
-      await img.decode();
-      const mat = cv.imread(img); cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY);
-      backTemplates[back] = { skin: back, tile: 'closed', isRed: false, mat };
-    })
-  ]);
 }
 
 /**
@@ -340,7 +174,6 @@ function findBestContour(src: cv.Mat, point?: cv.Point) {
       continue;
     }
     
-    console.log("cornerMatchCount", cornerMatchCount);
     bestContour?.delete();
     bestContour = contour;
     maxArea = area;
@@ -655,7 +488,7 @@ function createQuadMatFromBoundaryLines(boundaryLines: BoundaryLines): cv.Mat {
   
   if (!topLeftPoint || !topRightPoint || !bottomRightPoint || !bottomLeftPoint) {
     // 水平・垂直に分けてクラスタリングしているので通らないはず
-    throw new Error("Intersection point could not be determined.");
+    throw new Error("[createQuadMatFromBoundaryLines] Intersection point could not be determined.");
   }
 
   const quad = cv.matFromArray(4, 1, cv.CV_32FC2, [
@@ -698,7 +531,7 @@ function warpQuadToRect(src: cv.Mat, srcQuad: cv.Mat, dstSize: cv.Size): cv.Mat 
   const blur = new cv.Mat();
   cv.cvtColor(src, blur, cv.COLOR_RGBA2RGB);
   const bilateral = new cv.Mat();
-  cv.bilateralFilter(blur, bilateral, 9, 50, 75, cv.BORDER_DEFAULT);
+  cv.bilateralFilter(blur, bilateral, 9, 75, 75, cv.BORDER_DEFAULT);
 
   const intermediate = new cv.Mat();
   cv.warpPerspective(bilateral, intermediate, M, new cv.Size(intermediateW, intermediateH),);
@@ -737,7 +570,6 @@ function detectTileFromPlainMat(mat: cv.Mat): WallTile {
   cv.cvtColor(mat, hsv, cv.COLOR_RGB2HSV_FULL);
   const [h, s, v] = cv.mean(hsv);
   hsv.delete();
-  console.log(h, s, v);
   // 非魂牌：彩度小、明度大
   if (s < 50 && v > 200) return "P";
   // 魂牌：彩度やや小、暖色系
@@ -804,7 +636,6 @@ function splitWallAndMatch(wallMat: cv.Mat): MatchingResult[] {
       
       const variance = calcVarianceOfMat(grayRoiCenter);
       grayRoiCenter.delete();
-      console.log(variance);
       
       if (variance < 100) {
         // 分散が少ない牌は単色牌
@@ -835,160 +666,65 @@ function splitWallAndMatch(wallMat: cv.Mat): MatchingResult[] {
   return result;
 }
 
-const MahjongRecognizer: React.FC = () => {
-  const [cvReady, setCvReady] = useState(false);
-  const isTemplateLoadedRef = useRef(false);
+/**
+ * 牌山の画像に画像処理を行い、検出した牌山を返す
+ * @param img 牌山の画像
+ * @returns 牌山
+ */
+export function processWallImage(img: HTMLImageElement | HTMLCanvasElement) {
+  const colorMat = cv.imread(img);
+  resizeToReduceMoire(colorMat);
 
-  useEffect(() => {
-    cv.onRuntimeInitialized = () => {
-      console.log("initialized");
-      setCvReady(true);
-    }
-  }, []);
+  const edgeMat = detectEdges(colorMat);
   
-  const canvasRefs = {
-    _1resized: useRef<HTMLCanvasElement>(null),
-    _2edges: useRef<HTMLCanvasElement>(null),
-    _3morphology: useRef<HTMLCanvasElement>(null),
-    _4allContour: useRef<HTMLCanvasElement>(null),
-    _5contour: useRef<HTMLCanvasElement>(null),
-    _6croppedContour: useRef<HTMLCanvasElement>(null),
-    _7hough: useRef<HTMLCanvasElement>(null),
-    _8cluster: useRef<HTMLCanvasElement>(null),
-    _9warped: useRef<HTMLCanvasElement>(null),
-    _10tiles: useRef<HTMLCanvasElement[]>([]),
-  };
-  const tileRefs = useRef<HTMLSpanElement[]>([]);
+  morphologyClose(edgeMat);
+
+  const contourMat = findBestContour(edgeMat, new cv.Point(edgeMat.cols / 2, edgeMat.rows * 0.55));
+  edgeMat.delete();
   
-  // 初期レンダリング時に空配列をセット
-  useEffect(() => {
-    canvasRefs._10tiles.current = Array(36).fill(null);
-    tileRefs.current = Array(36).fill(null);
-  }, [canvasRefs._10tiles]);
-
-  // 起動時にテンプレート読み込み
-  React.useEffect(() => {
-    if (!cvReady) return;
-    if (isTemplateLoadedRef.current) return;
-    
-    isTemplateLoadedRef.current = true;
-    
-    loadTemplates();
-  }, [cvReady]);
-
-  const processWallImage = useCallback((img: HTMLImageElement) => {
-    if (!cvReady) return;
-    if (!isTemplateLoadedRef.current) return;
-
-    const colorMat = cv.imread(img);
-    resizeToReduceMoire(colorMat);
-    drawMatToCanvas(canvasRefs._1resized, colorMat);
-
-    const edgeMat = detectEdges(colorMat);
-    drawMatToCanvas(canvasRefs._2edges, edgeMat);
-    
-    morphologyClose(edgeMat);
-    drawMatToCanvas(canvasRefs._3morphology, edgeMat);
-    
-    drawMatWithAllContoursToCanvas(canvasRefs._4allContour, colorMat, edgeMat);
-
-    const contourMat = findBestContour(edgeMat, new cv.Point(edgeMat.cols / 2, edgeMat.rows * 0.55));
-    edgeMat.delete();
-    if (!contourMat) {
-      console.warn('No contour detected.');
-      colorMat.delete();
-      return;
-    }
-    drawMatWithContourToCanvas(canvasRefs._5contour, colorMat, contourMat);
-
-    const binaryContourMat = createBinaryContourMat(new cv.Size(colorMat.cols, colorMat.rows), contourMat);
-    const boundingBox = calcRotatedBoundingBox(contourMat);
-    contourMat.delete();
-    const croppedBoundingBox = trimBoundingBoxRight(boundingBox, 2);
-    maskOutsideRotatedBoundingBox(binaryContourMat, croppedBoundingBox);
-    
-    drawMatToCanvas(canvasRefs._6croppedContour, binaryContourMat);
-
-    const lines = new cv.Mat();
-    cv.HoughLinesP(binaryContourMat, lines, 1, Math.PI/720, 100, croppedBoundingBox.height * 0.4, croppedBoundingBox.height * 0.25);
-    binaryContourMat.delete();
-
-    drawMatWithLinesToCanvas(canvasRefs._7hough, colorMat, lines);
-
-    const { hClusters, vClusters } = clusterLines(lines, croppedBoundingBox);
-    lines.delete();
-
-    if (hClusters.length < 2) {
-      console.warn("[pre]Not enough horizontal clusters were detected.");
-      colorMat.delete();
-      return;
-    }
-    if (vClusters.length < 2) {
-      console.warn("[pre]Not enough vertical clusters were detected.");
-      colorMat.delete();
-      return;
-    }
-    
-    const boundaryLines = pickBoundaryLines(hClusters, vClusters);
-    const quad = createQuadMatFromBoundaryLines(boundaryLines);
-    
-    drawMatWithPolygonToCanvas(canvasRefs._8cluster, colorMat, quad);
-    
-    const warped = warpQuadToRect(colorMat, quad, new cv.Size(441, 283));
+  if (!contourMat) {
+    console.warn('No contour detected.');
     colorMat.delete();
-    quad.delete();
-    
-    const wallMat = warped.roi(new cv.Rect(0, 0, 441, 264));
-    warped.delete();
+    return;
+  }
 
-    drawMatToCanvas(canvasRefs._9warped, wallMat);
+  const binaryContourMat = createBinaryContourMat(new cv.Size(colorMat.cols, colorMat.rows), contourMat);
+  const boundingBox = calcRotatedBoundingBox(contourMat);
+  contourMat.delete();
+  const croppedBoundingBox = trimBoundingBoxRight(boundingBox, 2);
+  maskOutsideRotatedBoundingBox(binaryContourMat, croppedBoundingBox);
 
-    drawTilesToCanvases(canvasRefs._10tiles, wallMat)
+  const lines = new cv.Mat();
+  cv.HoughLinesP(binaryContourMat, lines, 1, Math.PI/720, 100, croppedBoundingBox.height * 0.4, croppedBoundingBox.height * 0.25);
+  binaryContourMat.delete();
 
-    const results = splitWallAndMatch(wallMat);
-    results.forEach((result, i) => tileRefs.current[i].innerText = result.tile);
-    console.log(results);
-    wallMat.delete();
-  }, [canvasRefs._10tiles, canvasRefs._1resized, canvasRefs._2edges, canvasRefs._3morphology, canvasRefs._4allContour, canvasRefs._5contour, canvasRefs._6croppedContour, canvasRefs._7hough, canvasRefs._8cluster, canvasRefs._9warped, cvReady]);
+  const { hClusters, vClusters } = clusterLines(lines, croppedBoundingBox);
+  lines.delete();
+
+  if (hClusters.length < 2) {
+    console.warn("[processWallImage] Not enough horizontal clusters were detected.");
+    colorMat.delete();
+    return;
+  }
+  if (vClusters.length < 2) {
+    console.warn("[processWallImage] Not enough vertical clusters were detected.");
+    colorMat.delete();
+    return;
+  }
   
-  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    const img = new Image(); img.src = URL.createObjectURL(file);
-    await img.decode();
-    processWallImage(img);
-  }, [processWallImage]);
+  const boundaryLines = pickBoundaryLines(hClusters, vClusters);
+  const quad = createQuadMatFromBoundaryLines(boundaryLines);
+  
+  const warped = warpQuadToRect(colorMat, quad, new cv.Size(441, 283));
+  colorMat.delete();
+  quad.delete();
+  
+  const wallMat = warped.roi(new cv.Rect(0, 0, 441, 264));
+  warped.delete();
 
-  return (
-    <div>
-      <h2>Mahjong Recognizer</h2>
-      <input type="file" accept="image/*" onChange={handleFileChange} />
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginTop: 16 }}>
-        <div><p>1. Resized</p><canvas ref={canvasRefs._1resized} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div><p>2. Edges</p><canvas ref={canvasRefs._2edges} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div><p>3. Morphology</p><canvas ref={canvasRefs._3morphology} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div><p>4. All Contour</p><canvas ref={canvasRefs._4allContour} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div><p>5. Contour</p><canvas ref={canvasRefs._5contour} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div><p>6. Cropped contour</p><canvas ref={canvasRefs._6croppedContour} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div><p>7. Hough</p><canvas ref={canvasRefs._7hough} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div><p>8. Cluster</p><canvas ref={canvasRefs._8cluster} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div><p>9. Warped</p><canvas ref={canvasRefs._9warped} style={{ maxWidth: '100%', border: '1px solid #ccc' }} /></div>
-        <div>
-          <p>10. Tiles</p>
-          <div style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: 8, marginTop: 16 }}>
-            {Array.from({ length: 36 }).map((_, idx) => (
-              <div key={`roi-${idx}`}>
-                <canvas
-                  ref={el => { if (el) canvasRefs._10tiles.current[idx] = el }}
-                  style={{ border: '1px solid #666', width: '100%', height: 'auto' }}
-                />
-                <span ref={el => { if (el) tileRefs.current[idx] = el }}></span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default MahjongRecognizer;
+  const results = splitWallAndMatch(wallMat);
+  const wall = results.map((result) => result.tile);
+  wallMat.delete();
+  
+  return wall;
+}

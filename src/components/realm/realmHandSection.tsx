@@ -179,7 +179,7 @@ const RealmHandSection: React.FC<RealmHandSectionProps> = ({
               {group.map(tile => {
                 const isRealm = isRealmEachTile[tile];
                 const isNotRealm = !isRealmEachTile[tile];
-                const soldOut = remainingTiles[tile] === 0;
+                const soldOut = remainingTiles[tile] <= 0;
                 return (
                   <div key={`hand_choice_${tile}`} className={`${styles.tile_counter} ${isRealm && styles.tile_counter_realm}`}>
                     <img

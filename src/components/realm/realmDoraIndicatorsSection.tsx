@@ -35,7 +35,6 @@ const RealmDoraIndicatorsSection: React.FC<RealmDoraIndicatorsSectionProps> = ({
     [...SOZU_TILES],
     [...NON_SEQUENTIAL_TILES],
   ];
-  const confirmButtonText = editProgress.isEditing ? "修正" : "決定";
   return (
     <section className={`${styles.dora_indicators_section} ${editProgress.isEditing && styles.editing}`}>
       <div style={{position: "relative"}}>
@@ -103,7 +102,7 @@ const RealmDoraIndicatorsSection: React.FC<RealmDoraIndicatorsSectionProps> = ({
           }}
           onClick={confirmDoraIndicators}
         >
-          <DynamicSVGText text={confirmButtonText} height="1.2em" />
+          <DynamicSVGText text="決定" height="1.2em" />
         </button>
       </div>
     </section>

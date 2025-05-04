@@ -20,7 +20,6 @@ const RealmBossSection: React.FC<RealmBossSectionProps> = ({ progressState, boss
   
   const { boss, setBoss, confirmBoss } = bossState;
   
-  const confirmButtonText = editProgress.isEditing ? "修正" : "決定";
   return (
     <section className={`${styles.dora_boss_section} ${editProgress.isEditing && styles.editing}`}>
       <div style={{ position: "relative", display: "flex", flexDirection: "column" }}>
@@ -67,7 +66,7 @@ const RealmBossSection: React.FC<RealmBossSectionProps> = ({ progressState, boss
           }}
           onClick={confirmBoss}
         >
-          <DynamicSVGText text={confirmButtonText} height="1.2em" />
+          <DynamicSVGText text="決定" height="1.2em" />
         </button>
       </div>
     </section>

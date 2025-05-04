@@ -37,6 +37,9 @@ declare const styles:
   & Readonly<{ "dora_indicator_choices": string }>
   & Readonly<{ "dora_indicator_choice": string }>
   & Readonly<{ "realm_wall": string }>
+  & Readonly<{ "wall_dropzone": string }>
+  & Readonly<{ "wall_dropzone_description": string }>
+  & Readonly<{ "wall_dropzone_description_row": string }>
   & Readonly<{ "realm_wall_tile": string }>
   & Readonly<{ "realm_wall_tile_choices": string }>
   & Readonly<{ "realm_warn_wrapper": string }>

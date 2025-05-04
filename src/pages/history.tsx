@@ -75,6 +75,12 @@ const history = [
       "領域和了シミュレーターに「入れ替え最大3枚」、「ロック」のステージ効果を実装しました。",
     ]
   },
+  {
+    version: "4.6",
+    messages: [
+      "領域和了シミュレーターに、画像から牌山の牌を検出して入力する機能を実装しました。",
+    ]
+  },
 ];
 
 const ImageCreditsPage: React.FC<PageProps> = () => (
