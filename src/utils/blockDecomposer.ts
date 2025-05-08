@@ -144,16 +144,10 @@ export function decomposeTilesIntoBlocks<T extends string>(
         }
       }
       
-      for (const wait of waits) {
-        // 刻子の牌で待っているかどうか
-        const waitingKotsuTile = result.blocks.some(block => block.type === "kotsu" && block.left === wait);
-        // 待ち牌を4枚使いしているかどうか
-        // ※4枚使いしている牌は待ち牌にならないため
-        const hasFourWaitingTiles = initialTileCounts[wait] === 4 && result.remaining[wait] === 0;
-        
-        if (waitingKotsuTile && !hasFourWaitingTiles) return true;
-      }
-      return false;
+      // 刻子の牌で待っている === 対子 + 順子と読み替えることができる
+      const waitingKotsuTile = waits.some(wait => result.blocks.some(block => block.type === "kotsu" && block.left === wait));
+
+      return waitingKotsuTile;
     }
     
     /**
