@@ -213,7 +213,7 @@ function resizeToReduceMoire(mat: cv.Mat, threshold: number = 1920 * 1080) {
  * @param threshold2 Canny法において、強エッジを検出する勾配強度の閾値
  * @returns エッジのMat
  */
-function detectEdges(src: cv.Mat, threshold1 = 50, threshold2 = 150) {
+function detectEdges(src: cv.Mat, threshold1 = 100, threshold2 = 150) {
   const gray = new cv.Mat();
   cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
   const blur = new cv.Mat();
