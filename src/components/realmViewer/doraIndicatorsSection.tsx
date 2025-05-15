@@ -1,5 +1,5 @@
 import React from "react";
-import DynamicSVGText from "../dynamicSVGText";
+import DynamicSVGText from "../common/dynamicSVGText";
 import styles from "../../pages/realm.module.css";
 import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "../../types/simulation";
 

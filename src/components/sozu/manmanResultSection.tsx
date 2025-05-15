@@ -1,9 +1,9 @@
 import React from "react";
-import DynamicSVGText from "../dynamicSVGText";
-import DynamicSVGTextSequence from "../dynamicSVGTextSequence";
+import DynamicSVGText from "../common/dynamicSVGText";
+import DynamicSVGTextSequence from "../common/dynamicSVGTextSequence";
 import styles from "../../pages/manman.module.css";
 import { SozuHand, SOZU_TILES, ManmanTenpaiResult } from "../../types/simulation";
-import ClearButton from "../clearButton";
+import ClearButton from "../common/clearButton";
 
 interface ManmanResultSectionProps {
   hand: SozuHand;

@@ -1,10 +1,10 @@
 import * as React from "react"
 
-import Layout from "../components/layout"
-import Seo from "../components/seo"
+import Layout from "../components/layout/layout"
+import Seo from "../components/layout/seo"
 import styles from "./index.module.css"
-import DynamicSvgText from "../components/dynamicSVGText"
-import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence"
+import DynamicSvgText from "../components/common/dynamicSVGText"
+import DynamicSVGTextSequence from "../components/common/dynamicSVGTextSequence"
 import { PageProps } from "gatsby"
 
 const links = [

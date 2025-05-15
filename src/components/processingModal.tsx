@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import "react-responsive-modal/styles.css";
 import { ProcessingState } from "../hooks/realm/useRealmProgressState";
-import DynamicSVGText from "./dynamicSVGText";
-import DynamicSVGTextSequence from "./dynamicSVGTextSequence";
+import DynamicSVGText from "./common/dynamicSVGText";
+import DynamicSVGTextSequence from "./common/dynamicSVGTextSequence";
 
 interface ProcessingModalProps {
   processingState: ProcessingState;

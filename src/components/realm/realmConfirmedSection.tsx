@@ -1,9 +1,9 @@
 import React from "react";
-import DynamicSVGText from "../dynamicSVGText";
+import DynamicSVGText from "../common/dynamicSVGText";
 import styles from "../../pages/realm-plus.module.css";
 import { RealmBoss, RealmEditPhase, RealmPhase, SanmaTile } from "../../types/simulation";
-import ClearButton from "../clearButton";
-import EditButton from "../editButton";
+import ClearButton from "../common/clearButton";
+import EditButton from "../common/editButton";
 import { RealmProgressState } from "../../hooks/realm/useRealmProgressState";
 import { RealmWallState } from "../../hooks/realm/useRealmWallState";
 

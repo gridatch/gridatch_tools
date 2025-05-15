@@ -1,5 +1,5 @@
 import React from "react";
-import DynamicSVGText from "../dynamicSVGText";
+import DynamicSVGText from "../common/dynamicSVGText";
 import styles from "../../pages/manman.module.css";
 import { SozuHand, HandComponent, SOZU_TILES } from "../../types/simulation";
 

@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import DynamicSVGText from "../dynamicSVGText";
+import DynamicSVGText from "../common/dynamicSVGText";
 import styles from "../../pages/realm-plus.module.css";
 import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES, RealmPhase, RealmEditPhase } from "../../types/simulation";
-import DynamicSVGTextSequence from "../dynamicSVGTextSequence";
+import DynamicSVGTextSequence from "../common/dynamicSVGTextSequence";
 import { RealmProgressState } from "../../hooks/realm/useRealmProgressState";
 import { RealmWallState } from "../../hooks/realm/useRealmWallState";
 import { RealmRemainingTilesLogic } from "../../hooks/realm/useRealmRemainingTilesLogic";

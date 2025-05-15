@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../components/layout"
-import Seo from "../components/seo"
+import Layout from "../components/layout/layout"
+import Seo from "../components/layout/seo"
 import styles from "./manman.module.css"
-import DynamicSVGText from "../components/dynamicSVGText"
+import DynamicSVGText from "../components/common/dynamicSVGText"
 import { useWallState } from "../hooks/useWallState";
 import { useHandState } from "../hooks/useHandState";
 import SozuWallSection from "../components/sozu/wallSection";

@@ -1,5 +1,5 @@
 import React from "react";
-import DynamicSVGText from "../dynamicSVGText";
+import DynamicSVGText from "../common/dynamicSVGText";
 import styles from "../../pages/realm-plus.module.css";
 import { REALM_BOSSES, RealmEditPhase, RealmPhase } from "../../types/simulation";
 import { REALM_BOSS_DESCRIPTIONS } from "../../constants/strings";

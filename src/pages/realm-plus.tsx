@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useCallback } from "react";
-import Layout from "../components/layout";
-import Seo from "../components/seo";
+import Layout from "../components/layout/layout";
+import Seo from "../components/layout/seo";
 import styles from "./realm-plus.module.css";
-import DynamicSVGText from "../components/dynamicSVGText";
+import DynamicSVGText from "../components/common/dynamicSVGText";
 import { useDoraIndicatorsState } from "../hooks/realm/useRealmDoraIndicatorsState";
 import { PageProps } from "gatsby";
 import { 

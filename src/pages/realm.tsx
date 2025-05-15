@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../components/layout"
-import Seo from "../components/seo"
+import Layout from "../components/layout/layout"
+import Seo from "../components/layout/seo"
 import styles from "./realm.module.css"
-import DynamicSVGText from "../components/dynamicSVGText"
+import DynamicSVGText from "../components/common/dynamicSVGText"
 import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
 import { PageProps } from "gatsby";
 import { RealmBoss, SanmaTile } from "../types/simulation";

@@ -1,9 +1,9 @@
 import * as React from "react"
 
-import Layout from "../components/layout"
-import Seo from "../components/seo"
-import DynamicSVGText from "../components/dynamicSVGText"
-import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence"
+import Layout from "../components/layout/layout"
+import Seo from "../components/layout/seo"
+import DynamicSVGText from "../components/common/dynamicSVGText"
+import DynamicSVGTextSequence from "../components/common/dynamicSVGTextSequence"
 import { PageProps } from "gatsby"
 
 const ImageCreditsPage: React.FC<PageProps> = () => (
