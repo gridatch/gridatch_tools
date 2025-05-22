@@ -4,10 +4,9 @@
  * See: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
  */
 
-/**
- * @type {import('gatsby').GatsbyConfig}
- */
-module.exports = {
+import type { GatsbyConfig } from "gatsby"
+
+const config: GatsbyConfig = {
   siteMetadata: {
     title: `わがつまだっちのツール`,
     description: `雀魂の青雲の志攻略用ツールなどを公開しているサイト`,
@@ -57,3 +56,5 @@ module.exports = {
     `gatsby-plugin-typescript`,
   ],
 }
+
+export default config

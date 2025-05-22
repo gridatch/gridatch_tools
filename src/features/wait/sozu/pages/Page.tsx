@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../../../components/layout/layout"
-import styles from "../../shared/styles/wait.module.css"
-import DynamicSVGText from "../../../../components/common/dynamicSVGText"
+import Layout from "../../../../components/layout/layout";
+import DynamicSVGText from "../../../../components/common/dynamicSVGText";
+import styles from "../../shared/styles/wait.module.css";
 import { useWallState } from "../../shared/hooks/useWallState";
 import { useHandState } from "../../shared/hooks/useHandState";
 import SozuWallSection from "../../shared/components/wallSection";

@@ -1,13 +1,6 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react";
 import { RealmPhase, RealmPhaseAction, RealmEditProgress, RealmSimulationProgress, RealmEditPhase, WallTile } from "../../../types/simulation";
 
-export interface ProcessingState {
-  percent: number;
-  setPercent: Dispatch<SetStateAction<number>>;
-  isBusy: boolean;
-  setIsBusy: Dispatch<SetStateAction<boolean>>;
-}
-
 export interface RealmProgressState {
   simulationProgress: RealmSimulationProgress;
   editProgress: RealmEditProgress;
@@ -18,7 +11,6 @@ export interface RealmProgressState {
   updatePhaseAction: (action: RealmPhaseAction) => RealmSimulationProgress;
   goToNextTurn: (wall: WallTile[], usableWallCount: number) => RealmSimulationProgress;
   clearRealmProgress: () => void;
-  processingState: ProcessingState;
 }
 
 export const useRealmProgressState = (): RealmProgressState => {
@@ -32,12 +24,6 @@ export const useRealmProgressState = (): RealmProgressState => {
 
   const [simulationProgress, setSimulationProgress] = useState<RealmSimulationProgress>({ ...initialSimulationProgress });
   const [editProgress, setEditProgress] = useState<RealmEditProgress>({ ...initialSimulationEditProgress });
-  
-  const [percent, setPercent] = useState(0);
-  const [isBusy, setIsBusy] = useState(false);
-  const processingState = useMemo(() => (
-    { percent, setPercent, isBusy, setIsBusy }
-  ), [isBusy, percent]);
   
   /**
    * 編集モードに入る
@@ -173,7 +159,6 @@ export const useRealmProgressState = (): RealmProgressState => {
     updatePhaseAction,
     goToNextTurn,
     clearRealmProgress,
-    processingState,
   }), [
     simulationProgress,
     editProgress,
@@ -184,6 +169,5 @@ export const useRealmProgressState = (): RealmProgressState => {
     updatePhaseAction,
     goToNextTurn,
     clearRealmProgress,
-    processingState,
   ]);
 };

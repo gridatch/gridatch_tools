@@ -7,6 +7,7 @@ export function useOpenCV(): boolean {
   useEffect(() => {
     cv.onRuntimeInitialized = () => {
       setReady(true);
+      console.log("[useOpenCV] OpenCV is ready.");
     };
   }, []);
 

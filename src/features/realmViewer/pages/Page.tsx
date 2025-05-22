@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../../components/layout/layout"
-import styles from "./realm.module.css"
 import DynamicSVGText from "../../../components/common/dynamicSVGText"
+import styles from "./realm.module.css"
 import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
 import { RealmBoss, SanmaTile } from "../../../types/simulation";
 import RealmViewerBossSection from "../components/bossSection";

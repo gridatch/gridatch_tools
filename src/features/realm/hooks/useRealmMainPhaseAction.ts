@@ -5,6 +5,7 @@ import { RealmHandState } from "./useRealmHandState";
 import { createDraft, Draft, finishDraft, isDraft, produce } from "immer";
 import { calcRealmWinsAverageByDiscard } from "../utils/realmSimulator";
 import { RealmWinsLogic } from "./useRealmWinsLogic";
+import { useProcessingContext } from "../../common/processing/context/ProcessingContext";
 
 export interface MainPhaseActions {
   canConfirmMainAction: boolean;
@@ -42,6 +43,8 @@ export const useMainPhaseActions = (
     pushHistory,
     updateCurrentHistory,
   } = handState;
+
+  const processingState = useProcessingContext();
   
   /**
    * 領域牌を以下の 3 グループに分類する
@@ -171,7 +174,7 @@ export const useMainPhaseActions = (
     
     const winsAverageByDiscard = await calcRealmWinsAverageByDiscard(
       newProgress,
-      progressState.processingState,
+      processingState,
       isRealmEachTile, remainingTiles,
       draft,
       wall,
@@ -192,7 +195,7 @@ export const useMainPhaseActions = (
       selectTile(tileToSelect);
       return;
     }
-  }, [categorizeRealmTiles, isRealmEachTile, progressState.processingState, remainingTiles, results, wall, usableWallCount, winsLogic]);
+  }, [categorizeRealmTiles, isRealmEachTile, processingState, remainingTiles, results, wall, usableWallCount, winsLogic]);
   
   /** メインフェーズ：ツモ・打牌の決定ができるかどうか */
   const canConfirmMainAction: boolean = useMemo(() => {

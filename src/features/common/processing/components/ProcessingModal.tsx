@@ -1,15 +1,12 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import { Modal } from "react-responsive-modal";
-import "react-responsive-modal/styles.css";
-import { ProcessingState } from "../features/realm/hooks/useRealmProgressState";
-import DynamicSVGText from "./common/dynamicSVGText";
-import DynamicSVGTextSequence from "./common/dynamicSVGTextSequence";
+import "react-responsive-modal/styles.css"
+import DynamicSVGText from "../../../../components/common/dynamicSVGText";
+import DynamicSVGTextSequence from "../../../../components/common/dynamicSVGTextSequence";
+import { useProcessingContext } from "../context/ProcessingContext";
 
-interface ProcessingModalProps {
-  processingState: ProcessingState;
-}
-
-const ProcessingModal: React.FC<ProcessingModalProps> = ({ processingState }) => {
+const ProcessingModal: React.FC = () => {
+  const { isBusy, percent } = useProcessingContext();
   const hasPreloaded = useRef(false);
   useEffect(() => {
     hasPreloaded.current = true;
@@ -33,7 +30,7 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({ processingState }) =>
         </div>
       )}
       <Modal
-        open={processingState.isBusy}
+        open={isBusy}
         center
         showCloseIcon={false}
         styles={{
@@ -46,17 +43,17 @@ const ProcessingModal: React.FC<ProcessingModalProps> = ({ processingState }) =>
         <div style={{ width: "100%", background: "#eee", borderRadius: 4, overflow: "hidden" }}>
           <div
             style={{
-              width: `${processingState.percent}%`,
+              width: `${percent}%`,
               height: "1em",
               background: "#4caf50",
               transition: "width 0.2s ease",
             }}
           />
         </div>
-        <p><DynamicSVGTextSequence text={`${processingState.percent}%`} /></p>
+        <p><DynamicSVGTextSequence text={`${percent}%`} /></p>
       </Modal>
     </>
-  ), [processingState.isBusy, processingState.percent]);
+  ), [isBusy, percent]);
 };
 
 export default ProcessingModal;

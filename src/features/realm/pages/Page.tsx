@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from "react";
 import Layout from "../../../components/layout/layout";
-import styles from "./realm-plus.module.css";
 import DynamicSVGText from "../../../components/common/dynamicSVGText";
+import styles from "./realm-plus.module.css";
 import { useDoraIndicatorsState } from "../hooks/useRealmDoraIndicatorsState";
 import { 
   RealmEditPhase,
@@ -27,7 +27,6 @@ import RealmResultSection from "../components/realmResultSection";
 import { useRealmProgressState } from "../hooks/useRealmProgressState";
 import { useRealmBossState } from "../hooks/useRealmBossState";
 import { useRealmHandAction } from "../hooks/useRealmHandAction";
-import ProcessingModal from "../../../components/processingModal";
 import { useRealmWinsLogic } from "../hooks/useRealmWinsLogic";
 import { useRealmRemainingTilesLogic } from "../hooks/useRealmRemainingTilesLogic";
 
@@ -115,7 +114,6 @@ export const RealmPage: React.FC = () => {
   return (
     <Layout>
       <div className={styles.container}>
-        <ProcessingModal processingState={progressState.processingState} />
         <DynamicSVGText text={"領域和了シミュレーター"} />
         <div className={styles.contents}>
           <RealmConfirmedSection
