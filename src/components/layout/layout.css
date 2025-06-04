@@ -39,6 +39,8 @@ html {
   user-select: none;
   -webkit-touch-callout: none;
   -moz-touch-callout: none;
+  /* ダブルタップ操作が無効になるため、高速で隣接ボタンをタップした際の誤動作を解消 */
+  touch-action: manipulation;
 }
 body {
   -moz-osx-font-smoothing: grayscale;
