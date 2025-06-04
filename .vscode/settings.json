@@ -5,7 +5,7 @@
     "emeraldwalk.runonsave": {
         "commands": [
             {
-                "match": "\\.(css|scss|less)$",
+                "match": "\\.module.(css|scss|less)$",
                 "cmd": "npx hcm ${file}"
             }
         ]
