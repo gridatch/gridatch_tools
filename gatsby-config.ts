@@ -4,10 +4,9 @@
  * See: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
  */
 
-/**
- * @type {import('gatsby').GatsbyConfig}
- */
-module.exports = {
+import type { GatsbyConfig } from "gatsby"
+
+const config: GatsbyConfig = {
   siteMetadata: {
     title: `わがつまだっちのツール`,
     description: `雀魂の青雲の志攻略用ツールなどを公開しているサイト`,
@@ -20,7 +19,7 @@ module.exports = {
       resolve: `gatsby-source-filesystem`,
       options: {
         name: `images`,
-        path: `${__dirname}/src/images`,
+        path: `${__dirname}/src/shared/images`,
       },
     },
     `gatsby-transformer-sharp`,
@@ -36,7 +35,7 @@ module.exports = {
         // https://css-tricks.com/meta-theme-color-and-trickery/
         theme_color: `#887c60`,
         display: `standalone`,
-        icon: `src/images/icon.png`, // This path is relative to the root of the site.
+        icon: `src/shared/images/icon.png`, // This path is relative to the root of the site.
         orientation: `portrait`,
         legacy: false, // this will not add apple-touch-icon links to <head>
       },
@@ -57,3 +56,5 @@ module.exports = {
     `gatsby-plugin-typescript`,
   ],
 }
+
+export default config

@@ -4,6 +4,7 @@ import tseslint from "typescript-eslint";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import tsParser from "@typescript-eslint/parser";
+import importPlugin from "eslint-plugin-import";
 
 export default [
   ...tseslint.config(
@@ -28,6 +29,7 @@ export default [
   {
     plugins: {
       "react-hooks": fixupPluginRules(reactHooks),
+      import: importPlugin,
     },
 
     languageOptions: {
@@ -56,6 +58,34 @@ export default [
 
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // feature 間の import を禁止
+      "import/no-restricted-paths": [
+        "error",
+        {
+          zones: [
+            {
+              target: './src/features/realm',
+              from: './src/features/!(realm)/**',
+            },
+            {
+              target: "./src/features/realmViewer",
+              from: "./src/features/!(realmViewer)/**",
+            },
+            {
+              target: './src/features/wait',
+              from: './src/features/!(wait)/**',
+            },
+            {
+              target: './src/features/wait/manman',
+              from: './src/features/wait/!(manman|common)/**',
+            },
+            {
+              target: './src/features/wait/sozu',
+              from: './src/features/wait/!(sozu|common)/**',
+            },
+          ],
+        },
+      ],
     },
   }
 ];

@@ -1,9 +1,9 @@
 import * as React from "react"
 
-import Layout from "../components/layout"
-import Seo from "../components/seo"
-import DynamicSVGText from "../components/dynamicSVGText"
-import DynamicSVGTextSequence from "../components/dynamicSVGTextSequence"
+import Layout from "../shared/layout/Layout"
+import Seo from "../shared/layout/Seo"
+import DynamicSVGText from "../shared/ui/DynamicSVGText"
+import DynamicSVGTextSequence from "../shared/ui/DynamicSVGTextSequence"
 import { PageProps } from "gatsby"
 
 const history = [

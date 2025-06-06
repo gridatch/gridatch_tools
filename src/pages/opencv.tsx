@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import cv, { MatVector } from "@techstark/opencv-js"
-import { SANMA_TILES, TILE_FACES, TILE_BACKS, TileFace, TileBack, WallTile, SANMA_RED_TILES, SANMA_RED_TO_BLACK, PLAIN_TILES, PLAIN_TILE_BACKS } from '../types/simulation';
+import { SANMA_TILES, TILE_FACES, TILE_BACKS, TileFace, TileBack, WallTile, SANMA_RED_TILES, SANMA_RED_TO_BLACK, PLAIN_TILES, PLAIN_TILE_BACKS } from '../shared/types/simulation';
 
 interface Template { skin: TileFace | TileBack, tile: WallTile; isRed: boolean; mat: cv.Mat; }
 const faceTemplates: Record<TileFace, Template[]> = {} as Record<TileFace, Template[]>;

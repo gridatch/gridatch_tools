@@ -1,7 +1,7 @@
 import * as React from "react"
 
-import Layout from "../components/layout"
-import Seo from "../components/seo"
+import Layout from "../shared/layout/Layout"
+import Seo from "../shared/layout/Seo"
 import { PageProps } from "gatsby"
 
 const NotFoundPage: React.FC<PageProps> = () => (

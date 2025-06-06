@@ -3,5 +3,7 @@
  *
  * See: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-browser/
  */
+import { GatsbyBrowser } from "gatsby";
+import { wrapRootElement as wrap } from "./src/app/wrapRootElement";
 
-// You can delete this file if you're not using it
+export const wrapRootElement: GatsbyBrowser["wrapRootElement"] = wrap;
