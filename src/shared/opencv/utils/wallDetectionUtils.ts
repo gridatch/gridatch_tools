@@ -1,5 +1,7 @@
 import cv, { MatVector } from "@techstark/opencv-js"
-import { TILE_FACES, TILE_BACKS, TileFace, TileBack, WallTile, PLAIN_TILES, PLAIN_TILE_BACKS } from '../../../shared/types/simulation';
+
+import { TILE_FACES, TILE_BACKS, TileFace, TileBack, WallTile, PLAIN_TILES, PLAIN_TILE_BACKS } from '@shared/types/simulation';
+
 import { backTemplates, faceTemplates } from "./tileTemplates";
 
 interface MatchingResult { skin?: TileFace | TileBack, tile: WallTile; isRed: boolean; score: number }

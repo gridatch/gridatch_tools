@@ -1,4 +1,4 @@
-import { SozuHand, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult, HandComponent, HAND_COMPONENT_RECORD_0 } from "../../../../shared/types/simulation";
+import { SozuHand, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult, HandComponent, HAND_COMPONENT_RECORD_0 } from "@shared/types/simulation";
 
 // CSVファイルに記載されているロス数の最大値
 const MAX_LOSS = 12;

@@ -1,8 +1,10 @@
 import React from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
+
+import { REALM_BOSS_DESCRIPTIONS } from "@shared/constants/strings";
+import { REALM_BOSSES, RealmBoss } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+
 import styles from "../pages/RealmViewerPage.module.css";
-import { REALM_BOSSES, RealmBoss } from "../../../shared/types/simulation";
-import { REALM_BOSS_DESCRIPTIONS } from "../../../shared/constants/strings";
 
 interface BossSectionProps {
   boss: RealmBoss;

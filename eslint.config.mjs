@@ -1,10 +1,10 @@
 import { fixupPluginRules } from "@eslint/compat";
 import eslintjs from "@eslint/js";
-import tseslint from "typescript-eslint";
-import react from "eslint-plugin-react";
-import reactHooks from "eslint-plugin-react-hooks";
 import tsParser from "@typescript-eslint/parser";
 import importPlugin from "eslint-plugin-import";
+import react from "eslint-plugin-react";
+import reactHooks from "eslint-plugin-react-hooks";
+import tseslint from "typescript-eslint";
 
 export default [
   ...tseslint.config(
@@ -50,6 +50,7 @@ export default [
 
     settings: {
       "import/resolver": {
+        typescript: {},
         node: {
           extensions: [".js", ".jsx", ".ts", ".tsx"],
         },
@@ -84,6 +85,32 @@ export default [
               from: './src/features/wait/!(sozu|common)/**',
             },
           ],
+        },
+      ],
+      
+      "import/order": [
+        "error",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "object",
+            "type",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+          ],
+          pathGroups: [
+            { pattern: "react", group: "external", position: "before" },
+            { pattern: "gatsby", group: "external", position: "before" },
+            { pattern: "gatsby-plugin-**", group: "external", position: "before" },
+            { pattern: "@shared/**", group: "internal", position: "after" },
+            { pattern: "@features/**", group: "internal", position: "after" },
+          ],
+          pathGroupsExcludedImportTypes: ["react", "gatsby", "gatsby-plugin-**"],
+          "newlines-between": "always",
+          alphabetize: { order: "asc", caseInsensitive: true },
         },
       ],
     },

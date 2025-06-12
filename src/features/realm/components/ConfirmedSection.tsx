@@ -1,11 +1,13 @@
 import React from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
-import styles from "../pages/RealmPage.module.css";
-import { RealmBoss, RealmEditPhase, RealmPhase, SanmaTile } from "../../../shared/types/simulation";
-import ClearButton from "../../../shared/ui/ClearButton";
-import EditButton from "../../../shared/ui/EditButton";
+
+import { RealmBoss, RealmEditPhase, RealmPhase, SanmaTile } from "@shared/types/simulation";
+import ClearButton from "@shared/ui/ClearButton";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import EditButton from "@shared/ui/EditButton";
+
 import { ProgressState } from "../hooks/useProgressState";
 import { WallState } from "../hooks/useWallState";
+import styles from "../pages/RealmPage.module.css";
 
 interface ConfirmedSectionProps {
   progressState: ProgressState;

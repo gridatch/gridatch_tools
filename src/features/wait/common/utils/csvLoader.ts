@@ -1,4 +1,4 @@
-import { ManmanCsvData, ManmanCsvRow, Sozu, SOZU_TILES, SozuCsvData, SozuCsvRow } from "../../../../shared/types/simulation";
+import { ManmanCsvData, ManmanCsvRow, Sozu, SOZU_TILES, SozuCsvData, SozuCsvRow } from "@shared/types/simulation";
 
 /**
  * CSVファイルの内容を読み込み、各行の「手牌」文字列をキーにしたオブジェクトを返す。

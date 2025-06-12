@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { useOpenCV } from './useOpenCV';
+
 import { loadTileTemplates } from '../utils/tileTemplates';
+
+import { useOpenCV } from './useOpenCV';
 
 export function useTileTemplates(): boolean {
   const cvReady = useOpenCV();

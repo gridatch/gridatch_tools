@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { RealmSimulationProgress, SanmaTile, Hand } from "../../../shared/types/simulation";
+
+import { RealmSimulationProgress, SanmaTile, Hand } from "@shared/types/simulation";
 
 export interface RealmSnapshot {
   progress: RealmSimulationProgress;

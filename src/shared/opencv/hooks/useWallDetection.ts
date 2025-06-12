@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useRef } from 'react';
-import { useTileTemplates } from './useTileTemplates';
+
+import { WallTile } from '@shared/types/simulation';
+
 import { processWallImage } from '../utils/wallDetectionUtils';
-import { WallTile } from '../../../shared/types/simulation';
+
+import { useTileTemplates } from './useTileTemplates';
 
 /**
  * 牌山画像の牌検出処理を行うカスタムフック

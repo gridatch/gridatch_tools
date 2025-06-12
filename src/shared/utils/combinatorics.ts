@@ -1,4 +1,4 @@
-import { MultisetPermutation } from "../types/simulation";
+import { MultisetPermutation } from "@shared/types/simulation";
 
 /** nPk を計算する */
 function perm(n: number, k: number): number {

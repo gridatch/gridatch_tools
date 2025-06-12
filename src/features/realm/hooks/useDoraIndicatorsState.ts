@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { RealmBoss, SanmaTile } from "../../../shared/types/simulation";
+
+import { RealmBoss, SanmaTile } from "@shared/types/simulation";
+
 import { ProgressState } from "./useProgressState";
 
 const MAX_DORA_INDICATORS = 10;

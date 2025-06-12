@@ -1,4 +1,4 @@
-import { MultisetPermutation } from "../types/simulation";
+import { MultisetPermutation } from "@shared/types/simulation";
 
 export interface IndexedTreeNode {
   score: number;

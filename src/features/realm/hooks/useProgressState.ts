@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react";
-import { RealmPhase, RealmPhaseAction, RealmEditProgress, RealmSimulationProgress, RealmEditPhase, WallTile } from "../../../shared/types/simulation";
+
+import { RealmPhase, RealmPhaseAction, RealmEditProgress, RealmSimulationProgress, RealmEditPhase, WallTile } from "@shared/types/simulation";
 
 export interface ProgressState {
   simulationProgress: RealmSimulationProgress;

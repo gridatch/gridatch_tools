@@ -1,4 +1,5 @@
 import React, { SVGAttributes } from 'react';
+
 import DynamicSVGText from './DynamicSVGText';
 
 interface DynamicSVGTextSequenceProps extends SVGAttributes<SVGElement> {

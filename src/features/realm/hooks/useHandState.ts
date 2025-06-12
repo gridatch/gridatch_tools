@@ -1,7 +1,9 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react";
-import { Hand, INITIAL_HAND, RealmSimulationProgress, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile } from "../../../shared/types/simulation";
-import { ProgressState } from "./useProgressState";
+
+import { Hand, INITIAL_HAND, RealmSimulationProgress, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile } from "@shared/types/simulation";
+
 import { RealmSnapshot, useHistoryState } from "./useHistoryState";
+import { ProgressState } from "./useProgressState";
 
 const MAX_HAND = 13;
 

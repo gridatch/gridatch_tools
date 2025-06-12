@@ -1,8 +1,12 @@
 import React, { SVGAttributes, useEffect, useState } from 'react';
-import sanitize from 'sanitize-filename';
+
 import parse from 'html-react-parser';
+import sanitize from 'sanitize-filename';
+
+import { hash32 } from '@shared/utils/hash32';
+
 import styles from './DynamicSVGText.module.css';
-import { hash32 } from '../../shared/utils/hash32';
+
 
 interface DynamicSVGTextProps extends SVGAttributes<SVGElement> {
   text: string;

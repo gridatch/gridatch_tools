@@ -1,7 +1,10 @@
 import React from "react";
-import Seo from "../shared/layout/Seo"
+
 import { PageProps } from "gatsby";
-import { RealmViewerPage } from "../features/realmViewer/pages/RealmViewerPage";
+
+import Seo from "@shared/layout/Seo"
+
+import { RealmViewerPage } from "@features/realmViewer/pages/RealmViewerPage";
 
 const RealmViewerRoute: React.FC<PageProps> = () => {
   return <RealmViewerPage />;

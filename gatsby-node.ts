@@ -1,3 +1,5 @@
+import path from "path";
+
 import { GatsbyNode } from "gatsby";
 
 /**
@@ -19,6 +21,11 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
 
   config.resolve = {
     ...config.resolve,
+    alias: {
+      ...(config.resolve?.alias ?? {}),
+      "@features": path.resolve(__dirname, "src/features"),
+      "@shared": path.resolve(__dirname, "src/shared"),
+    },
     fallback: {
       ...((config.resolve?.fallback) || {}),
       fs: false,

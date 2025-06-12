@@ -1,5 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react";
-import { RealmBoss, SANMA_TILES, SanmaTile, WallTile } from "../../../shared/types/simulation";
+
+import { RealmBoss, SANMA_TILES, SanmaTile, WallTile } from "@shared/types/simulation";
+
 import { ProgressState } from "./useProgressState";
 
 const MAX_WALL = 36;

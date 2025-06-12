@@ -1,9 +1,11 @@
 import React from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
-import styles from "../pages/RealmPage.module.css";
-import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, RealmPhase, RealmEditPhase } from "../../../shared/types/simulation";
-import { ProgressState } from "../hooks/useProgressState";
+
+import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, RealmPhase, RealmEditPhase } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+
 import { DoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
+import { ProgressState } from "../hooks/useProgressState";
+import styles from "../pages/RealmPage.module.css";
 
 interface DoraIndicatorsSectionProps {
   progressState: ProgressState;

@@ -1,10 +1,13 @@
 import React from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
-import styles from "../pages/RealmPage.module.css";
-import { REALM_BOSSES, RealmEditPhase, RealmPhase } from "../../../shared/types/simulation";
-import { REALM_BOSS_DESCRIPTIONS } from "../../../shared/constants/strings";
-import { ProgressState } from "../hooks/useProgressState";
+
+import { REALM_BOSS_DESCRIPTIONS } from "@shared/constants/strings";
+import { REALM_BOSSES, RealmEditPhase, RealmPhase } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+
 import { BossState } from "../hooks/useBossState";
+import { ProgressState } from "../hooks/useProgressState";
+import styles from "../pages/RealmPage.module.css";
+
 
 interface BossSectionProps {
   progressState: ProgressState;

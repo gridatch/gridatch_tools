@@ -4,13 +4,15 @@
  *
  * See: https://www.gatsbyjs.com/docs/how-to/querying-data/use-static-query/
  */
+import "./Layout.css"
 
 import * as React from "react"
+
 import { useStaticQuery, graphql } from "gatsby"
 
-import "./Layout.css"
+import ProcessingModal from "@shared/processing/components/ProcessingModal";
+
 import Header from "./Header"
-import ProcessingModal from "../processing/components/ProcessingModal";
 
 interface LayoutProps {
   children: React.ReactNode;

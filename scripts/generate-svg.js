@@ -1,6 +1,7 @@
-const opentype = require('opentype.js');
-const fs = require('fs-extra');
 const path = require('path');
+
+const fs = require('fs-extra');
+const opentype = require('opentype.js');
 const sanitize = require('sanitize-filename');
 const xxhash = require('xxhash-wasm');
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { RealmBoss, SanmaTile } from "../../../shared/types/simulation";
+
+import { RealmBoss, SanmaTile } from "@shared/types/simulation";
 
 const MAX_DORA_INDICATORS = 10;
 

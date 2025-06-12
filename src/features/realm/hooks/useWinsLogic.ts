@@ -1,8 +1,10 @@
 import { useCallback, useMemo } from "react";
-import { isSozuTile, RealmEditPhase, RealmPhase, RealmTenpai, SanmaTile, SanmaTileOrNonRealm, Sozu, SOZU_RECORD_0, SOZU_TILES } from "../../../shared/types/simulation";
+
+import { isSozuTile, RealmEditPhase, RealmPhase, RealmTenpai, SanmaTile, SanmaTileOrNonRealm, Sozu, SOZU_RECORD_0, SOZU_TILES } from "@shared/types/simulation";
+
 import { ProgressState } from "./useProgressState";
-import { WallState } from "./useWallState";
 import { RemainingTilesLogic } from "./useRemainingTilesLogic";
+import { WallState } from "./useWallState";
 
 
 export interface WinsLogic {

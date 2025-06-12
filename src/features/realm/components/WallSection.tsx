@@ -1,14 +1,20 @@
 import React, { useCallback, useEffect, useState } from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
-import styles from "../pages/RealmPage.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES, RealmPhase, RealmEditPhase } from "../../../shared/types/simulation";
-import DynamicSVGTextSequence from "../../../shared/ui/DynamicSVGTextSequence";
-import { ProgressState } from "../hooks/useProgressState";
-import { WallState } from "../hooks/useWallState";
-import { RemainingTilesLogic } from "../hooks/useRemainingTilesLogic";
+
 import { useDropzone } from "react-dropzone";
-import { useWallDetection } from "../../../shared/opencv/hooks/useWallDetection";
 import Modal from "react-responsive-modal";
+
+import { useWallDetection } from "@shared/opencv/hooks/useWallDetection";
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES, RealmPhase, RealmEditPhase } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import DynamicSVGTextSequence from "@shared/ui/DynamicSVGTextSequence";
+
+import { ProgressState } from "../hooks/useProgressState";
+import { RemainingTilesLogic } from "../hooks/useRemainingTilesLogic";
+import { WallState } from "../hooks/useWallState";
+import styles from "../pages/RealmPage.module.css";
+
+
+
 
 interface WallSectionProps {
   progressState: ProgressState;

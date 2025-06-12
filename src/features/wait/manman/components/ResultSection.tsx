@@ -1,9 +1,11 @@
 import React from "react";
-import DynamicSVGText from "../../../../shared/ui/DynamicSVGText";
-import DynamicSVGTextSequence from "../../../../shared/ui/DynamicSVGTextSequence";
-import styles from "../../common/styles/wait.module.css";
-import { SozuHand, SOZU_TILES, ManmanTenpaiResult } from "../../../../shared/types/simulation";
-import ClearButton from "../../../../shared/ui/ClearButton";
+
+import { SozuHand, SOZU_TILES, ManmanTenpaiResult } from "@shared/types/simulation";
+import ClearButton from "@shared/ui/ClearButton";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import DynamicSVGTextSequence from "@shared/ui/DynamicSVGTextSequence";
+
+import styles from "@features/wait/common/styles/wait.module.css";
 
 interface ManmanResultSectionProps {
   hand: SozuHand;

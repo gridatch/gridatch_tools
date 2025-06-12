@@ -1,6 +1,8 @@
 import React from "react";
-import { ProcessingProvider } from "../shared/processing/context/ProcessingContext";
+
 import { GatsbyBrowser, GatsbySSR, WrapRootElementNodeArgs } from "gatsby";
+
+import { ProcessingProvider } from "@shared/processing/context/ProcessingContext";
 
 type WrapRootElement = GatsbyBrowser["wrapRootElement"] | GatsbySSR["wrapRootElement"];
 

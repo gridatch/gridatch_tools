@@ -1,8 +1,11 @@
 import { useCallback, useMemo } from "react";
-import { RealmBoss, RealmPhaseAction, SANMA_TILES, SanmaTile, TileStatus } from "../../../shared/types/simulation";
-import { ProgressState } from "./useProgressState";
-import { HandState } from "./useHandState";
+
 import { produce } from "immer";
+
+import { RealmBoss, RealmPhaseAction, SANMA_TILES, SanmaTile, TileStatus } from "@shared/types/simulation";
+
+import { HandState } from "./useHandState";
+import { ProgressState } from "./useProgressState";
 
 export interface ExchangePhaseActions {
   canConfirmExchangeAction: boolean;

@@ -1,9 +1,14 @@
+import "react-responsive-modal/styles.css";
+
 import React, { useEffect, useMemo, useRef } from "react";
+
 import { Modal } from "react-responsive-modal";
-import "react-responsive-modal/styles.css"
-import DynamicSVGText from "../../ui/DynamicSVGText";
-import DynamicSVGTextSequence from "../../ui/DynamicSVGTextSequence";
+
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import DynamicSVGTextSequence from "@shared/ui/DynamicSVGTextSequence";
+
 import { useProcessingContext } from "../context/ProcessingContext";
+
 
 const ProcessingModal: React.FC = () => {
   const { isBusy, percent } = useProcessingContext();

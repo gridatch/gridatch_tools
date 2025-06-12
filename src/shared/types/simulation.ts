@@ -1,4 +1,4 @@
-import { deepFreeze } from "../utils/common";
+import { deepFreeze } from "@shared/utils/common";
 
 // --- 基本型 ---
 export const SANMA_MANZU_TILES = ["1m", "9m"] as const;

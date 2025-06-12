@@ -1,7 +1,10 @@
 import React from "react";
-import Seo from "../shared/layout/Seo";
+
 import { PageProps } from "gatsby";
-import { ManmanPage } from "../features/wait/manman/pages/ManmanPage";
+
+import Seo from "@shared/layout/Seo";
+
+import { ManmanPage } from "@features/wait/manman/pages/ManmanPage";
 
 const ManmanRoute: React.FC<PageProps> = () => {
   return <ManmanPage />;

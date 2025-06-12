@@ -1,12 +1,14 @@
 import React from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
-import styles from "../pages/RealmPage.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, SANMA_TILES, RealmPhase, RealmPhaseAction } from "../../../shared/types/simulation";
-import DynamicSVGTextSequence from "../../../shared/ui/DynamicSVGTextSequence";
-import { ProgressState } from "../hooks/useProgressState";
-import { HandState } from "../hooks/useHandState";
+
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, SANMA_TILES, RealmPhase, RealmPhaseAction } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import DynamicSVGTextSequence from "@shared/ui/DynamicSVGTextSequence";
+
 import { HandActions } from "../hooks/useHandActions";
+import { HandState } from "../hooks/useHandState";
+import { ProgressState } from "../hooks/useProgressState";
 import { RemainingTilesLogic } from "../hooks/useRemainingTilesLogic";
+import styles from "../pages/RealmPage.module.css";
 
 interface HandSectionProps {
   progressState: ProgressState;

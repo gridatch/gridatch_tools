@@ -1,34 +1,37 @@
 import React, { useState, useMemo, useCallback } from "react";
-import Layout from "../../../shared/layout/Layout";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
-import styles from "./RealmPage.module.css";
-import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
+
+import Layout from "@shared/layout/Layout";
 import { 
   RealmEditPhase,
   RealmPhase,
   SANMA_TILE_RECORD_4, 
   SANMA_TILE_RECORD_NUMBER_ARRAY,
   SanmaTile, 
-} from "../../../shared/types/simulation";
+} from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+
+import BossSection from "../components/BossSection";
+import ConfirmedSection from "../components/ConfirmedSection";
+import DoraIndicatorsSection from "../components/DoraIndicatorsSection";
+import HandSection from "../components/HandSection";
+import ResultSection from "../components/ResultSection";
+import WallSection from "../components/WallSection";
+import { useBossState } from "../hooks/useBossState";
+import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
+import { useHandActions } from "../hooks/useHandActions";
+import { useHandState } from "../hooks/useHandState";
+import { useProgressState } from "../hooks/useProgressState";
+import { useRemainingTilesLogic } from "../hooks/useRemainingTilesLogic";
+import { useWallState } from "../hooks/useWallState";
+import { useWinsLogic } from "../hooks/useWinsLogic";
 import {
   calcDrawTurnsByTiles, 
   calcIsRealmEachTile, 
   calcRealmTenpai, 
   calcFirstDrawTurnByTilesByTurns
 } from "../utils/realmSimulator";
-import BossSection from "../components/BossSection";
-import DoraIndicatorsSection from "../components/DoraIndicatorsSection";
-import ConfirmedSection from "../components/ConfirmedSection";
-import { useWallState } from "../hooks/useWallState";
-import WallSection from "../components/WallSection";
-import { useHandState } from "../hooks/useHandState";
-import HandSection from "../components/HandSection";
-import ResultSection from "../components/ResultSection";
-import { useProgressState } from "../hooks/useProgressState";
-import { useBossState } from "../hooks/useBossState";
-import { useHandActions } from "../hooks/useHandActions";
-import { useWinsLogic } from "../hooks/useWinsLogic";
-import { useRemainingTilesLogic } from "../hooks/useRemainingTilesLogic";
+
+import styles from "./RealmPage.module.css";
 
 export const RealmPage: React.FC = () => {
   /** 進行状況管理のフック */

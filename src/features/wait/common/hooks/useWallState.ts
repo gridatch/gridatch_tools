@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Sozu } from "../../../../shared/types/simulation";
+
+import { Sozu } from "@shared/types/simulation";
 
 export interface UseWallStateReturn {
   wall: Sozu[];

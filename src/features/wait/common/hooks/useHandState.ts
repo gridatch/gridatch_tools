@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { INITIAL_SOZU_HAND, SozuHand, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, HandComponent, PINZU_BLOCKS, isSozuTile, Sozu } from "../../../../shared/types/simulation";
+
 import { produce } from "immer";
+
+import { INITIAL_SOZU_HAND, SozuHand, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, HandComponent, PINZU_BLOCKS, isSozuTile, Sozu } from "@shared/types/simulation";
 
 export interface UseHandStateReturn {
   hand: SozuHand;

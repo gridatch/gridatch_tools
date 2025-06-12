@@ -1,11 +1,16 @@
 import { useCallback, useMemo } from "react";
-import { Hand, isSanmaTile, isSozuTile, PINZU_TILES, RealmPhase, RealmPhaseAction, RealmSimulationProgress, RealmTenpaiResult, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile, SOZU_TILES, WallTile } from "../../../shared/types/simulation";
-import { ProgressState } from "./useProgressState";
-import { HandState } from "./useHandState";
+
 import { createDraft, Draft, finishDraft, isDraft, produce } from "immer";
+
+import { useProcessingContext } from "@shared/processing/context/ProcessingContext";
+import { Hand, isSanmaTile, isSozuTile, PINZU_TILES, RealmPhase, RealmPhaseAction, RealmSimulationProgress, RealmTenpaiResult, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile, SOZU_TILES, WallTile } from "@shared/types/simulation";
+
 import { calcRealmWinsAverageByDiscard } from "../utils/realmSimulator";
+
+import { HandState } from "./useHandState";
+import { ProgressState } from "./useProgressState";
 import { WinsLogic } from "./useWinsLogic";
-import { useProcessingContext } from "../../../shared/processing/context/ProcessingContext";
+
 
 export interface MainPhaseActions {
   canConfirmMainAction: boolean;

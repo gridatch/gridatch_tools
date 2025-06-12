@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../../shared/layout/Layout"
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText"
-import styles from "./RealmViewerPage.module.css"
-import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
-import { RealmBoss, SanmaTile } from "../../../shared/types/simulation";
+
+import Layout from "@shared/layout/Layout"
+import { RealmBoss, SanmaTile } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText"
+
 import BossSection from "../components/BossSection";
 import DoraIndicatorsSection from "../components/DoraIndicatorsSection";
 import ResultSection from "../components/ResultSection";
+import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
 import { calcRealmTiles } from "../utils/calcRealmTiles";
+
+import styles from "./RealmViewerPage.module.css"
 
 export const RealmViewerPage: React.FC = () => {
   const [boss, setBoss] = useState<RealmBoss>("empty");

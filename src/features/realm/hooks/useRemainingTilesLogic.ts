@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useMemo } from "react";
-import { Hand, SANMA_TILE_RECORD_4, SANMA_TILES, SanmaTile, WallTile } from "../../../shared/types/simulation";
+
+import { Hand, SANMA_TILE_RECORD_4, SANMA_TILES, SanmaTile, WallTile } from "@shared/types/simulation";
 
 
 export interface RemainingTilesLogic {

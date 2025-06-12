@@ -1,9 +1,11 @@
-import { ProcessingState } from "../../../shared/processing/context/ProcessingContext";
+import { ProcessingState } from "@shared/processing/context/ProcessingContext";
+import { RealmBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_FALSE, Hand, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS, SANMA_TILE_RECORD_MINUS_1, RealmSimulationProgress, RealmPhaseAction, SanmaTileOrNonRealm, SANMA_TILES_OR_NON_REALM_RECORD_0, RealmPhase, isSanmaTile, EMPTY_REALM_TENPAI, DecomposedResult } from "@shared/types/simulation";
+import { enumerateMultisetPermutations } from "@shared/utils/combinatorics";
+import { IndexedTree } from "@shared/utils/indexedTree";
+
 import { WinsLogic } from "../hooks/useWinsLogic";
-import { RealmBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_FALSE, Hand, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS, SANMA_TILE_RECORD_MINUS_1, RealmSimulationProgress, RealmPhaseAction, SanmaTileOrNonRealm, SANMA_TILES_OR_NON_REALM_RECORD_0, RealmPhase, isSanmaTile, EMPTY_REALM_TENPAI, DecomposedResult } from "../../../shared/types/simulation";
+
 import { decomposeTilesIntoBlocks, ResultInternal } from "./blockDecomposer";
-import { enumerateMultisetPermutations } from "../../../shared/utils/combinatorics";
-import { IndexedTree } from "../../../shared/utils/indexedTree";
 
 
 /**

@@ -1,9 +1,11 @@
 import React from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
+
+import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, RealmBoss } from "@shared/types/simulation";
+import ClearButton from "@shared/ui/ClearButton";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import DynamicSVGTextSequence from "@shared/ui/DynamicSVGTextSequence";
+
 import styles from "../pages/RealmViewerPage.module.css";
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, RealmBoss } from "../../../shared/types/simulation";
-import DynamicSVGTextSequence from "../../../shared/ui/DynamicSVGTextSequence";
-import ClearButton from "../../../shared/ui/ClearButton";
 
 interface ResultSectionProps {
   boss: RealmBoss;

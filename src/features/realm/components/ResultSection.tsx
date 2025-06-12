@@ -1,8 +1,10 @@
 import React from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
+
+import { SANMA_TILES, RealmTenpaiResult, SanmaTile, SOZU_TILES } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import DynamicSVGTextSequence from "@shared/ui/DynamicSVGTextSequence";
+
 import styles from "../pages/RealmPage.module.css";
-import { SANMA_TILES, RealmTenpaiResult, SanmaTile, SOZU_TILES } from "../../../shared/types/simulation";
-import DynamicSVGTextSequence from "../../../shared/ui/DynamicSVGTextSequence";
 
 interface ResultSectionProps {
   isEditing: boolean;

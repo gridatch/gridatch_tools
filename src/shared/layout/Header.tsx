@@ -1,6 +1,8 @@
 import * as React from "react"
+
 import { Link } from "gatsby"
-import DynamicSVGText from "../ui/DynamicSVGText"
+
+import DynamicSVGText from "@shared/ui/DynamicSVGText"
 
 interface HeaderProps {
   siteTitle: string;

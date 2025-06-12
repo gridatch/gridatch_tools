@@ -2,6 +2,9 @@
     "remote.WSL.fileWatcher.polling": true,
     "typescript.suggest.paths": false,
     "javascript.suggest.paths": false,
+    
+    "typescript.preferences.importModuleSpecifier": "shortest",
+    "javascript.preferences.importModuleSpecifier": "shortest",
     "emeraldwalk.runonsave": {
         "commands": [
             {
@@ -18,5 +21,8 @@
     "files.watcherExclude": {
         "**/**/*": true
     },
-    "editor.tabSize": 2
+    "editor.tabSize": 2,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit"
+    },
 }

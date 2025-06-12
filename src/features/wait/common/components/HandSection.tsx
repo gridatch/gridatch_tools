@@ -1,7 +1,9 @@
 import React from "react";
-import DynamicSVGText from "../../../../shared/ui/DynamicSVGText";
+
+import { SozuHand, HandComponent, SOZU_TILES } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+
 import styles from "../styles/wait.module.css";
-import { SozuHand, HandComponent, SOZU_TILES } from "../../../../shared/types/simulation";
 
 interface SozuHandSectionProps {
   hand: SozuHand;

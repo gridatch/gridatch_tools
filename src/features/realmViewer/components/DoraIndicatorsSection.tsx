@@ -1,7 +1,9 @@
 import React from "react";
-import DynamicSVGText from "../../../shared/ui/DynamicSVGText";
+
+import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText";
+
 import styles from "../pages/RealmViewerPage.module.css";
-import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "../../../shared/types/simulation";
 
 interface DoraIndicatorsSectionProps {
   doraIndicators: SanmaTile[];

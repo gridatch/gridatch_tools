@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
-import Layout from "../../../../shared/layout/Layout"
-import DynamicSVGText from "../../../../shared/ui/DynamicSVGText"
-import styles from "../../common/styles/wait.module.css"
-import { useWallState } from "../../common/hooks/useWallState";
-import { useHandState } from "../../common/hooks/useHandState";
-import SozuWallSection from "../../common/components/WallSection";
-import SozuHandSection from "../../common/components/HandSection";
+
+import Layout from "@shared/layout/Layout"
+import { ManmanCsvData, ManmanTenpaiResult } from "@shared/types/simulation";
+import DynamicSVGText from "@shared/ui/DynamicSVGText"
+
+import SozuHandSection from "@features/wait/common/components/HandSection";
+import SozuWallSection from "@features/wait/common/components/WallSection";
+import { useHandState } from "@features/wait/common/hooks/useHandState";
+import { useWallState } from "@features/wait/common/hooks/useWallState";
+import styles from "@features/wait/common/styles/wait.module.css";
+import { loadManmanCsvData } from "@features/wait/common/utils/csvLoader";
+import { computeOptimalManmanTenpais } from "@features/wait/common/utils/tenpaiSimulator";
+
 import ManmanResultSection from "../components/ResultSection";
-import { loadManmanCsvData } from "../../common/utils/csvLoader";
-import { computeOptimalManmanTenpais } from "../../common/utils/tenpaiSimulator";
-import { ManmanCsvData, ManmanTenpaiResult } from "../../../../shared/types/simulation";
+
 
 // CSVファイル名に対応する索子牌の枚数
 const ALLOWED_SINGLE_COUNTS = [6, 7, 9, 10, 12];

@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { RealmBoss, RealmPhase, RealmPhaseAction, RealmTenpaiResult, SANMA_TILES, SanmaTile, WallTile } from "../../../shared/types/simulation";
-import { ProgressState } from "./useProgressState";
-import { useExchangePhaseActions } from "./useExchangePhaseActions";
-import { useMainPhaseActions } from "./useMainPhaseActions";
-import { HandState } from "./useHandState";
+
 import { produce } from "immer";
+
+import { RealmBoss, RealmPhase, RealmPhaseAction, RealmTenpaiResult, SANMA_TILES, SanmaTile, WallTile } from "@shared/types/simulation";
+
+import { useExchangePhaseActions } from "./useExchangePhaseActions";
+import { HandState } from "./useHandState";
+import { useMainPhaseActions } from "./useMainPhaseActions";
+import { ProgressState } from "./useProgressState";
 import { WinsLogic } from "./useWinsLogic";
 
 export interface HandActions {
