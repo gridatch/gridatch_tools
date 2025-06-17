@@ -1,4 +1,4 @@
-import { MultisetPermutation } from "@shared/types/simulation";
+import { MultisetPermutation } from '@shared/types/simulation';
 
 export interface IndexedTreeNode {
   score: number;
@@ -21,7 +21,7 @@ export class IndexedTree<T extends string> {
     const node: IndexedTreeNode = {
       score: 0,
       probability: 0,
-      children: []
+      children: [],
     };
     if (depth < this.maxDepth) {
       for (let i = 0; i < this.domains.length; ++i) {

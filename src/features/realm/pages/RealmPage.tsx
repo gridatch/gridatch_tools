@@ -1,42 +1,42 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback } from 'react';
 
-import Layout from "@shared/layout/Layout";
-import { 
+import Layout from '@shared/layout/Layout';
+import {
   RealmEditPhase,
   RealmPhase,
-  SANMA_TILE_RECORD_4, 
+  SANMA_TILE_RECORD_4,
   SANMA_TILE_RECORD_NUMBER_ARRAY,
-  SanmaTile, 
-} from "@shared/types/simulation";
-import DynamicSVGText from "@shared/ui/DynamicSVGText";
+  SanmaTile,
+} from '@shared/types/simulation';
+import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
-import BossSection from "../components/BossSection";
-import ConfirmedSection from "../components/ConfirmedSection";
-import DoraIndicatorsSection from "../components/DoraIndicatorsSection";
-import HandSection from "../components/HandSection";
-import ResultSection from "../components/ResultSection";
-import WallSection from "../components/WallSection";
-import { useBossState } from "../hooks/useBossState";
-import { useDoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
-import { useHandActions } from "../hooks/useHandActions";
-import { useHandState } from "../hooks/useHandState";
-import { useProgressState } from "../hooks/useProgressState";
-import { useRemainingTilesLogic } from "../hooks/useRemainingTilesLogic";
-import { useWallState } from "../hooks/useWallState";
-import { useWinsLogic } from "../hooks/useWinsLogic";
+import BossSection from '../components/BossSection';
+import ConfirmedSection from '../components/ConfirmedSection';
+import DoraIndicatorsSection from '../components/DoraIndicatorsSection';
+import HandSection from '../components/HandSection';
+import ResultSection from '../components/ResultSection';
+import WallSection from '../components/WallSection';
+import { useBossState } from '../hooks/useBossState';
+import { useDoraIndicatorsState } from '../hooks/useDoraIndicatorsState';
+import { useHandActions } from '../hooks/useHandActions';
+import { useHandState } from '../hooks/useHandState';
+import { useProgressState } from '../hooks/useProgressState';
+import { useRemainingTilesLogic } from '../hooks/useRemainingTilesLogic';
+import { useWallState } from '../hooks/useWallState';
+import { useWinsLogic } from '../hooks/useWinsLogic';
 import {
-  calcDrawTurnsByTiles, 
-  calcIsRealmEachTile, 
-  calcRealmTenpai, 
-  calcFirstDrawTurnByTilesByTurns
-} from "../utils/realmSimulator";
+  calcDrawTurnsByTiles,
+  calcIsRealmEachTile,
+  calcRealmTenpai,
+  calcFirstDrawTurnByTilesByTurns,
+} from '../utils/realmSimulator';
 
-import styles from "./RealmPage.module.css";
+import styles from './RealmPage.module.css';
 
 export const RealmPage: React.FC = () => {
   /** 進行状況管理のフック */
   const progressState = useProgressState();
-  
+
   // ステージ効果関連のフック
   const bossState = useBossState(progressState);
 
@@ -52,7 +52,7 @@ export const RealmPage: React.FC = () => {
   /** 各牌が領域牌かどうか */
   const isRealmEachTile = useMemo(
     () => calcIsRealmEachTile(bossState.boss, doraIndicatorsState.doraIndicators),
-    [bossState.boss, doraIndicatorsState.doraIndicators]
+    [bossState.boss, doraIndicatorsState.doraIndicators],
   );
 
   // 手牌関連のフック
@@ -64,7 +64,7 @@ export const RealmPage: React.FC = () => {
     doraIndicatorsState.doraIndicators,
     isRealmEachTile,
     wallState.wall,
-    handState.hand, 
+    handState.hand,
     handState.discardedTiles,
     remainingTiles,
     setRemainingTiles,
@@ -77,7 +77,7 @@ export const RealmPage: React.FC = () => {
     if (progressState.simulationProgress.phase <= RealmPhase.Wall) return null;
     if (progressState.editProgress.isEditing) {
       if (progressState.editProgress.phase !== RealmEditPhase.Wall) return null;
-      if (wallState.wall.some(tile => tile === "empty")) return null;
+      if (wallState.wall.some(tile => tile === 'empty')) return null;
     }
     return calcRealmTenpai(
       progressState.simulationProgress,
@@ -117,7 +117,7 @@ export const RealmPage: React.FC = () => {
   return (
     <Layout>
       <div className={styles.container}>
-        <DynamicSVGText text={"領域和了シミュレーター"} />
+        <DynamicSVGText text="領域和了シミュレーター" />
         <div className={styles.contents}>
           <ConfirmedSection
             progressState={progressState}

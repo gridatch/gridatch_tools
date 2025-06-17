@@ -1,4 +1,4 @@
-import { SozuHand, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult, HandComponent, HAND_COMPONENT_RECORD_0 } from "@shared/types/simulation";
+import { SozuHand, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult, HandComponent, HAND_COMPONENT_RECORD_0 } from '@shared/types/simulation';
 
 // CSVファイルに記載されているロス数の最大値
 const MAX_LOSS = 12;
@@ -11,8 +11,8 @@ const MAX_LOSS = 12;
  */
 const generateHandComponentPool = (hand: SozuHand, wall: Sozu[]): Record<HandComponent, number> => {
   const pool: Record<HandComponent, number> = { ...hand.closed };
-  if (hand.drawn !== "empty") ++pool[hand.drawn];
-  
+  if (hand.drawn !== 'empty') ++pool[hand.drawn];
+
   wall.forEach(tile => {
     if (pool[tile] < 4) ++pool[tile];
   });
@@ -35,16 +35,16 @@ const enumerateAllHands = (
   currentHand: Record<HandComponent, number>,
   currentTileCount: number,
   targetTileCount: number,
-  results: Record<HandComponent, number>[]
+  results: Record<HandComponent, number>[],
 ): void => {
   if (currentTileCount === targetTileCount) {
     results.push({ ...currentHand });
     return;
   }
   if (componentIndex >= HAND_COMPONENTS.length) return;
-  
+
   const component = HAND_COMPONENTS[componentIndex];
-  
+
   // 現在の手牌パーツを選択する
   for (let componentCount = pool[component]; componentCount >= 0; --componentCount) {
     if (currentTileCount + HAND_COMPONENTS_TILE_COUNT[component] * componentCount <= targetTileCount) {
@@ -53,10 +53,10 @@ const enumerateAllHands = (
       currentHand[component] -= componentCount;
     }
   }
-  
+
   // 刻子を変換した対子の追加
   // プールに対子が存在せず、選択していない刻子が余っている場合のみ
-  if (component === "pair" && pool.pair === 0 && pool.triplet - currentHand.triplet >= 1) {
+  if (component === 'pair' && pool.pair === 0 && pool.triplet - currentHand.triplet >= 1) {
     const componentCount = 1;
     if (currentTileCount + HAND_COMPONENTS_TILE_COUNT[component] * componentCount <= targetTileCount) {
       currentHand[component] += componentCount;
@@ -64,7 +64,7 @@ const enumerateAllHands = (
       currentHand[component] -= componentCount;
     }
   }
-  
+
   // 現在の手牌パーツを選択しない
   enumerateAllHands(pool, componentIndex + 1, currentHand, currentTileCount, targetTileCount, results);
 };
@@ -76,9 +76,9 @@ const enumerateAllHands = (
  * @returns キー文字列
  */
 const getCsvKeyFromHand = (hand: Record<HandComponent, number>): string => {
-  let csvKey = "";
-  SOZU_TILES.forEach((tile) => {
-    const digitStr = tile.replace("s", "");
+  let csvKey = '';
+  SOZU_TILES.forEach(tile => {
+    const digitStr = tile.replace('s', '');
     for (let i = 0; i < hand[tile]; ++i) {
       csvKey += digitStr;
     }
@@ -98,15 +98,15 @@ export const computeOptimalManmanTenpais = (
   handState: SozuHand,
   wall: Sozu[],
   maxHand: number,
-  csvData: ManmanCsvData
+  csvData: ManmanCsvData,
 ): ManmanTenpaiResult[] => {
   if (!csvData || Object.keys(csvData).length === 0) return [];
-  
+
   const pool = generateHandComponentPool(handState, wall);
-  
+
   let allHands: Record<HandComponent, number>[] = [];
   enumerateAllHands(pool, 0, { ...HAND_COMPONENT_RECORD_0 }, 0, maxHand, allHands);
-  
+
   // 単体牌が一致している手牌を重複排除する
   const allHandMap: { [key: string]: Record<HandComponent, number> } = {};
   allHands.forEach(hand => {
@@ -114,7 +114,7 @@ export const computeOptimalManmanTenpais = (
     allHandMap[key] = hand;
   });
   allHands = Object.values(allHandMap);
-  
+
   const tenpais: ManmanTenpaiResult[] = [];
   allHands.forEach(hand => {
     const csvKey = getCsvKeyFromHand(hand);
@@ -126,12 +126,12 @@ export const computeOptimalManmanTenpais = (
         loss: csvRow.loss,
         key: csvRow.key,
         breakdown: csvRow.breakdown,
-        hand
+        hand,
       });
     }
   });
   if (tenpais.length === 0) return tenpais;
-  
+
   let optimalTenpais: ManmanTenpaiResult[] = [];
   const minLoss = Math.min(...tenpais.map(r => r.loss));
   for (let loss = minLoss; loss <= MAX_LOSS; loss++) {
@@ -154,15 +154,15 @@ export const computeOptimalSozuTenpais = (
   handState: SozuHand,
   wall: Sozu[],
   maxHand: number,
-  csvData: SozuCsvData
+  csvData: SozuCsvData,
 ): SozuTenpaiResult[] => {
   if (!csvData || Object.keys(csvData).length === 0) return [];
-  
+
   const pool = generateHandComponentPool(handState, wall);
-  
+
   let allHands: Record<HandComponent, number>[] = [];
   enumerateAllHands(pool, 0, { ...HAND_COMPONENT_RECORD_0 }, 0, maxHand, allHands);
-  
+
   // 単体牌が一致している手牌を重複排除する
   const allHandMap: { [key: string]: Record<HandComponent, number> } = {};
   allHands.forEach(hand => {
@@ -170,7 +170,7 @@ export const computeOptimalSozuTenpais = (
     allHandMap[key] = hand;
   });
   allHands = Object.values(allHandMap);
-  
+
   const tenpais: SozuTenpaiResult[] = [];
   allHands.forEach(hand => {
     const csvKey = getCsvKeyFromHand(hand);
@@ -182,12 +182,12 @@ export const computeOptimalSozuTenpais = (
         totalWaits: csvRow.totalWaits,
         key: csvRow.key,
         waits: csvRow.waits,
-        hand
+        hand,
       });
     }
   });
   if (tenpais.length === 0) return tenpais;
-  
+
   let optimalTenpais: SozuTenpaiResult[] = [];
   const maxWaits = Math.max(...tenpais.map(r => r.totalWaits));
   for (let waitCount = maxWaits; waitCount >= 1; --waitCount) {

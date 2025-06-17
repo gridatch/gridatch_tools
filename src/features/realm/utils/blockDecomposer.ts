@@ -1,4 +1,4 @@
-import { Block, BlockType, DecomposedResult, DecomposerTileSetId, SOZU_RECORD_0, SOZU_TILES } from "@shared/types/simulation";
+import { Block, BlockType, DecomposedResult, DecomposerTileSetId, SOZU_RECORD_0, SOZU_TILES } from '@shared/types/simulation';
 
 // 内部では牌の種類を区別せず、整数で牌を管理する。
 // 整数で管理することで、牌の種類に依らず共通の牌姿になった際に共通のmemoを使うことができる。
@@ -18,9 +18,8 @@ export interface ResultInternal {
   count: number;
   blocks: BlockInternal[];
   remaining: number[];
-  nonRealmWins: number[],
+  nonRealmWins: number[];
 }
-
 
 /**
  * 牌プール内の指定した牌をブロック分解する関数
@@ -47,7 +46,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
   nonRealmWinsEachSozu?: Record<T, number>,
 ): DecomposedResult<T> {
   const n = tiles.length;
-  
+
   // メモ化用の指数計算
   // 牌姿を5進数としてエンコードするために使用する
   const base = 5;
@@ -58,8 +57,8 @@ export function decomposeTilesIntoBlocks<T extends string>(
   }
 
   // int型牌姿（対象の牌の数をint配列化したもの）
-  const initialTileCounts: number[] = tiles.map(tile =>  pool[tile]);
-  
+  const initialTileCounts: number[] = tiles.map(tile => pool[tile]);
+
   // int型非領域牌の和了回数
   const nonRealmWins: number[] = tiles.map(tile => nonRealmWinsEachSozu ? nonRealmWinsEachSozu[tile] : 0);
 
@@ -90,7 +89,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
       remaining: tileCounts.slice(),
       nonRealmWins: nonRealmWins.slice().fill(0),
     };
-    
+
     /**
      * 刻子を対子扱いできるかどうか判定する
      * ※他色対子とのシャンポン待ちを除外するため
@@ -99,35 +98,35 @@ export function decomposeTilesIntoBlocks<T extends string>(
      */
     function canUseKotsuAsToitsu(result: ResultInternal): boolean {
       // 刻子の牌で待つ塔子が存在する場合、順子 + 対子と扱うことができる
-      
+
       // （他色対子 + ）刻子 + 両面（例：22234s、22234567s）
-      const ryanmen = result.blocks.find(block => block.type === "ryanmen");
+      const ryanmen = result.blocks.find(block => block.type === 'ryanmen');
       // （他色対子 + ）刻子 + 嵌張（例：23334s）
-      const kanchan = result.blocks.find(block => block.type === "kanchan");
+      const kanchan = result.blocks.find(block => block.type === 'kanchan');
       // （他色対子 + ）刻子 + 辺張（例：12333s）
-      const penchan = result.blocks.find(block => block.type === "penchan");
-      
+      const penchan = result.blocks.find(block => block.type === 'penchan');
+
       if (!ryanmen && !kanchan && !penchan) return false;
-      
+
       const waits: number[] = [];
-      
+
       if (ryanmen) {
         const left = ryanmen.left;
         const right = ryanmen.left + 1;
         waits.push(left - 1);
         waits.push(right + 1);
-        
+
         const lowShuntsuLeft = left - 3;
         const highShuntsuLeft = right + 1;
         const highShuntsuRight = right + 3;
         if (lowShuntsuLeft > 0) {
-          if (result.blocks.some(block => block.type === "shuntsu" && block.left === lowShuntsuLeft)) {
+          if (result.blocks.some(block => block.type === 'shuntsu' && block.left === lowShuntsuLeft)) {
             // 左に三面張
             waits.push(lowShuntsuLeft - 1);
           }
         }
         if (highShuntsuRight < n - 1) {
-          if (result.blocks.some(block => block.type === "shuntsu" && block.left === highShuntsuLeft)) {
+          if (result.blocks.some(block => block.type === 'shuntsu' && block.left === highShuntsuLeft)) {
             // 右に三面張
             waits.push(highShuntsuRight + 1);
           }
@@ -143,41 +142,41 @@ export function decomposeTilesIntoBlocks<T extends string>(
           waits.push(penchan.left - 1);
         }
       }
-      
+
       // 刻子の牌で待っている === 対子 + 順子と読み替えることができる
-      const waitingKotsuTile = waits.some(wait => result.blocks.some(block => block.type === "kotsu" && block.left === wait));
+      const waitingKotsuTile = waits.some(wait => result.blocks.some(block => block.type === 'kotsu' && block.left === wait));
 
       return waitingKotsuTile;
     }
-    
+
     /**
      * 非領域牌の和了回数を設定する
      * @param result int型管理の分解結果
      */
     function setNonRealmWins(result: ResultInternal) {
-      const ryanmen = result.blocks.find(block => block.type === "ryanmen");
-      const kanchan = result.blocks.find(block => block.type === "kanchan");
-      const penchan = result.blocks.find(block => block.type === "penchan");
-      
+      const ryanmen = result.blocks.find(block => block.type === 'ryanmen');
+      const kanchan = result.blocks.find(block => block.type === 'kanchan');
+      const penchan = result.blocks.find(block => block.type === 'penchan');
+
       if (!ryanmen && !kanchan && !penchan) return;
-      
+
       if (ryanmen) {
         const left = ryanmen.left;
         const right = ryanmen.left + 1;
         result.nonRealmWins[left - 1] = nonRealmWins[left - 1];
         result.nonRealmWins[right + 1] = nonRealmWins[right + 1];
-        
+
         const lowShuntsuLeft = left - 3;
         const highShuntsuLeft = right + 1;
         const highShuntsuRight = right + 3;
         if (lowShuntsuLeft > 0) {
-          if (result.blocks.some(block => block.type === "shuntsu" && block.left === lowShuntsuLeft)) {
+          if (result.blocks.some(block => block.type === 'shuntsu' && block.left === lowShuntsuLeft)) {
             // 左に三面張
             result.nonRealmWins[lowShuntsuLeft - 1] = nonRealmWins[lowShuntsuLeft - 1];
           }
         }
         if (highShuntsuRight < n - 1) {
-          if (result.blocks.some(block => block.type === "shuntsu" && block.left === highShuntsuLeft)) {
+          if (result.blocks.some(block => block.type === 'shuntsu' && block.left === highShuntsuLeft)) {
             // 右に三面張
             result.nonRealmWins[highShuntsuRight + 1] = nonRealmWins[highShuntsuRight + 1];
           }
@@ -201,7 +200,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
         tileCounts[left] -= 3;
         const candidate = dfs(tileCounts, requiredToitsuCount, requiredTaatsuCount);
         if (candidate.count !== Number.NEGATIVE_INFINITY) {
-          const block: BlockInternal = { type: "kotsu", left };
+          const block: BlockInternal = { type: 'kotsu', left };
           const candidateWithBlock: ResultInternal = {
             count: candidate.count + 1,
             blocks: [block].concat(candidate.blocks),
@@ -231,7 +230,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
         tileCounts[left + 2]--;
         const candidate = dfs(tileCounts, requiredToitsuCount, requiredTaatsuCount);
         if (candidate.count !== Number.NEGATIVE_INFINITY) {
-          const block: BlockInternal = { type: "shuntsu", left };
+          const block: BlockInternal = { type: 'shuntsu', left };
           const candidateWithBlock: ResultInternal = {
             count: candidate.count + 1,
             blocks: [block].concat(candidate.blocks),
@@ -261,7 +260,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
           tileCounts[left] -= 2;
           const candidate = dfs(tileCounts, requiredToitsuCount - 1, requiredTaatsuCount);
           if (candidate.count !== Number.NEGATIVE_INFINITY) {
-            const block: BlockInternal = { type: "toitsu", left };
+            const block: BlockInternal = { type: 'toitsu', left };
             const candidateWithBlock: ResultInternal = {
               count: candidate.count + 1,
               blocks: [block].concat(candidate.blocks),
@@ -292,7 +291,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
           tileCounts[left + 1]--;
           const candidate = dfs(tileCounts, requiredToitsuCount, requiredTaatsuCount - 1);
           if (candidate.count !== Number.NEGATIVE_INFINITY) {
-            const blockType: BlockType = (left === 0 || left + 1 === (n - 1)) ? "penchan" : "ryanmen";
+            const blockType: BlockType = (left === 0 || left + 1 === (n - 1)) ? 'penchan' : 'ryanmen';
             const block: BlockInternal = { type: blockType, left };
             const candidateWithBlock: ResultInternal = {
               count: candidate.count + 1,
@@ -323,7 +322,7 @@ export function decomposeTilesIntoBlocks<T extends string>(
           tileCounts[left + 2]--;
           const candidate = dfs(tileCounts, requiredToitsuCount, requiredTaatsuCount - 1);
           if (candidate.count !== Number.NEGATIVE_INFINITY) {
-            const block: BlockInternal = { type: "kanchan", left: left };
+            const block: BlockInternal = { type: 'kanchan', left: left };
             const candidateWithBlock: ResultInternal = {
               count: candidate.count + 1,
               blocks: [block].concat(candidate.blocks),
@@ -356,19 +355,19 @@ export function decomposeTilesIntoBlocks<T extends string>(
   // int型管理の分解結果を、牌名ベースに変換
   const convertedBlocks: Block<T>[] = resultInternal.blocks.map(block => {
     switch (block.type) {
-      case "kotsu":
+      case 'kotsu':
         return { type: block.type, tiles: [tiles[block.left], tiles[block.left], tiles[block.left]] };
-      case "shuntsu":
+      case 'shuntsu':
         return { type: block.type, tiles: [tiles[block.left], tiles[block.left + 1], tiles[block.left + 2]] };
-      case "toitsu":
+      case 'toitsu':
         return { type: block.type, tiles: [tiles[block.left], tiles[block.left]] };
-      case "ryanmen":
-      case "penchan":
+      case 'ryanmen':
+      case 'penchan':
         return { type: block.type, tiles: [tiles[block.left], tiles[block.left + 1]] };
-      case "kanchan":
+      case 'kanchan':
         return { type: block.type, tiles: [tiles[block.left], tiles[block.left + 2]] };
       default:
-        throw new Error("Unknown block type: " + block.type);
+        throw new Error('Unknown block type: ' + block.type);
     }
   });
 

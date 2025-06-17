@@ -1,13 +1,13 @@
-import React from "react";
+import React from 'react';
 
-import { RealmBoss, RealmEditPhase, RealmPhase, SanmaTile } from "@shared/types/simulation";
-import ClearButton from "@shared/ui/ClearButton";
-import DynamicSVGText from "@shared/ui/DynamicSVGText";
-import EditButton from "@shared/ui/EditButton";
+import { RealmBoss, RealmEditPhase, RealmPhase, SanmaTile } from '@shared/types/simulation';
+import ClearButton from '@shared/ui/ClearButton';
+import DynamicSVGText from '@shared/ui/DynamicSVGText';
+import EditButton from '@shared/ui/EditButton';
 
-import { ProgressState } from "../hooks/useProgressState";
-import { WallState } from "../hooks/useWallState";
-import styles from "../pages/RealmPage.module.css";
+import { ProgressState } from '../hooks/useProgressState';
+import { WallState } from '../hooks/useWallState';
+import styles from '../pages/RealmPage.module.css';
 
 interface ConfirmedSectionProps {
   progressState: ProgressState;
@@ -28,25 +28,25 @@ const ConfirmedSection: React.FC<ConfirmedSectionProps> = ({
 }) => {
   const { simulationProgress, editProgress } = progressState;
   const { wall, usableWallCount } = wallState;
-  
+
   const isBossConfirmed = (!editProgress.isEditing && simulationProgress.phase > RealmPhase.Boss)
     || (editProgress.isEditing && editProgress.phase > RealmEditPhase.Boss);
   const isDoraIndicatorsConfirmed = (!editProgress.isEditing && simulationProgress.phase > RealmPhase.DoraIndicators)
     || (editProgress.isEditing && editProgress.phase > RealmEditPhase.DoraIndicators);
   const isWallConfirmed = !editProgress.isEditing && simulationProgress.phase > RealmPhase.Wall;
-  
+
   if (!isBossConfirmed) return;
-  
+
   return (
     <section className={styles.confirmed_section}>
-      <div style={{position: "relative"}}>
-        <ClearButton onClick={clearAll} style={{ marginTop: "-5px" }} />
+      <div style={{ position: 'relative' }}>
+        <ClearButton onClick={clearAll} style={{ marginTop: '-5px' }} />
         {
           isWallConfirmed && <EditButton onClick={progressState.enterEditMode} />
         }
         <div className={styles.area_title}>
-          <span style={{position: "absolute"}}>
-            <DynamicSVGText text={"場"} />
+          <span style={{ position: 'absolute' }}>
+            <DynamicSVGText text="場" />
           </span>
         </div>
         <div className={`${styles.area} ${styles.confirmed_dora}`}>
@@ -74,7 +74,7 @@ const ConfirmedSection: React.FC<ConfirmedSectionProps> = ({
               isWallConfirmed && Array.from({ length: 4 }).map((_, i) => {
                 const rowUsableCount = Math.min(9, usableWallCount - 9 * i);
                 const rowUsablePercentage = rowUsableCount / 9 * 100;
-                const visibility = rowUsableCount < 9 ? "visible" : "hidden";
+                const visibility = rowUsableCount < 9 ? 'visible' : 'hidden';
                 return (
                   <img
                     key={`lock_${i}`}
@@ -86,27 +86,27 @@ const ConfirmedSection: React.FC<ConfirmedSectionProps> = ({
                 );
               })
             }
-            
+
           </div>
           {
             isWallConfirmed && wall.map((tile, i) => {
-              const isNotRealm = wall[i] !== "empty" && wall[i] !== "closed" && !isRealmEachTile[wall[i]];
+              const isNotRealm = wall[i] !== 'empty' && wall[i] !== 'closed' && !isRealmEachTile[wall[i]];
               const visible = i > simulationProgress.turn - 1;
               const isLocked = i >= usableWallCount;
               return (
                 <React.Fragment key={`wall_${i}`}>
                   {
-                    wall[i] !== "empty" && (
+                    wall[i] !== 'empty' && (
                       <img
                         className={`${styles.confirmed_wall_tile} ${isNotRealm && styles.not_realm} ${isLocked && styles.locked}`}
-                        style={{ visibility: visible ? "visible" : "hidden" }}
+                        style={{ visibility: visible ? 'visible' : 'hidden' }}
                         src={`/tiles/${tile}.png`}
                         alt={tile}
                       />
                     )
                   }
                 </React.Fragment>
-              )
+              );
             })
           }
         </div>

@@ -4,7 +4,7 @@
  * See: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-config/
  */
 
-import type { GatsbyConfig } from "gatsby"
+import type { GatsbyConfig } from 'gatsby';
 
 const config: GatsbyConfig = {
   siteMetadata: {
@@ -52,9 +52,9 @@ const config: GatsbyConfig = {
         },
       },
     },
-    'gatsby-plugin-offline',
+    `gatsby-plugin-offline`,
     `gatsby-plugin-typescript`,
   ],
-}
+};
 
-export default config
+export default config;

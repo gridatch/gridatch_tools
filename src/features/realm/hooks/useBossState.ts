@@ -1,9 +1,8 @@
-import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 
-import { RealmBoss } from "@shared/types/simulation";
+import { RealmBoss } from '@shared/types/simulation';
 
-import { ProgressState } from "./useProgressState";
-
+import { ProgressState } from './useProgressState';
 
 export interface BossState {
   boss: RealmBoss;
@@ -13,9 +12,9 @@ export interface BossState {
 }
 
 export const useBossState = (progressState: ProgressState): BossState => {
-  const initialBoss: RealmBoss = "empty";
+  const initialBoss: RealmBoss = 'empty';
   const [boss, setBoss] = useState<RealmBoss>(initialBoss);
-    
+
   const confirmBoss = useCallback(() => {
     if (progressState.editProgress.isEditing) {
       progressState.goToNextEditPhase();
@@ -23,10 +22,10 @@ export const useBossState = (progressState: ProgressState): BossState => {
       progressState.goToNextSimulationPhase();
     }
   }, [progressState]);
-    
+
   const clearBoss = useCallback(() => {
     setBoss(initialBoss);
   }, []);
-  
+
   return useMemo(() => ({ boss, setBoss, confirmBoss, clearBoss }), [boss, confirmBoss, clearBoss]);
 };

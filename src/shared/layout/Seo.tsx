@@ -5,9 +5,9 @@
  * See: https://www.gatsbyjs.com/docs/how-to/querying-data/use-static-query/
  */
 
-import * as React from "react"
+import * as React from 'react';
 
-import { useStaticQuery, graphql } from "gatsby"
+import { useStaticQuery, graphql } from 'gatsby';
 
 interface SeoProps {
   description?: string;
@@ -27,11 +27,11 @@ const Seo: React.FC<SeoProps> = ({ description, title, children }) => {
           }
         }
       }
-    `
-  )
+    `,
+  );
 
-  const metaDescription = description || site.siteMetadata.description
-  const defaultTitle = site.siteMetadata?.title
+  const metaDescription = description || site.siteMetadata.description;
+  const defaultTitle = site.siteMetadata?.title;
 
   return (
     <>
@@ -54,7 +54,7 @@ const Seo: React.FC<SeoProps> = ({ description, title, children }) => {
       <link rel="apple-touch-icon" sizes="512x512" href="/icons/apple-touch-icon-512x512.png" />
       {children}
     </>
-  )
-}
+  );
+};
 
-export default Seo
+export default Seo;

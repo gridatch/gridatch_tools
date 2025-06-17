@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
-import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from "@shared/types/simulation";
-import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from '@shared/types/simulation';
+import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
-import styles from "../pages/RealmViewerPage.module.css";
+import styles from '../pages/RealmViewerPage.module.css';
 
 interface DoraIndicatorsSectionProps {
   doraIndicators: SanmaTile[];
@@ -27,32 +27,34 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
     <section className={styles.dora_indicators_section}>
       <div>
         <div className={styles.area_title}>
-          <DynamicSVGText text={"ドラ表示牌"} />
+          <DynamicSVGText text="ドラ表示牌" />
         </div>
         <div className={`${styles.area} ${styles.dora_indicators}`}>
           {Array.from({ length: maxDoraIndicators }, (_, i) =>
-            i < doraIndicators.length ? (
-              <img
-                key={`dora_indicator_${i}`}
-                className={styles.dora_indicator}
-                src={`/tiles/${doraIndicators[i]}.png`}
-                onClick={() => removeDoraIndicatorAtIndex(i)}
-                alt={doraIndicators[i]}
-              />
-            ) : (
-              <img
-                key={`dora_indicator_${i}`}
-                className={styles.dora_indicator}
-                src={`/tiles/empty.png`}
-                alt={"empty"}
-              />
-            )
+            i < doraIndicators.length
+              ? (
+                  <img
+                    key={`dora_indicator_${i}`}
+                    className={styles.dora_indicator}
+                    src={`/tiles/${doraIndicators[i]}.png`}
+                    onClick={() => removeDoraIndicatorAtIndex(i)}
+                    alt={doraIndicators[i]}
+                  />
+                )
+              : (
+                  <img
+                    key={`dora_indicator_${i}`}
+                    className={styles.dora_indicator}
+                    src="/tiles/empty.png"
+                    alt="empty"
+                  />
+                ),
           )}
         </div>
       </div>
       <div>
         <div className={styles.area_title}>
-          <DynamicSVGText text={"ドラ表示牌選択"} />
+          <DynamicSVGText text="ドラ表示牌選択" />
         </div>
         <div className={`${styles.area} ${styles.dora_indicator_choices}`}>
           {tileGroups.map((group, groupIndex) => (
@@ -66,7 +68,7 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
                   alt={tile}
                 />
               ))}
-              {groupIndex < tileGroups.length - 1 && <div style={{ width: "100%" }} />}
+              {groupIndex < tileGroups.length - 1 && <div style={{ width: '100%' }} />}
             </React.Fragment>
           ))}
         </div>

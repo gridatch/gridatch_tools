@@ -1,6 +1,6 @@
-import path from "path";
+import path from 'path';
 
-import { GatsbyNode } from "gatsby";
+import { GatsbyNode } from 'gatsby';
 
 /**
  * Implement Gatsby's Node APIs in this file.
@@ -8,7 +8,7 @@ import { GatsbyNode } from "gatsby";
  * See: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-node/
  */
 
-export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
+export const onCreateWebpackConfig: GatsbyNode['onCreateWebpackConfig'] = ({
   actions,
   getConfig,
 }) => {
@@ -23,8 +23,8 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
     ...config.resolve,
     alias: {
       ...(config.resolve?.alias ?? {}),
-      "@features": path.resolve(__dirname, "src/features"),
-      "@shared": path.resolve(__dirname, "src/shared"),
+      '@features': path.resolve(__dirname, 'src/features'),
+      '@shared': path.resolve(__dirname, 'src/shared'),
     },
     fallback: {
       ...((config.resolve?.fallback) || {}),

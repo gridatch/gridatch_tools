@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
-import { Sozu, SOZU_TILES } from "@shared/types/simulation";
-import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import { Sozu, SOZU_TILES } from '@shared/types/simulation';
+import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
-import styles from "../styles/wait.module.css";
+import styles from '../styles/wait.module.css';
 
 interface SozuWallSectionProps {
   wall: string[];
@@ -22,32 +22,34 @@ const SozuWallSection: React.FC<SozuWallSectionProps> = ({
     <section className={styles.wall_section}>
       <div>
         <div className={styles.area_title}>
-          <DynamicSVGText text={"牌山"} />
+          <DynamicSVGText text="牌山" />
         </div>
         <div id="wall" className={`${styles.area} ${styles.wall}`}>
           {Array.from({ length: maxWall }, (_, i) =>
-            i < wall.length ? (
-              <img
-                key={`wall_${i}`}
-                className={styles.wall_tile}
-                src={`/tiles/${wall[i]}.png`}
-                onClick={() => removeTileFromWallAtIndex(i)}
-                alt={wall[i]}
-              />
-            ) : (
-              <img
-                key={`wall_${i}`}
-                className={styles.wall_tile}
-                src={`/tiles/empty.png`}
-                alt="empty"
-              />
-            )
+            i < wall.length
+              ? (
+                  <img
+                    key={`wall_${i}`}
+                    className={styles.wall_tile}
+                    src={`/tiles/${wall[i]}.png`}
+                    onClick={() => removeTileFromWallAtIndex(i)}
+                    alt={wall[i]}
+                  />
+                )
+              : (
+                  <img
+                    key={`wall_${i}`}
+                    className={styles.wall_tile}
+                    src="/tiles/empty.png"
+                    alt="empty"
+                  />
+                ),
           )}
         </div>
       </div>
       <div>
         <div className={styles.area_title}>
-          <DynamicSVGText text={"牌選択ボタン"} />
+          <DynamicSVGText text="牌選択ボタン" />
         </div>
         <div id="wall_choices" className={`${styles.area} ${styles.tile_choices}`}>
           {SOZU_TILES.map(tile => (

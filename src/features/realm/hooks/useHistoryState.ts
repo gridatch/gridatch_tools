@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState } from 'react';
 
-import { RealmSimulationProgress, SanmaTile, Hand } from "@shared/types/simulation";
+import { RealmSimulationProgress, SanmaTile, Hand } from '@shared/types/simulation';
 
 export interface RealmSnapshot {
   progress: RealmSimulationProgress;
@@ -32,17 +32,17 @@ export const useHistoryState = (
    */
   const pushHistory = useCallback((snapshotDiff: Partial<RealmSnapshot>) => {
     const newSnapshot: RealmSnapshot = { ...getSnapshot(), ...snapshotDiff };
-    setHistory((prev) => prev.slice(0, historyIndex + 1).concat(newSnapshot));
-    setHistoryIndex((prev) => prev + 1);
+    setHistory(prev => prev.slice(0, historyIndex + 1).concat(newSnapshot));
+    setHistoryIndex(prev => prev + 1);
   }, [getSnapshot, historyIndex]);
-  
+
   /**
    * 現在のスナップショットを更新する
    * 現在のスナップショットより新しいものは破棄する
    */
   const updateCurrentHistory = useCallback((snapshotDiff: Partial<RealmSnapshot> = {}) => {
     const newSnapshot: RealmSnapshot = { ...getSnapshot(), ...snapshotDiff };
-    setHistory((prev) => prev.slice(0, historyIndex).concat(newSnapshot));
+    setHistory(prev => prev.slice(0, historyIndex).concat(newSnapshot));
   }, [getSnapshot, historyIndex]);
 
   /** 履歴を一つ前に戻す */
@@ -60,7 +60,7 @@ export const useHistoryState = (
     setHistoryIndex(newIndex);
     applySnapshot(history[newIndex]);
   }, [history, historyIndex, applySnapshot]);
-  
+
   /**
    * 手牌履歴をリセットする
    */

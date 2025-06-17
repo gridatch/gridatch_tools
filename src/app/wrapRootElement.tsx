@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import { GatsbyBrowser, GatsbySSR, WrapRootElementNodeArgs } from "gatsby";
+import { GatsbyBrowser, GatsbySSR, WrapRootElementNodeArgs } from 'gatsby';
 
-import { ProcessingProvider } from "@shared/processing/context/ProcessingContext";
+import { ProcessingProvider } from '@shared/processing/context/ProcessingContext';
 
-type WrapRootElement = GatsbyBrowser["wrapRootElement"] | GatsbySSR["wrapRootElement"];
+type WrapRootElement = GatsbyBrowser['wrapRootElement'] | GatsbySSR['wrapRootElement'];
 
 export const wrapRootElement: WrapRootElement = ({ element }: WrapRootElementNodeArgs) => (
   <ProcessingProvider>

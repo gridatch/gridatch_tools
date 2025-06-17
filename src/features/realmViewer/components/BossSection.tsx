@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import { REALM_BOSS_DESCRIPTIONS } from "@shared/constants/strings";
-import { REALM_BOSSES, RealmBoss } from "@shared/types/simulation";
-import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import { REALM_BOSS_DESCRIPTIONS } from '@shared/constants/strings';
+import { REALM_BOSSES, RealmBoss } from '@shared/types/simulation';
+import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
-import styles from "../pages/RealmViewerPage.module.css";
+import styles from '../pages/RealmViewerPage.module.css';
 
 interface BossSectionProps {
   boss: RealmBoss;
@@ -16,13 +16,13 @@ const BossSection: React.FC<BossSectionProps> = ({ boss, setBoss }) => {
     <section className={styles.dora_boss_section}>
       <div>
         <div className={styles.area_title}>
-          <DynamicSVGText text={"ステージ効果"} />
+          <DynamicSVGText text="ステージ効果" />
         </div>
         <div className={`${styles.area} ${styles.dora_boss}`}>
           <img
             className={styles.dora_boss_image}
             src={`/boss/${boss}.png`}
-            onClick={() => setBoss("empty")}
+            onClick={() => setBoss('empty')}
             alt={boss}
           />
           <DynamicSVGText text={REALM_BOSS_DESCRIPTIONS[boss]} />
@@ -30,18 +30,21 @@ const BossSection: React.FC<BossSectionProps> = ({ boss, setBoss }) => {
       </div>
       <div>
         <div className={styles.area_title}>
-          <DynamicSVGText text={"ステージ効果選択"} />
+          <DynamicSVGText text="ステージ効果選択" />
         </div>
         <div className={`${styles.area} ${styles.dora_boss_choices}`}>
           {REALM_BOSSES.map(boss => (
-            boss === "empty" ? null
-            : <img
-              key={`boss_choice_${boss}`}
-              className={styles.dora_boss_image}
-              src={`/boss/${boss}.png`}
-              onClick={() => setBoss(boss)}
-              alt={boss}
-            />
+            boss === 'empty'
+              ? null
+              : (
+                  <img
+                    key={`boss_choice_${boss}`}
+                    className={styles.dora_boss_image}
+                    src={`/boss/${boss}.png`}
+                    onClick={() => setBoss(boss)}
+                    alt={boss}
+                  />
+                )
           ))}
         </div>
       </div>

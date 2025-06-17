@@ -5,7 +5,7 @@ import React, {
   ReactNode,
   Dispatch,
   SetStateAction,
-} from "react";
+} from 'react';
 
 export interface ProcessingState {
   percent: number;
@@ -30,7 +30,7 @@ export const ProcessingProvider: React.FC<{ children: ReactNode }> = ({ children
 export const useProcessingContext = (): ProcessingState => {
   const ctx = useContext(ProcessingContext);
   if (!ctx) {
-    throw new Error("[useProcessingContext] useProcessingContext must be used within a ProcessingProvider");
+    throw new Error('[useProcessingContext] useProcessingContext must be used within a ProcessingProvider');
   }
   return ctx;
 };

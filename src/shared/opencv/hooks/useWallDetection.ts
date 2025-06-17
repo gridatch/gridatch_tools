@@ -11,21 +11,21 @@ import { useTileTemplates } from './useTileTemplates';
  * @param setWall 牌山をセットする関数
  */
 export function useWallDetection(
-  setWall: React.Dispatch<React.SetStateAction<WallTile[]>>
+  setWall: React.Dispatch<React.SetStateAction<WallTile[]>>,
 ) {
   const templatesLoaded = useTileTemplates();
   const isProcessingRef = useRef(false);
 
   const detectWall = useCallback((img: HTMLImageElement | HTMLCanvasElement) => {
     if (!templatesLoaded) {
-      console.error("[detectWall] Templates have not been loaded.");
+      console.error('[detectWall] Templates have not been loaded.');
       return;
     }
     if (isProcessingRef.current) {
-      console.error("[detectWall] Processing...");
+      console.error('[detectWall] Processing...');
       return;
     }
-    
+
     isProcessingRef.current = true;
     try {
       const wall = processWallImage(img);
@@ -36,11 +36,11 @@ export function useWallDetection(
         return false;
       }
     } catch {
-      console.error("[detectWall] Failed to detect wall.");
+      console.error('[detectWall] Failed to detect wall.');
     } finally {
       isProcessingRef.current = false;
     }
   }, [templatesLoaded, setWall]);
 
-  return  useMemo(() => ({ detectWall }), [detectWall]);
+  return useMemo(() => ({ detectWall }), [detectWall]);
 }

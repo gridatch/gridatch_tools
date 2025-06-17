@@ -1,14 +1,14 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
-import { produce } from "immer";
+import { produce } from 'immer';
 
-import { RealmBoss, RealmPhase, RealmPhaseAction, RealmTenpaiResult, SANMA_TILES, SanmaTile, WallTile } from "@shared/types/simulation";
+import { RealmBoss, RealmPhase, RealmPhaseAction, RealmTenpaiResult, SANMA_TILES, SanmaTile, WallTile } from '@shared/types/simulation';
 
-import { useExchangePhaseActions } from "./useExchangePhaseActions";
-import { HandState } from "./useHandState";
-import { useMainPhaseActions } from "./useMainPhaseActions";
-import { ProgressState } from "./useProgressState";
-import { WinsLogic } from "./useWinsLogic";
+import { useExchangePhaseActions } from './useExchangePhaseActions';
+import { HandState } from './useHandState';
+import { useMainPhaseActions } from './useMainPhaseActions';
+import { ProgressState } from './useProgressState';
+import { WinsLogic } from './useWinsLogic';
 
 export interface HandActions {
   canConfirmAction: boolean;
@@ -46,7 +46,7 @@ export const useHandActions = (
 ): HandActions => {
   const {
     simulationProgress: progress,
-    editProgress
+    editProgress,
   } = progressState;
 
   const exchangePhaseAction = useExchangePhaseActions(
@@ -67,7 +67,7 @@ export const useHandActions = (
     results,
     winsLogic,
   );
-  
+
   const canConfirmAction = useMemo(() => {
     switch (progress.phase) {
       case RealmPhase.Exchange:
@@ -78,7 +78,7 @@ export const useHandActions = (
         return false;
     }
   }, [exchangePhaseAction.canConfirmExchangeAction, mainPhaseAction.canConfirmMainAction, progress.phase]);
-  
+
   const canConfirmExchangePhase = useMemo(() => {
     switch (progress.phase) {
       case RealmPhase.Exchange:
@@ -87,7 +87,7 @@ export const useHandActions = (
         return false;
     }
   }, [exchangePhaseAction.canConfirmExchangePhase, progress.phase]);
-  
+
   /** ツモ牌を選択するラッパー */
   const draw = useCallback((tile: SanmaTile) => {
     switch (progress.phase) {
@@ -98,7 +98,7 @@ export const useHandActions = (
         mainPhaseAction.drawClosedTile(tile);
         break;
       default:
-        console.error("[draw] Unexpected phase", progress.phase);
+        console.error('[draw] Unexpected phase', progress.phase);
         break;
     }
   }, [progress.phase, exchangePhaseAction, mainPhaseAction]);
@@ -114,7 +114,7 @@ export const useHandActions = (
         mainPhaseAction.cancelDrawClosedTile();
         break;
       default:
-        console.error("[cancelDraw] Unexpected phase", progress.phase);
+        console.error('[cancelDraw] Unexpected phase', progress.phase);
         break;
     }
   }, [progress.phase, exchangePhaseAction, mainPhaseAction]);
@@ -129,14 +129,14 @@ export const useHandActions = (
         mainPhaseAction.confirmDrawClosedTile();
         break;
       default:
-        console.error("[confirmDraw] Unexpected phase", progress.phase);
+        console.error('[confirmDraw] Unexpected phase', progress.phase);
         break;
     }
   }, [progress.phase, exchangePhaseAction, mainPhaseAction]);
 
   /**
    * 捨て牌選択を切り替えるラッパー
-   * 
+   *
    * @param tile 対象牌
    * @param index 対象牌の中のindex、ツモ牌の場合は -1
    */
@@ -149,7 +149,7 @@ export const useHandActions = (
         mainPhaseAction.mainToggleDiscard(tile, index);
         break;
       default:
-        console.error("[toggleDiscard] Unexpected phase", progress.phase);
+        console.error('[toggleDiscard] Unexpected phase', progress.phase);
         break;
     }
   }, [progress.phase, exchangePhaseAction, mainPhaseAction]);
@@ -164,7 +164,7 @@ export const useHandActions = (
         mainPhaseAction.confirmMainDiscard();
         break;
       default:
-        console.error("[confirmDiscard] Unexpected phase", progress.phase);
+        console.error('[confirmDiscard] Unexpected phase', progress.phase);
         break;
     }
   }, [progress.phase, exchangePhaseAction, mainPhaseAction]);
@@ -173,7 +173,7 @@ export const useHandActions = (
   const refreshHandBeforeEditMode = useCallback(() => {
     if (progress.phase < RealmPhase.Exchange) return;
     if (progress.action === RealmPhaseAction.Draw) return;
-    
+
     handState.setHand(prev =>
       produce(prev, draft => {
         SANMA_TILES.forEach(tile => {
@@ -182,7 +182,7 @@ export const useHandActions = (
           });
         });
         draft.drawn.isSelected = false;
-      })
+      }),
     );
   }, [handState, progress.action, progress.phase]);
 
@@ -196,11 +196,11 @@ export const useHandActions = (
         mainPhaseAction.refreshMainHandAfterEditMode();
         break;
       default:
-        console.error("[refreshHandAfterEditMode] Unexpected phase", progress.phase);
+        console.error('[refreshHandAfterEditMode] Unexpected phase', progress.phase);
         break;
     }
   }, [exchangePhaseAction, mainPhaseAction, progress.phase]);
-  
+
   const prevIsEditing = useRef(editProgress.isEditing);
 
   useEffect(() => {
@@ -223,7 +223,7 @@ export const useHandActions = (
    */
   const confirmExchangePhase = useCallback(() => {
     if (progress.phase !== RealmPhase.Exchange) {
-      console.error("[confirmExchangePhase] Unexpected phase", progress.phase);
+      console.error('[confirmExchangePhase] Unexpected phase', progress.phase);
     }
     mainPhaseAction.enterMainPhase();
   }, [progress.phase, mainPhaseAction]);

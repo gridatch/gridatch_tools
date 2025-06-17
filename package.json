@@ -27,6 +27,7 @@
     "xxhash-wasm": "^1.1.0"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin": "^4.4.1",
     "@types/node": "^22.13.5",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

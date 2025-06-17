@@ -1,5 +1,3 @@
-
-
 // https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function deepFreeze(object: any) {
@@ -10,7 +8,7 @@ export function deepFreeze(object: any) {
   for (const name of propNames) {
     const value = object[name];
 
-    if ((value && typeof value === "object") || typeof value === "function") {
+    if ((value && typeof value === 'object') || typeof value === 'function') {
       deepFreeze(value);
     }
   }

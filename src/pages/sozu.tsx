@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import { PageProps } from "gatsby";
+import { PageProps } from 'gatsby';
 
-import Seo from "@shared/layout/Seo"
+import Seo from '@shared/layout/Seo';
 
-import { SozuPage } from "@features/wait/sozu/pages/SozuPage";
+import { SozuPage } from '@features/wait/sozu/pages/SozuPage';
 
 const SozuRoute: React.FC<PageProps> = () => {
   return <SozuPage />;

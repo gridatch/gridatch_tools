@@ -1,16 +1,15 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo } from 'react';
 
-import { createDraft, Draft, finishDraft, isDraft, produce } from "immer";
+import { createDraft, Draft, finishDraft, isDraft, produce } from 'immer';
 
-import { useProcessingContext } from "@shared/processing/context/ProcessingContext";
-import { Hand, isSanmaTile, isSozuTile, PINZU_TILES, RealmPhase, RealmPhaseAction, RealmSimulationProgress, RealmTenpaiResult, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile, SOZU_TILES, WallTile } from "@shared/types/simulation";
+import { useProcessingContext } from '@shared/processing/context/ProcessingContext';
+import { Hand, isSanmaTile, isSozuTile, PINZU_TILES, RealmPhase, RealmPhaseAction, RealmSimulationProgress, RealmTenpaiResult, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile, SOZU_TILES, WallTile } from '@shared/types/simulation';
 
-import { calcRealmWinsAverageByDiscard } from "../utils/realmSimulator";
+import { calcRealmWinsAverageByDiscard } from '../utils/realmSimulator';
 
-import { HandState } from "./useHandState";
-import { ProgressState } from "./useProgressState";
-import { WinsLogic } from "./useWinsLogic";
-
+import { HandState } from './useHandState';
+import { ProgressState } from './useProgressState';
+import { WinsLogic } from './useWinsLogic';
 
 export interface MainPhaseActions {
   canConfirmMainAction: boolean;
@@ -32,7 +31,7 @@ export const useMainPhaseActions = (
   handState: HandState,
   results: readonly RealmTenpaiResult[] | null,
   winsLogic: WinsLogic,
-) : MainPhaseActions => {
+): MainPhaseActions => {
   const {
     simulationProgress: progress,
     goToNextSimulationPhase,
@@ -50,7 +49,7 @@ export const useMainPhaseActions = (
   } = handState;
 
   const processingState = useProcessingContext();
-  
+
   /**
    * 領域牌を以下の 3 グループに分類する
    * 1. 3連続以上の領域牌 (sequentialRealmTiles)
@@ -60,7 +59,7 @@ export const useMainPhaseActions = (
   const categorizeRealmTiles = useCallback(() => {
     const sequentialSet = new Set<SanmaTile>();
 
-    [PINZU_TILES, SOZU_TILES].forEach((tiles) => {
+    [PINZU_TILES, SOZU_TILES].forEach(tiles => {
       let run = 0;
       for (let i = 0; i < tiles.length; i++) {
         if (isRealmEachTile[tiles[i]]) {
@@ -82,7 +81,7 @@ export const useMainPhaseActions = (
     const nonSequentialSozuRealmTiles: SanmaTile[] = [];
     const nonSequentialOtherRealmTiles: SanmaTile[] = [];
 
-    SANMA_TILES.forEach((tile) => {
+    SANMA_TILES.forEach(tile => {
       if (!isRealmEachTile[tile]) return;
       if (sequentialSet.has(tile)) {
         sequentialRealmTiles.push(tile);
@@ -101,11 +100,11 @@ export const useMainPhaseActions = (
     newProgress: RealmSimulationProgress,
   ): Promise<void> => {
     if (!isDraft(draft)) {
-      console.error("[selectBestDiscardInDraft] Expected a draft from Immer, but got a plain Hand.");
+      console.error('[selectBestDiscardInDraft] Expected a draft from Immer, but got a plain Hand.');
       return;
     }
     if (!isSanmaTile(draft.drawn.tile)) {
-      console.error("[selectBestDiscardInDraft] Unexpected drawn tile.", draft.drawn.tile);
+      console.error('[selectBestDiscardInDraft] Unexpected drawn tile.', draft.drawn.tile);
       return;
     }
     const drawnTile = draft.drawn.tile;
@@ -119,7 +118,7 @@ export const useMainPhaseActions = (
         }
       }
     };
-    
+
     // 非領域のツモ牌
     if (!isRealmEachTile[drawnTile]) {
       selectTile(drawnTile);
@@ -136,17 +135,17 @@ export const useMainPhaseActions = (
     if (!results) return;
 
     const diffs: Record<SanmaTile, number>[] = [];
-    results.forEach((result) => {
+    results.forEach(result => {
       const diff = { ...SANMA_TILE_RECORD_0 };
       SANMA_TILES.forEach(tile => {
         diff[tile] = result.hand[tile] - draft.closed[tile].length;
-      })
+      });
       --diff[drawnTile];
       diffs.push(diff);
-    })
-    
+    });
+
     const { sequentialRealmTiles, nonSequentialSozuRealmTiles, nonSequentialOtherRealmTiles } = categorizeRealmTiles();
-    
+
     let tileToSelect: SanmaTile | null = null;
     let tileToSelectRemaining = Number.POSITIVE_INFINITY;
 
@@ -154,7 +153,7 @@ export const useMainPhaseActions = (
 
     let closedCount = 0;
     for (let turn = newProgress.turn + 1; turn < Math.min(tenpaiTurn, usableWallCount); ++turn) {
-      if (wall[turn - 1] === "closed") ++closedCount;
+      if (wall[turn - 1] === 'closed') ++closedCount;
     }
 
     if (closedCount === 0) {
@@ -176,7 +175,7 @@ export const useMainPhaseActions = (
         }
       }
     }
-    
+
     const winsAverageByDiscard = await calcRealmWinsAverageByDiscard(
       newProgress,
       processingState,
@@ -187,7 +186,7 @@ export const useMainPhaseActions = (
       winsLogic,
     );
     if (!winsAverageByDiscard) return;
-    
+
     if (SANMA_TILES.some(tile => winsAverageByDiscard[tile] > 0)) {
       tileToSelect = [
         ...nonSequentialOtherRealmTiles,
@@ -195,21 +194,21 @@ export const useMainPhaseActions = (
         ...sequentialRealmTiles,
       ].reduce((acc, cur) => winsAverageByDiscard[acc] >= winsAverageByDiscard[cur] ? acc : cur);
     }
-    
+
     if (tileToSelect) {
       selectTile(tileToSelect);
       return;
     }
   }, [categorizeRealmTiles, isRealmEachTile, processingState, remainingTiles, results, wall, usableWallCount, winsLogic]);
-  
+
   /** メインフェーズ：ツモ・打牌の決定ができるかどうか */
   const canConfirmMainAction: boolean = useMemo(() => {
     switch (progress.action) {
       case RealmPhaseAction.Draw: {
-        return hand.drawn.isClosed && hand.drawn.tile !== "closed" && hand.drawn.tile !== "empty";
+        return hand.drawn.isClosed && hand.drawn.tile !== 'closed' && hand.drawn.tile !== 'empty';
       }
       case RealmPhaseAction.Discard: {
-        if (hand.drawn.tile === "closed" || hand.drawn.tile === "empty") return false;
+        if (hand.drawn.tile === 'closed' || hand.drawn.tile === 'empty') return false;
         let selectedTileCount = 0;
         selectedTileCount += SANMA_TILES.reduce((sum, tile) => sum + hand.closed[tile].filter(status => status.isSelected).length, 0);
         selectedTileCount += hand.drawn.isSelected ? 1 : 0;
@@ -226,7 +225,7 @@ export const useMainPhaseActions = (
     if (progress.action !== RealmPhaseAction.Discard) return;
 
     const newProgress = goToNextSimulationPhase(wall);
-    
+
     const nextDrawnTile = wall[newProgress.turn - 1];
 
     const handDraft = createDraft(hand);
@@ -239,13 +238,13 @@ export const useMainPhaseActions = (
     // 次のツモ牌設定
     handDraft.drawn = {
       tile: nextDrawnTile,
-      isClosed: nextDrawnTile === "closed",
+      isClosed: nextDrawnTile === 'closed',
       isSelected: false,
     };
-      
-    if (nextDrawnTile !== "closed") await selectBestDiscardInDraft(handDraft, newProgress);
+
+    if (nextDrawnTile !== 'closed') await selectBestDiscardInDraft(handDraft, newProgress);
     const newHand = finishDraft(handDraft);
-    
+
     setHand(newHand);
     pushHistory({ progress: newProgress, hand: newHand, discardedTiles });
   }, [progress.action, goToNextSimulationPhase, wall, hand, setHand, pushHistory, discardedTiles, selectBestDiscardInDraft]);
@@ -254,10 +253,10 @@ export const useMainPhaseActions = (
   const drawClosedTile = useCallback((tile: SanmaTile) => {
     if (progress.action !== RealmPhaseAction.Draw) return;
     if (remainingTiles[tile] <= 0) return;
-    
+
     setHand(prev => {
       if (!prev.drawn.isClosed) {
-        console.error("[drawClosedTile] Drawn tile is not closed.");
+        console.error('[drawClosedTile] Drawn tile is not closed.');
         return prev;
       }
       return { ...prev, drawn: { ...prev.drawn, tile, isSelected: true } };
@@ -267,13 +266,13 @@ export const useMainPhaseActions = (
   /** メインフェーズ > ツモアクション：選択されたツモ牌の裏牌の種類を取り消す */
   const cancelDrawClosedTile = useCallback(() => {
     if (progress.action !== RealmPhaseAction.Draw) return;
-    
+
     setHand(prev => {
       if (!prev.drawn.isClosed) {
-        console.error("[cancelDrawClosedTile] Drawn tile is not closed.");
+        console.error('[cancelDrawClosedTile] Drawn tile is not closed.');
         return prev;
       }
-      return { ...prev, drawn: { ...prev.drawn, tile: "closed", isSelected: false } };
+      return { ...prev, drawn: { ...prev.drawn, tile: 'closed', isSelected: false } };
     });
   }, [progress.action, setHand]);
 
@@ -281,18 +280,18 @@ export const useMainPhaseActions = (
   const confirmDrawClosedTile = useCallback(async () => {
     if (progress.action !== RealmPhaseAction.Draw) return;
     if (!isSanmaTile(hand.drawn.tile)) return;
-    
+
     updateCurrentHistory({ progress, hand, discardedTiles });
-    
+
     const newProgress = updatePhaseAction(RealmPhaseAction.Discard);
-    
+
     const handDraft = createDraft(hand);
     handDraft.drawn.isSelected = false;
     await selectBestDiscardInDraft(handDraft, newProgress);
     const newHand = finishDraft(handDraft);
-    
+
     setHand(newHand);
-    
+
     pushHistory({ progress: newProgress, hand: newHand });
   }, [discardedTiles, hand, progress, pushHistory, selectBestDiscardInDraft, setHand, updateCurrentHistory, updatePhaseAction]);
 
@@ -305,16 +304,16 @@ export const useMainPhaseActions = (
   const mainToggleDiscard = useCallback(async (tile: SanmaTile, index: number) => {
     if (progress.phase !== RealmPhase.Main) return;
     if (progress.action !== RealmPhaseAction.Discard) return;
-    
+
     setHand(prev => {
       const newHand = structuredClone(prev);
-  
+
       // 手牌の全ての牌の選択を解除する
       SANMA_TILES.forEach(t => {
         newHand.closed[t].forEach(status => (status.isSelected = false));
       });
       newHand.drawn.isSelected = false;
-      
+
       if (
         (index === -1 && prev.drawn.isSelected)
         || (index !== -1 && prev.closed[tile][index].isSelected)
@@ -322,7 +321,7 @@ export const useMainPhaseActions = (
         // 指定の牌が選択されていた場合は、全解除した手牌をそのまま返す
         return newHand;
       }
-    
+
       if (index === -1) {
         // ツモ牌を選択する
         newHand.drawn.isSelected = true;
@@ -337,10 +336,10 @@ export const useMainPhaseActions = (
   /** メインフェーズ > 打牌アクション：手牌とツモ牌の中から選択されている牌を1枚打牌する。 */
   const confirmMainDiscard = useCallback(async () => {
     if (progress.phase !== RealmPhase.Main) return;
-    
+
     const drawnTile = hand.drawn.tile;
-    if (drawnTile === "closed" || drawnTile === "empty") {
-      console.error("[confirmMainDiscard] Unexpected drawn tile.", drawnTile);
+    if (drawnTile === 'closed' || drawnTile === 'empty') {
+      console.error('[confirmMainDiscard] Unexpected drawn tile.', drawnTile);
       return;
     }
 
@@ -354,20 +353,20 @@ export const useMainPhaseActions = (
     const drawnSelected = hand.drawn.isSelected;
     const totalSelected = (drawnSelected ? 1 : 0) + selectedClosedTiles.length;
     if (totalSelected !== 1) {
-      console.error("[confirmMainDiscard] Unexpected total selected.", totalSelected);
+      console.error('[confirmMainDiscard] Unexpected total selected.', totalSelected);
       return;
     }
-    
+
     if (progress.turn >= usableWallCount) {
       // TODO: 結果表示など
       return;
     }
-    
+
     updateCurrentHistory({ progress, hand, discardedTiles });
-    
+
     const newProgress = goToNextTurn(wall, usableWallCount);
     const nextDrawnTile = wall[newProgress.turn - 1];
-    
+
     const handDraft = createDraft(hand);
     if (!drawnSelected) {
       // 手出し
@@ -379,13 +378,13 @@ export const useMainPhaseActions = (
     // 次のツモ牌設定
     handDraft.drawn = {
       tile: nextDrawnTile,
-      isClosed: nextDrawnTile === "closed",
+      isClosed: nextDrawnTile === 'closed',
       isSelected: false,
     };
-    
-    if (nextDrawnTile !== "closed") await selectBestDiscardInDraft(handDraft, newProgress);
+
+    if (nextDrawnTile !== 'closed') await selectBestDiscardInDraft(handDraft, newProgress);
     const newHand = finishDraft(handDraft);
-    
+
     const newDiscarded = produce(discardedTiles, draft => {
       if (drawnSelected) {
         // ツモ切り
@@ -396,7 +395,7 @@ export const useMainPhaseActions = (
         draft[tile] += 1;
       }
     });
-    
+
     setHand(newHand);
     setDiscardedTiles(newDiscarded);
     pushHistory({ progress: newProgress, hand: newHand, discardedTiles: newDiscarded });
@@ -407,7 +406,7 @@ export const useMainPhaseActions = (
       updateCurrentHistory();
       return;
     }
-    
+
     const handDraft = createDraft(hand);
     await selectBestDiscardInDraft(handDraft, progress);
     const newHand = finishDraft(handDraft);

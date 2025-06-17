@@ -17,7 +17,7 @@ export function useTileTemplates(): boolean {
     loadTileTemplates()
       .then(() => {
         setLoaded(true);
-        console.log("[useTileTemplates] Tile templates are ready.");
+        console.log('[useTileTemplates] Tile templates are ready.');
       })
       .catch((err: unknown) => {
         console.error('[useTileTemplates] Template load failed.', err);

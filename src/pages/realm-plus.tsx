@@ -1,10 +1,10 @@
-import React from "react";
+import React from 'react';
 
-import { PageProps } from "gatsby";
+import { PageProps } from 'gatsby';
 
-import Seo from "@shared/layout/Seo";
+import Seo from '@shared/layout/Seo';
 
-import { RealmPage } from "@features/realm/pages/RealmPage";
+import { RealmPage } from '@features/realm/pages/RealmPage';
 
 const RealmRoute: React.FC<PageProps> = () => {
   return <RealmPage />;

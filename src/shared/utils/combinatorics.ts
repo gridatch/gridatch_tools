@@ -1,4 +1,4 @@
-import { MultisetPermutation } from "@shared/types/simulation";
+import { MultisetPermutation } from '@shared/types/simulation';
 
 /** nPk を計算する */
 function perm(n: number, k: number): number {
@@ -19,19 +19,19 @@ function perm(n: number, k: number): number {
  * @returns 重複順列オブジェクトの配列
  */
 export function enumerateMultisetPermutations<
-  T extends string
+  T extends string,
 >(
   domainCountsOrig: Readonly<Record<T, number>>,
-  pickCount: number
+  pickCount: number,
 ): MultisetPermutation<T>[] {
   const domain = Object.keys(domainCountsOrig) as T[];
   const domainCounts: Record<T, number> = { ...domainCountsOrig };
-  const totalDomain = domain.reduce((acc, t) => acc + domainCountsOrig[t], 0)
+  const totalDomain = domain.reduce((acc, t) => acc + domainCountsOrig[t], 0);
   const T_RECORD_0 = Object.freeze(Object.fromEntries(domain.map(t => [t, 0])) as Record<T, number>);
 
   const permutation: T[] = [];
   const waysDenominator = perm(totalDomain, pickCount);
-  
+
   const result: MultisetPermutation<T>[] = [];
 
   const backtrack = () => {

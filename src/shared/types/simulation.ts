@@ -1,13 +1,13 @@
-import { deepFreeze } from "@shared/utils/common";
+import { deepFreeze } from '@shared/utils/common';
 
 // --- 基本型 ---
-export const SANMA_MANZU_TILES = ["1m", "9m"] as const;
-export const PINZU_TILES = ["1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p"] as const;
-export const SOZU_TILES = ["1s", "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s"] as const;
-export const WIND_TILES = ["E", "S", "W", "N"] as const;
-export const DRAGON_TILES = ["P", "F", "C"] as const;
+export const SANMA_MANZU_TILES = ['1m', '9m'] as const;
+export const PINZU_TILES = ['1p', '2p', '3p', '4p', '5p', '6p', '7p', '8p', '9p'] as const;
+export const SOZU_TILES = ['1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s'] as const;
+export const WIND_TILES = ['E', 'S', 'W', 'N'] as const;
+export const DRAGON_TILES = ['P', 'F', 'C'] as const;
 export const SANMA_TILES = [...SANMA_MANZU_TILES, ...PINZU_TILES, ...SOZU_TILES, ...WIND_TILES, ...DRAGON_TILES] as const;
-export const WALL_TILES = [...SANMA_TILES, "closed", "empty"] as const;
+export const WALL_TILES = [...SANMA_TILES, 'closed', 'empty'] as const;
 export const NON_SEQUENTIAL_TILES = [...SANMA_MANZU_TILES, ...WIND_TILES, ...DRAGON_TILES] as const;
 
 export type SanmaManzu = (typeof SANMA_MANZU_TILES)[number];
@@ -28,23 +28,23 @@ export const isSanmaTile = (tile: string): tile is SanmaTile => (SANMA_TILES as 
 export const isWallTile = (tile: string): tile is WallTile => (WALL_TILES as readonly string[]).includes(tile);
 export const isNonSequentialTile = (tile: string): tile is NonSequentialTile => (NON_SEQUENTIAL_TILES as readonly string[]).includes(tile);
 
-export const TILE_FACES = ["default", "cat_saint"] as const;
-export const TILE_BACKS = ["orange", "red", "shuriken", "orientation", "cat_saint", "happy_orange", "small_cosmos", "meeting_the_butterfly", "tranquil_night_lights"] as const;
+export const TILE_FACES = ['default', 'cat_saint'] as const;
+export const TILE_BACKS = ['orange', 'red', 'shuriken', 'orientation', 'cat_saint', 'happy_orange', 'small_cosmos', 'meeting_the_butterfly', 'tranquil_night_lights'] as const;
 
 export type TileFace = (typeof TILE_FACES)[number];
 export type TileBack = (typeof TILE_BACKS)[number];
 
-export const PLAIN_TILES: WallTile[] = ["P"] as const;
-export const PLAIN_TILE_BACKS: TileBack[] = ["orange", "red"] as const;
+export const PLAIN_TILES: WallTile[] = ['P'] as const;
+export const PLAIN_TILE_BACKS: TileBack[] = ['orange', 'red'] as const;
 
-export const SANMA_RED_TILES = ["5pr", "5sr"] as const;
+export const SANMA_RED_TILES = ['5pr', '5sr'] as const;
 export type SanmaRedTile = (typeof SANMA_RED_TILES)[number];
 export const isSanmaRedTile = (tile: string): tile is SanmaRedTile => (SANMA_RED_TILES as readonly string[]).includes(tile);
 
-export const SANMA_RED_TO_BLACK: Record<SanmaRedTile, SanmaTile> = { "5pr": "5p", "5sr": "5s" };
+export const SANMA_RED_TO_BLACK: Record<SanmaRedTile, SanmaTile> = { '5pr': '5p', '5sr': '5s' };
 
 // --- 待ち牌シミュレーター（万万、索子） ---
-export const PINZU_BLOCKS = ["sequence", "triplet", "pair"] as const;
+export const PINZU_BLOCKS = ['sequence', 'triplet', 'pair'] as const;
 export const HAND_COMPONENTS = [...PINZU_BLOCKS, ...SOZU_TILES] as const;
 export type PinzuBlock = (typeof PINZU_BLOCKS)[number];
 export type HandComponent = (typeof HAND_COMPONENTS)[number];
@@ -52,13 +52,13 @@ export const HAND_COMPONENT_RECORD_0 = Object.freeze(Object.fromEntries(HAND_COM
 
 export type SozuHand = {
   closed: Record<HandComponent, number>;
-  drawn: Sozu | "empty";
+  drawn: Sozu | 'empty';
 };
 
-export const INITIAL_SOZU_HAND: SozuHand = Object.freeze({ closed: { ...HAND_COMPONENT_RECORD_0 }, drawn: "empty" });
-export const HAND_COMPONENTS_TILE_COUNT = Object.fromEntries(HAND_COMPONENTS.map(component => { 
-  if (component === "sequence" || component === "triplet") return [component, 3];
-  if (component === "pair") return [component, 2];
+export const INITIAL_SOZU_HAND: SozuHand = Object.freeze({ closed: { ...HAND_COMPONENT_RECORD_0 }, drawn: 'empty' });
+export const HAND_COMPONENTS_TILE_COUNT = Object.fromEntries(HAND_COMPONENTS.map(component => {
+  if (component === 'sequence' || component === 'triplet') return [component, 3];
+  if (component === 'pair') return [component, 2];
   return [component, 1];
 })) as Record<HandComponent, number>;
 
@@ -116,8 +116,8 @@ export enum RealmPhase {
 
 // フェーズ内で行うアクション
 export enum RealmPhaseAction {
-  Draw = "draw",
-  Discard = "discard",
+  Draw = 'draw',
+  Discard = 'discard',
 }
 
 // シミュレーションの進行状況
@@ -150,7 +150,7 @@ export type RealmEditProgress = {
   phase?: never;
 };
 
-export const REALM_BOSSES = ["dora_indicator", "dora_manzu", "dora_pinzu", "dora_sozu", "exchange_amount", "lock", "others", "empty"] as const;
+export const REALM_BOSSES = ['dora_indicator', 'dora_manzu', 'dora_pinzu', 'dora_sozu', 'exchange_amount', 'lock', 'others', 'empty'] as const;
 export type RealmBoss = (typeof REALM_BOSSES)[number];
 
 export const SANMA_TILE_RECORD_FALSE: Record<SanmaTile, boolean> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, false])) as Record<SanmaTile, boolean>);
@@ -182,13 +182,13 @@ export interface Hand {
 
 export const INITIAL_HAND: Hand = deepFreeze({
   closed: Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as TileStatus[]])) as Record<SanmaTile, TileStatus[]>,
-  drawn: { tile: "empty", isClosed: false, isSelected: false }
-})
+  drawn: { tile: 'empty', isClosed: false, isSelected: false },
+});
 
 // --- 手牌のブロック分解 ---
-export const MENTSU_TYPES = ["shuntsu", "kotsu"] as const;
-export const TOITSU_TYPES = ["toitsu"] as const;
-export const TAATSU_TYPES = ["ryanmen", "kanchan", "penchan"] as const;
+export const MENTSU_TYPES = ['shuntsu', 'kotsu'] as const;
+export const TOITSU_TYPES = ['toitsu'] as const;
+export const TAATSU_TYPES = ['ryanmen', 'kanchan', 'penchan'] as const;
 export const BLOCK_TYPES = [...MENTSU_TYPES, ...TOITSU_TYPES, ...TAATSU_TYPES] as const;
 
 export type MentsuType = (typeof MENTSU_TYPES)[number];
@@ -219,7 +219,7 @@ export const EMPTY_REALM_TENPAI: RealmTenpai = deepFreeze({
   nonRealmWinsEachTiles: { ...SOZU_RECORD_0 },
 });
 
-export type WinningHandType = "standard" | "sevenPairs" | "kokushi";
+export type WinningHandType = 'standard' | 'sevenPairs' | 'kokushi';
 export interface RealmTenpaiResult {
   type: WinningHandType;
   turn: number;
@@ -235,7 +235,7 @@ export const DECOMPOSER_TILE_SET_IDS = {
 } as const;
 export type DecomposerTileSetId = (typeof DECOMPOSER_TILE_SET_IDS)[keyof typeof DECOMPOSER_TILE_SET_IDS];
 
-export const SANMA_TILES_OR_NON_REALM = [...SANMA_TILES, "nonRealm"] as const;
+export const SANMA_TILES_OR_NON_REALM = [...SANMA_TILES, 'nonRealm'] as const;
 export type SanmaTileOrNonRealm = (typeof SANMA_TILES_OR_NON_REALM)[number];
 export const isSanmaTileOrNonRealm = (tile: string): tile is SanmaTileOrNonRealm => (SANMA_TILES_OR_NON_REALM as readonly string[]).includes(tile);
 export const SANMA_TILES_OR_NON_REALM_RECORD_0: Record<SanmaTileOrNonRealm, number> = Object.freeze(Object.fromEntries(SANMA_TILES_OR_NON_REALM.map(tile => [tile, 0])) as Record<SanmaTileOrNonRealm, number>);

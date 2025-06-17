@@ -1,10 +1,12 @@
-import cv, { MatVector } from "@techstark/opencv-js"
+import cv, { MatVector } from '@techstark/opencv-js';
 
 import { TILE_FACES, TILE_BACKS, TileFace, TileBack, WallTile, PLAIN_TILES, PLAIN_TILE_BACKS } from '@shared/types/simulation';
 
-import { backTemplates, faceTemplates } from "./tileTemplates";
+import { backTemplates, faceTemplates } from './tileTemplates';
 
-interface MatchingResult { skin?: TileFace | TileBack, tile: WallTile; isRed: boolean; score: number }
+interface MatchingResult {
+  skin?: TileFace | TileBack; tile: WallTile; isRed: boolean; score: number;
+}
 
 type Line = { x1: number; y1: number; x2: number; y2: number };
 
@@ -36,7 +38,7 @@ interface RotatedBoundingBox {
  */
 function resizeToReduceMoire(mat: cv.Mat, threshold: number = 1920 * 1080) {
   if (mat.cols * mat.rows <= threshold) return mat.clone();
-  
+
   const w0 = Math.round(mat.cols * 0.5);
   const h0 = Math.round(mat.rows * 0.5);
   cv.resize(mat, mat, new cv.Size(w0, h0), 0, 0, cv.INTER_AREA);
@@ -139,16 +141,16 @@ function findBestContour(src: cv.Mat, point?: cv.Point) {
   // CHAIN_APPROX_SIMPLE: 直線部分の中間点を削除する
   cv.findContours(src, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
   hierarchy.delete();
-  
+
   const cx = point ? point.x : src.cols / 2;
   // スクリーンショットを入力画像としたときに中央よりやや下に牌山がある場合があるため上から55%
   const cy = point ? point.y : src.rows / 2;
-  
+
   let bestContour: cv.Mat | null = null;
   let maxArea = 0;
   for (let i = 0; i < contours.size(); i++) {
     const contour = contours.get(i);
-    
+
     if (cv.pointPolygonTest(contour, new cv.Point(cx, cy), false) < 0) {
       // 中心点を含まない
       contour.delete();
@@ -161,7 +163,7 @@ function findBestContour(src: cv.Mat, point?: cv.Point) {
       contour.delete();
       continue;
     }
-    
+
     const extent = calcContourExtent(contour);
     if (extent >= 0.9) {
       // 外接矩形に占める充填率が90%以上の輪郭はウィンドウ枠とみなし除外
@@ -175,7 +177,7 @@ function findBestContour(src: cv.Mat, point?: cv.Point) {
       contour.delete();
       continue;
     }
-    
+
     bestContour?.delete();
     bestContour = contour;
     maxArea = area;
@@ -193,11 +195,11 @@ function findBestContour(src: cv.Mat, point?: cv.Point) {
  */
 function createBinaryContourMat(size: cv.Size, contour: cv.Mat, thickness: number = 2) {
   const mat = cv.Mat.zeros(size.height, size.width, cv.CV_8UC1);
-  
+
   const vec = new cv.MatVector();
   vec.push_back(contour);
   cv.drawContours(mat, vec, 0, new cv.Scalar(255), thickness);
-  
+
   vec.delete();
   return mat;
 };
@@ -212,12 +214,12 @@ function sortRotatedRectVertices(points: cv.Point[]): RectVertices {
   const topPoint1 = points.reduce((acc, cur) => cur.y < acc.y ? cur : acc, points[0]);
   // 最上部の頂点とのなす角が最も水平に近い頂点
   const topPoint2 = points.filter(
-    point => point !== topPoint1
+    point => point !== topPoint1,
   ).map(point => ({
     point,
-    absRotationRad: Math.atan2(Math.abs(point.y - topPoint1.y), Math.abs(point.x - topPoint1.x))
-  })).reduce((prev, curr) => 
-    curr.absRotationRad < prev.absRotationRad ? curr : prev
+    absRotationRad: Math.atan2(Math.abs(point.y - topPoint1.y), Math.abs(point.x - topPoint1.x)),
+  })).reduce((prev, curr) =>
+    curr.absRotationRad < prev.absRotationRad ? curr : prev,
   ).point;
   const [topLeft, topRight] = [topPoint1, topPoint2].sort((a, b) => a.x - b.x);
   const bottomPoints = points.filter(p => p !== topPoint1 && p !== topPoint2);
@@ -240,7 +242,7 @@ function calcRotatedBoundingBox(contour: cv.Mat): RotatedBoundingBox {
 
   const width = Math.hypot(vertices.topRight.x - vertices.topLeft.x, vertices.topRight.y - vertices.topLeft.y);
   const height = Math.hypot(vertices.bottomLeft.x - vertices.topLeft.x, vertices.bottomLeft.y - vertices.topLeft.y);
-  
+
   const angle = Math.atan2(vertices.topRight.y - vertices.topLeft.y, vertices.topRight.x - vertices.topLeft.x) * 180 / Math.PI;
 
   return { vertices, width, height, angle };
@@ -254,7 +256,7 @@ function calcRotatedBoundingBox(contour: cv.Mat): RotatedBoundingBox {
  */
 function trimBoundingBoxRight(
   rotatedBoundingBox: RotatedBoundingBox,
-  maxRatio: number
+  maxRatio: number,
 ): RotatedBoundingBox {
   const { vertices, angle, width, height } = rotatedBoundingBox;
   const ratio = width / height;
@@ -300,7 +302,7 @@ function maskOutsideRotatedBoundingBox(
     vertices.topLeft.x, vertices.topLeft.y,
     vertices.topRight.x, vertices.topRight.y,
     vertices.bottomRight.x, vertices.bottomRight.y,
-    vertices.bottomLeft.x, vertices.bottomLeft.y
+    vertices.bottomLeft.x, vertices.bottomLeft.y,
   ]);
 
   const innerMask = cv.Mat.zeros(binaryMat.rows, binaryMat.cols, cv.CV_8UC1);
@@ -347,7 +349,7 @@ function getScalarProjectionByAngle(vec: cv.Point, angle: number): number {
  */
 function clusterByScalar<T>(
   items: { value: T; scalar: number }[],
-  threshold: number
+  threshold: number,
 ): T[][] {
   if (items.length === 0) return [];
   items.sort((a, b) => a.scalar - b.scalar);
@@ -381,12 +383,12 @@ function clusterLines(lines: cv.Mat, rotatedBoundingBox: RotatedBoundingBox) {
   const vAngle = rotatedBoundingBox.angle + 90;
   const hLines: Line[] = [];
   const vLines: Line[] = [];
-  
+
   for (let i = 0; i < lines.rows; i++) {
     const [x1, y1, x2, y2] = lines.intPtr(i, 0) as number[];
     const dx = x2 - x1, dy = y2 - y1;
     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-    const len = Math.hypot(dx,dy);
+    const len = Math.hypot(dx, dy);
 
     const hAngleDiff = calcAcuteAngleBetweenLines(hAngle, angle);
     if (hAngleDiff < 10 && len >= rotatedBoundingBox.width * 0.4) {
@@ -487,17 +489,17 @@ function createQuadMatFromBoundaryLines(boundaryLines: BoundaryLines): cv.Mat {
   const topRightPoint = calcIntersection(topLine, rightLine);
   const bottomRightPoint = calcIntersection(bottomLine, rightLine);
   const bottomLeftPoint = calcIntersection(leftLine, bottomLine);
-  
+
   if (!topLeftPoint || !topRightPoint || !bottomRightPoint || !bottomLeftPoint) {
     // 水平・垂直に分けてクラスタリングしているので通らないはず
-    throw new Error("[createQuadMatFromBoundaryLines] Intersection point could not be determined.");
+    throw new Error('[createQuadMatFromBoundaryLines] Intersection point could not be determined.');
   }
 
   const quad = cv.matFromArray(4, 1, cv.CV_32FC2, [
     topLeftPoint.x, topLeftPoint.y,
     topRightPoint.x, topRightPoint.y,
     bottomRightPoint.x, bottomRightPoint.y,
-    bottomLeftPoint.x, bottomLeftPoint.y
+    bottomLeftPoint.x, bottomLeftPoint.y,
   ]);
 
   return quad;
@@ -529,14 +531,14 @@ function warpQuadToRect(src: cv.Mat, srcQuad: cv.Mat, dstSize: cv.Size): cv.Mat 
   ]);
 
   const M = cv.getPerspectiveTransform(srcQuad, intermediateQuad);
-  
+
   const blur = new cv.Mat();
   cv.cvtColor(src, blur, cv.COLOR_RGBA2RGB);
   const bilateral = new cv.Mat();
   cv.bilateralFilter(blur, bilateral, 9, 75, 75, cv.BORDER_DEFAULT);
 
   const intermediate = new cv.Mat();
-  cv.warpPerspective(bilateral, intermediate, M, new cv.Size(intermediateW, intermediateH),);
+  cv.warpPerspective(bilateral, intermediate, M, new cv.Size(intermediateW, intermediateH));
 
   const dst = new cv.Mat();
   cv.resize(intermediate, dst, dstSize, 0, 0, cv.INTER_AREA);
@@ -558,7 +560,7 @@ function calcVarianceOfMat(mat: cv.Mat) {
   const variance = sigma * sigma;
   mean.delete();
   stddev.delete();
-  
+
   return variance;
 }
 
@@ -573,10 +575,10 @@ function detectTileFromPlainMat(mat: cv.Mat): WallTile {
   const [h, s, v] = cv.mean(hsv);
   hsv.delete();
   // 非魂牌：彩度小、明度大
-  if (s < 50 && v > 200) return "P";
+  if (s < 50 && v > 200) return 'P';
   // 魂牌：彩度やや小、暖色系
-  if (s < 100 && h < 60) return "P";
-  return "closed";
+  if (s < 100 && h < 60) return 'P';
+  return 'closed';
 }
 
 /**
@@ -585,7 +587,7 @@ function detectTileFromPlainMat(mat: cv.Mat): WallTile {
  * @returns 最良のマッチング結果
  */
 function matchTileFromMat(mat: cv.Mat) {
-  const best: MatchingResult = { tile: "empty", isRed: false, score: -1 }
+  const best: MatchingResult = { tile: 'empty', isRed: false, score: -1 };
   // 表牌
   TILE_FACES.forEach(tileFace => {
     for (const template of faceTemplates[tileFace]) {
@@ -594,7 +596,12 @@ function matchTileFromMat(mat: cv.Mat) {
       cv.matchTemplate(mat, template.mat, result, cv.TM_CCOEFF_NORMED);
       // @ts-expect-error: @techstark/opencv-js の型定義の誤りのため発生するエラーを無視
       const { maxVal } = cv.minMaxLoc(result);
-      if (maxVal > best.score) { best.skin = template.skin; best.tile = template.tile; best.isRed = template.isRed; best.score = maxVal; }
+      if (maxVal > best.score) {
+        best.skin = template.skin;
+        best.tile = template.tile;
+        best.isRed = template.isRed;
+        best.score = maxVal;
+      }
       result.delete();
     }
   });
@@ -606,7 +613,12 @@ function matchTileFromMat(mat: cv.Mat) {
     cv.matchTemplate(mat, template.mat, result, cv.TM_CCOEFF_NORMED);
     // @ts-expect-error: @techstark/opencv-js の型定義の誤りのため発生するエラーを無視
     const { maxVal } = cv.minMaxLoc(result);
-    if (maxVal > best.score) { best.skin = template.skin; best.tile = template.tile; best.isRed = template.isRed; best.score = maxVal; }
+    if (maxVal > best.score) {
+      best.skin = template.skin;
+      best.tile = template.tile;
+      best.isRed = template.isRed;
+      best.score = maxVal;
+    }
     result.delete();
   });
   return best;
@@ -623,22 +635,23 @@ function splitWallAndMatch(wallMat: cv.Mat): MatchingResult[] {
   const cellH = Math.round(wallMat.rows / rows);
   const result: MatchingResult[] = [];
 
-  const gray = new cv.Mat(); cv.cvtColor(wallMat, gray, cv.COLOR_RGBA2GRAY);
+  const gray = new cv.Mat();
+  cv.cvtColor(wallMat, gray, cv.COLOR_RGBA2GRAY);
 
   for (let row = 0; row < rows; row++) {
     for (let col = 0; col < cols; col++) {
       const colorRoi = wallMat.roi(new cv.Rect(col * cellW, row * cellH, cellW, cellH));
       const grayRoi = gray.roi(new cv.Rect(col * cellW, row * cellH, cellW, cellH));
-      
+
       // 中心部分の分散を調べる
       const roiCenterHeight = row * cols + col < (36 - 3) ? grayRoi.rows * 0.8 : grayRoi.rows * 0.4;
       const colorRoiCenter = colorRoi.roi(new cv.Rect(colorRoi.cols * 0.1, colorRoi.rows * 0.1, colorRoi.cols * 0.8, roiCenterHeight));
       const grayRoiCenter = grayRoi.roi(new cv.Rect(grayRoi.cols * 0.1, grayRoi.rows * 0.1, grayRoi.cols * 0.8, roiCenterHeight));
       colorRoi.delete();
-      
+
       const variance = calcVarianceOfMat(grayRoiCenter);
       grayRoiCenter.delete();
-      
+
       if (variance < 100) {
         // 分散が少ない牌は単色牌
         const tile = detectTileFromPlainMat(colorRoiCenter);
@@ -647,9 +660,9 @@ function splitWallAndMatch(wallMat: cv.Mat): MatchingResult[] {
         grayRoi.delete();
         continue;
       }
-      
+
       const best = matchTileFromMat(grayRoi);
-      
+
       if (variance < 1000 && best.score < 0.5) {
         // 分散がそこそこ少なく、テンプレートとのマッチ度が低い場合も単色牌とみなす
         const tile = detectTileFromPlainMat(colorRoiCenter);
@@ -659,7 +672,7 @@ function splitWallAndMatch(wallMat: cv.Mat): MatchingResult[] {
         continue;
       }
       result.push(best);
-      
+
       colorRoiCenter.delete();
       grayRoi.delete();
     }
@@ -678,12 +691,12 @@ export function processWallImage(img: HTMLImageElement | HTMLCanvasElement) {
   resizeToReduceMoire(colorMat);
 
   const edgeMat = detectEdges(colorMat);
-  
+
   morphologyClose(edgeMat);
 
   const contourMat = findBestContour(edgeMat, new cv.Point(edgeMat.cols / 2, edgeMat.rows * 0.55));
   edgeMat.delete();
-  
+
   if (!contourMat) {
     console.warn('No contour detected.');
     colorMat.delete();
@@ -697,36 +710,36 @@ export function processWallImage(img: HTMLImageElement | HTMLCanvasElement) {
   maskOutsideRotatedBoundingBox(binaryContourMat, croppedBoundingBox);
 
   const lines = new cv.Mat();
-  cv.HoughLinesP(binaryContourMat, lines, 1, Math.PI/720, 100, croppedBoundingBox.height * 0.4, croppedBoundingBox.height * 0.25);
+  cv.HoughLinesP(binaryContourMat, lines, 1, Math.PI / 720, 100, croppedBoundingBox.height * 0.4, croppedBoundingBox.height * 0.25);
   binaryContourMat.delete();
 
   const { hClusters, vClusters } = clusterLines(lines, croppedBoundingBox);
   lines.delete();
 
   if (hClusters.length < 2) {
-    console.warn("[processWallImage] Not enough horizontal clusters were detected.");
+    console.warn('[processWallImage] Not enough horizontal clusters were detected.');
     colorMat.delete();
     return;
   }
   if (vClusters.length < 2) {
-    console.warn("[processWallImage] Not enough vertical clusters were detected.");
+    console.warn('[processWallImage] Not enough vertical clusters were detected.');
     colorMat.delete();
     return;
   }
-  
+
   const boundaryLines = pickBoundaryLines(hClusters, vClusters);
   const quad = createQuadMatFromBoundaryLines(boundaryLines);
-  
+
   const warped = warpQuadToRect(colorMat, quad, new cv.Size(441, 283));
   colorMat.delete();
   quad.delete();
-  
+
   const wallMat = warped.roi(new cv.Rect(0, 0, 441, 264));
   warped.delete();
 
   const results = splitWallAndMatch(wallMat);
-  const wall = results.map((result) => result.tile);
+  const wall = results.map(result => result.tile);
   wallMat.delete();
-  
+
   return wall;
 }

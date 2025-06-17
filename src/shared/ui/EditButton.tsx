@@ -1,20 +1,20 @@
-import React, { useState, useEffect, ButtonHTMLAttributes } from "react";
+import React, { useState, useEffect, ButtonHTMLAttributes } from 'react';
 
-import parse from "html-react-parser";
+import parse from 'html-react-parser';
 
 interface EditButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   width?: string;
   height?: string;
 }
 
-const EditButton: React.FC<EditButtonProps> = ({ width = "10%", height = "10%", style, ...props }) => {
+const EditButton: React.FC<EditButtonProps> = ({ width = '10%', height = '10%', style, ...props }) => {
   const [baseSvg, setBaseSvg] = useState<string | null>(null);
   const [svgContent, setSvgContent] = useState<React.ReactNode | null>(null);
-  const SVG_COLOR = "var(--color-text)";
+  const SVG_COLOR = 'var(--color-text)';
 
   useEffect(() => {
     const fetchSvg = async () => {
-      const src = "/ui_icons/edit.svg";
+      const src = '/ui_icons/edit.svg';
       try {
         const response = await fetch(src);
         const data = await response.text();
@@ -30,36 +30,38 @@ const EditButton: React.FC<EditButtonProps> = ({ width = "10%", height = "10%", 
   useEffect(() => {
     if (baseSvg) {
       const parser = new DOMParser();
-      const svgDoc = parser.parseFromString(baseSvg, "image/svg+xml");
+      const svgDoc = parser.parseFromString(baseSvg, 'image/svg+xml');
       const svgElement = svgDoc.documentElement;
       if (svgElement) {
-        svgElement.setAttribute("fill", SVG_COLOR);
-        svgElement.setAttribute("height", "80%");
-        svgElement.setAttribute("width", "80%");
-        svgElement.style.margin = "10%";
+        svgElement.setAttribute('fill', SVG_COLOR);
+        svgElement.setAttribute('height', '80%');
+        svgElement.setAttribute('width', '80%');
+        svgElement.style.margin = '10%';
         setSvgContent(parse(svgElement.outerHTML));
       }
     }
   }, [baseSvg]);
 
   return (
-    <div style={{
-      padding: `calc(${height} / 2) calc(${width} / 2)`,
-      position: "absolute",
-      bottom: 0,
-      right: 0,
-    }}>
+    <div
+      style={{
+        padding: `calc(${height} / 2) calc(${width} / 2)`,
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+      }}
+    >
       <button
         {...props}
         style={
           {
             ...{
-              position: "absolute",
+              position: 'absolute',
               inset: 0,
-              width: "100%",
-              height: "100%",
+              width: '100%',
+              height: '100%',
               padding: 0,
-              fontSize: "inherit",
+              fontSize: 'inherit',
             },
             ...style,
           }

@@ -1,11 +1,11 @@
-import React from "react";
+import React from 'react';
 
-import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, RealmPhase, RealmEditPhase } from "@shared/types/simulation";
-import DynamicSVGText from "@shared/ui/DynamicSVGText";
+import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, RealmPhase, RealmEditPhase } from '@shared/types/simulation';
+import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
-import { DoraIndicatorsState } from "../hooks/useDoraIndicatorsState";
-import { ProgressState } from "../hooks/useProgressState";
-import styles from "../pages/RealmPage.module.css";
+import { DoraIndicatorsState } from '../hooks/useDoraIndicatorsState';
+import { ProgressState } from '../hooks/useProgressState';
+import styles from '../pages/RealmPage.module.css';
 
 interface DoraIndicatorsSectionProps {
   progressState: ProgressState;
@@ -19,11 +19,11 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
   remainingTiles,
 }) => {
   const { simulationProgress, editProgress } = progressState;
-  
+
   const showDoraIndicatorsSection = (!editProgress.isEditing && simulationProgress.phase === RealmPhase.DoraIndicators)
     || (editProgress.isEditing && editProgress.phase === RealmEditPhase.DoraIndicators);
   if (!showDoraIndicatorsSection) return;
-  
+
   const {
     doraIndicators,
     maxDoraIndicators,
@@ -31,7 +31,7 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
     removeDoraIndicatorAtIndex,
     confirmDoraIndicators,
   } = doraIndicatorsState;
-  
+
   const tileGroups: SanmaTile[][] = [
     [...PINZU_TILES],
     [...SOZU_TILES],
@@ -39,40 +39,44 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
   ];
   return (
     <section className={`${styles.dora_indicators_section} ${editProgress.isEditing && styles.editing}`}>
-      <div style={{position: "relative"}}>
+      <div style={{ position: 'relative' }}>
         {
-          editProgress.isEditing && 
-          <div className={styles.editingTextWrapper}>
-            <DynamicSVGText text={"修正中"} />  
-          </div>
+          editProgress.isEditing
+          && (
+            <div className={styles.editingTextWrapper}>
+              <DynamicSVGText text="修正中" />
+            </div>
+          )
         }
         <div className={styles.area_title}>
-          <DynamicSVGText text={"ドラ表示牌"} />
+          <DynamicSVGText text="ドラ表示牌" />
         </div>
         <div className={`${styles.area} ${styles.dora_indicators}`}>
           {Array.from({ length: maxDoraIndicators }, (_, i) =>
-            i < doraIndicators.length ? (
-              <img
-                key={`dora_indicator_${i}`}
-                className={styles.dora_indicator}
-                src={`/tiles/${doraIndicators[i]}.png`}
-                onClick={() => removeDoraIndicatorAtIndex(i)}
-                alt={doraIndicators[i]}
-              />
-            ) : (
-              <img
-                key={`dora_indicator_${i}`}
-                className={styles.dora_indicator}
-                src={`/tiles/empty.png`}
-                alt={"empty"}
-              />
-            )
+            i < doraIndicators.length
+              ? (
+                  <img
+                    key={`dora_indicator_${i}`}
+                    className={styles.dora_indicator}
+                    src={`/tiles/${doraIndicators[i]}.png`}
+                    onClick={() => removeDoraIndicatorAtIndex(i)}
+                    alt={doraIndicators[i]}
+                  />
+                )
+              : (
+                  <img
+                    key={`dora_indicator_${i}`}
+                    className={styles.dora_indicator}
+                    src="/tiles/empty.png"
+                    alt="empty"
+                  />
+                ),
           )}
         </div>
       </div>
       <div>
         <div className={styles.area_title}>
-          <DynamicSVGText text={"ドラ表示牌選択"} />
+          <DynamicSVGText text="ドラ表示牌選択" />
         </div>
         <div className={`${styles.area} ${styles.dora_indicator_choices}`}>
           {tileGroups.map((group, groupIndex) => (
@@ -86,21 +90,21 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
                     alt={tile}
                   />
                   <span className={styles.tile_counter_text}>
-                    <DynamicSVGText text={"×"} />
+                    <DynamicSVGText text="×" />
                     <DynamicSVGText text={`${remainingTiles[tile]}`} />
                   </span>
                 </div>
               ))}
-              {groupIndex < tileGroups.length - 1 && <div style={{ width: "100%" }} />}
+              {groupIndex < tileGroups.length - 1 && <div style={{ width: '100%' }} />}
             </React.Fragment>
           ))}
         </div>
       </div>
-      <div style={{ display: "flex" }}>
+      <div style={{ display: 'flex' }}>
         <button
           style={{
-            marginLeft: "auto",
-            visibility: doraIndicators.length === maxDoraIndicators ? "visible" : "hidden",
+            marginLeft: 'auto',
+            visibility: doraIndicators.length === maxDoraIndicators ? 'visible' : 'hidden',
           }}
           onClick={confirmDoraIndicators}
         >

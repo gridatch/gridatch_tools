@@ -1,9 +1,9 @@
-import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 
-import { Hand, INITIAL_HAND, RealmSimulationProgress, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile } from "@shared/types/simulation";
+import { Hand, INITIAL_HAND, RealmSimulationProgress, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile } from '@shared/types/simulation';
 
-import { RealmSnapshot, useHistoryState } from "./useHistoryState";
-import { ProgressState } from "./useProgressState";
+import { RealmSnapshot, useHistoryState } from './useHistoryState';
+import { ProgressState } from './useProgressState';
 
 const MAX_HAND = 13;
 
@@ -72,7 +72,7 @@ export const useHandState = (
   const handTileCount = useMemo(() => (
     SANMA_TILES.reduce((acc, tile) => acc + hand.closed[tile].length, 0)
   ), [hand.closed]);
-  
+
   /** 手牌、捨て牌、手牌履歴をリセットする */
   const clearHandState = useCallback(() => {
     const clearedState = structuredClone(INITIAL_HAND);

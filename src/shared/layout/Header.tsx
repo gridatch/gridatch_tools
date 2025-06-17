@@ -1,8 +1,8 @@
-import * as React from "react"
+import * as React from 'react';
 
-import { Link } from "gatsby"
+import { Link } from 'gatsby';
 
-import DynamicSVGText from "@shared/ui/DynamicSVGText"
+import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
 interface HeaderProps {
   siteTitle: string;
@@ -27,6 +27,6 @@ const Header: React.FC<HeaderProps> = ({ siteTitle }) => (
     </Link>
     <span></span>
   </header>
-)
+);
 
-export default Header
+export default Header;

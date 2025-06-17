@@ -1,11 +1,11 @@
-import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 
-import { RealmBoss, SANMA_TILES, SanmaTile, WallTile } from "@shared/types/simulation";
+import { RealmBoss, SANMA_TILES, SanmaTile, WallTile } from '@shared/types/simulation';
 
-import { ProgressState } from "./useProgressState";
+import { ProgressState } from './useProgressState';
 
 const MAX_WALL = 36;
-const DEFAULT_INITIAL_WALL: readonly WallTile[] = Object.freeze(new Array(MAX_WALL).fill(("empty")));
+const DEFAULT_INITIAL_WALL: readonly WallTile[] = Object.freeze(new Array(MAX_WALL).fill(('empty')));
 
 export interface WallState {
   wall: WallTile[];
@@ -26,39 +26,39 @@ export const useWallState = (
   initialWall: WallTile[] = [...DEFAULT_INITIAL_WALL],
 ): WallState => {
   const [wall, setWall] = useState(initialWall);
-  
-  const lockCount = boss === "lock" ? 3 : 0;
-  
+
+  const lockCount = boss === 'lock' ? 3 : 0;
+
   const usableWallCount = MAX_WALL - lockCount;
-  
+
   const canConfirmWall = useMemo(() => {
-    if (wall.some(tile => tile == "empty")) return false;
+    if (wall.some(tile => tile == 'empty')) return false;
     if (SANMA_TILES.some(tile => remainingTiles[tile] < 0)) return false;
     return true;
   }, [remainingTiles, wall]);
-  
+
   const addTileToWall = useCallback((tile: WallTile) => {
-    if (tile !== "empty" && tile !== "closed" && remainingTiles[tile] === 0) return;
-    setWall((prev) => {
-      const firstEmptyIndex = prev.findIndex((tile) => tile === "empty");
+    if (tile !== 'empty' && tile !== 'closed' && remainingTiles[tile] === 0) return;
+    setWall(prev => {
+      const firstEmptyIndex = prev.findIndex(tile => tile === 'empty');
       if (firstEmptyIndex === -1) return prev;
-      
+
       const newWall = [...prev];
       newWall[firstEmptyIndex] = tile;
       return newWall;
     });
   }, [remainingTiles]);
-  
+
   const removeTileFromWallAtIndex = useCallback((index: number) => {
-    setWall((prev) => {
+    setWall(prev => {
       if (index < 0 || index >= prev.length) return prev;
-      
+
       const newWall = [...prev];
-      newWall[index] = "empty";
+      newWall[index] = 'empty';
       return newWall;
     });
   }, []);
-    
+
   const confirmWall = useCallback(() => {
     if (progressState.editProgress.isEditing) {
       progressState.goToNextEditPhase();
@@ -66,11 +66,11 @@ export const useWallState = (
       progressState.goToNextSimulationPhase();
     }
   }, [progressState]);
-    
+
   const clearWall = useCallback(() => {
     setWall([...DEFAULT_INITIAL_WALL]);
   }, []);
-  
+
   return useMemo(() => ({
     wall,
     maxWall: MAX_WALL,

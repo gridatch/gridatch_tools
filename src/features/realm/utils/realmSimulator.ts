@@ -1,12 +1,11 @@
-import { ProcessingState } from "@shared/processing/context/ProcessingContext";
-import { RealmBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_FALSE, Hand, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS, SANMA_TILE_RECORD_MINUS_1, RealmSimulationProgress, RealmPhaseAction, SanmaTileOrNonRealm, SANMA_TILES_OR_NON_REALM_RECORD_0, RealmPhase, isSanmaTile, EMPTY_REALM_TENPAI, DecomposedResult } from "@shared/types/simulation";
-import { enumerateMultisetPermutations } from "@shared/utils/combinatorics";
-import { IndexedTree } from "@shared/utils/indexedTree";
+import { ProcessingState } from '@shared/processing/context/ProcessingContext';
+import { RealmBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_FALSE, Hand, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS, SANMA_TILE_RECORD_MINUS_1, RealmSimulationProgress, RealmPhaseAction, SanmaTileOrNonRealm, SANMA_TILES_OR_NON_REALM_RECORD_0, RealmPhase, isSanmaTile, EMPTY_REALM_TENPAI, DecomposedResult } from '@shared/types/simulation';
+import { enumerateMultisetPermutations } from '@shared/utils/combinatorics';
+import { IndexedTree } from '@shared/utils/indexedTree';
 
-import { WinsLogic } from "../hooks/useWinsLogic";
+import { WinsLogic } from '../hooks/useWinsLogic';
 
-import { decomposeTilesIntoBlocks, ResultInternal } from "./blockDecomposer";
-
+import { decomposeTilesIntoBlocks, ResultInternal } from './blockDecomposer';
 
 /**
  * 全ての牌について領域牌かどうかを判定する
@@ -16,13 +15,13 @@ import { decomposeTilesIntoBlocks, ResultInternal } from "./blockDecomposer";
  */
 export const calcIsRealmEachTile = (boss: RealmBoss, doraIndicators: SanmaTile[]): Record<SanmaTile, boolean> => {
   const isRealmEachTile = { ...SANMA_TILE_RECORD_FALSE };
-  if (boss === "empty") return isRealmEachTile;
+  if (boss === 'empty') return isRealmEachTile;
 
   const markRealmTileForGroup = <T extends SanmaTile>(
     doraIndicator: SanmaTile,
     predicate: (tile: SanmaTile) => tile is T,
     tiles: readonly T[],
-    tBoss?: RealmBoss
+    tBoss?: RealmBoss,
   ) => {
     if (!predicate(doraIndicator)) return;
     if (tBoss && boss === tBoss) return;
@@ -33,14 +32,14 @@ export const calcIsRealmEachTile = (boss: RealmBoss, doraIndicators: SanmaTile[]
     isRealmEachTile[tiles[nextIndex]] = true;
   };
 
-  doraIndicators.forEach((doraIndicator) => {
-    markRealmTileForGroup(doraIndicator, isSanmaManzuTile, SANMA_MANZU_TILES, "dora_manzu");
-    markRealmTileForGroup(doraIndicator, isPinzuTile, PINZU_TILES, "dora_pinzu");
-    markRealmTileForGroup(doraIndicator, isSozuTile, SOZU_TILES, "dora_sozu");
+  doraIndicators.forEach(doraIndicator => {
+    markRealmTileForGroup(doraIndicator, isSanmaManzuTile, SANMA_MANZU_TILES, 'dora_manzu');
+    markRealmTileForGroup(doraIndicator, isPinzuTile, PINZU_TILES, 'dora_pinzu');
+    markRealmTileForGroup(doraIndicator, isSozuTile, SOZU_TILES, 'dora_sozu');
     markRealmTileForGroup(doraIndicator, isWindTile, WIND_TILES);
     markRealmTileForGroup(doraIndicator, isDragonTile, DRAGON_TILES);
   });
-  
+
   return isRealmEachTile;
 };
 
@@ -52,20 +51,20 @@ export const calcIsRealmEachTile = (boss: RealmBoss, doraIndicators: SanmaTile[]
  */
 export const calcFirstDrawTurnByTilesByTurns = (wall: WallTile[], maxWall: number, usableWallCount: number): Record<SanmaTile, number>[] => {
   const result: Record<SanmaTile, number>[] = new Array(usableWallCount + 1);
-  
+
   const firstDrawTurnByTiles = { ...SANMA_TILE_RECORD_MINUS_1 };
   result[maxWall] = { ...firstDrawTurnByTiles };
-  
+
   for (let turn = maxWall - 1; turn >= 0; --turn) {
     if (turn < usableWallCount) {
       const nextTile = wall[turn];
-      if (nextTile !== "empty" && nextTile !== "closed") {
+      if (nextTile !== 'empty' && nextTile !== 'closed') {
         firstDrawTurnByTiles[nextTile] = turn + 1;
       }
     }
     result[turn] = { ...firstDrawTurnByTiles };
   }
-  
+
   return result;
 };
 
@@ -93,15 +92,13 @@ export const calcDrawTurnsByTiles = (progress: RealmSimulationProgress, hand: Ha
     if (!isSanmaTile(tile)) continue;
     result[tile].push(turn);
   }
-  
+
   return result;
 };
-
 
 /** 各牌の総枚数を返す */
 const totalTiles = (counter: Record<SanmaTile, number>): number =>
   SANMA_TILES.reduce((acc, tile) => acc + counter[tile], 0);
-
 
 /**
  * 面子手聴牌の手牌作成
@@ -116,13 +113,13 @@ function createStandardTenpai(
   nonRealmWinsEachSozu: Record<Sozu, number>,
   memo: Map<number, ResultInternal>,
 ): RealmTenpai {
-  type BlockCombinationBreakDown = { toitsu: number; taatsu: number, allowKotsuAsToitsu: boolean };
+  type BlockCombinationBreakDown = { toitsu: number; taatsu: number; allowKotsuAsToitsu: boolean };
   type BlockCombination = {
-    requiredMentsuCount: number,
-    requireSozuTanki: boolean,
-    nonSequential: BlockCombinationBreakDown,
-    pinzu: BlockCombinationBreakDown,
-    sozu: BlockCombinationBreakDown,
+    requiredMentsuCount: number;
+    requireSozuTanki: boolean;
+    nonSequential: BlockCombinationBreakDown;
+    pinzu: BlockCombinationBreakDown;
+    sozu: BlockCombinationBreakDown;
   };
 
   // 聴牌形のブロックの組み合わせ
@@ -132,69 +129,69 @@ function createStandardTenpai(
     {
       requiredMentsuCount: 3,
       requireSozuTanki: false,
-      nonSequential:  { toitsu: 1, taatsu: 0, allowKotsuAsToitsu: true },
-      pinzu:          { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
-      sozu:           { toitsu: 0, taatsu: 1, allowKotsuAsToitsu: false },
+      nonSequential: { toitsu: 1, taatsu: 0, allowKotsuAsToitsu: true },
+      pinzu: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      sozu: { toitsu: 0, taatsu: 1, allowKotsuAsToitsu: false },
     },
     // 3面子 + 対子1組（筒子） + 塔子1組（索子）
     {
       requiredMentsuCount: 3,
       requireSozuTanki: false,
-      nonSequential:  { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
-      pinzu:          { toitsu: 1, taatsu: 0, allowKotsuAsToitsu: true },
-      sozu:           { toitsu: 0, taatsu: 1, allowKotsuAsToitsu: false },
+      nonSequential: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      pinzu: { toitsu: 1, taatsu: 0, allowKotsuAsToitsu: true },
+      sozu: { toitsu: 0, taatsu: 1, allowKotsuAsToitsu: false },
     },
     // 3面子 + 対子1組（索子） + 塔子1組（索子）
     {
       requiredMentsuCount: 3,
       requireSozuTanki: false,
-      nonSequential:  { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
-      pinzu:          { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
-      sozu:           { toitsu: 1, taatsu: 1, allowKotsuAsToitsu: true },
+      nonSequential: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      pinzu: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      sozu: { toitsu: 1, taatsu: 1, allowKotsuAsToitsu: true },
     },
     // 3面子 + 対子2組（索子）
     {
       requiredMentsuCount: 3,
       requireSozuTanki: false,
-      nonSequential:  { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
-      pinzu:          { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
-      sozu:           { toitsu: 2, taatsu: 0, allowKotsuAsToitsu: true },
+      nonSequential: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      pinzu: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      sozu: { toitsu: 2, taatsu: 0, allowKotsuAsToitsu: true },
     },
     // 4面子 + 単騎1枚（索子）
     {
       requiredMentsuCount: 4,
       requireSozuTanki: true,
-      nonSequential:  { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
-      pinzu:          { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
-      sozu:           { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      nonSequential: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      pinzu: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
+      sozu: { toitsu: 0, taatsu: 0, allowKotsuAsToitsu: true },
     },
   ];
-  
+
   let bestTenpai = EMPTY_REALM_TENPAI;
-  
+
   for (const blockCombination of blockCombinations) {
     const { requiredMentsuCount, requireSozuTanki, nonSequential, pinzu, sozu } = blockCombination;
     const nonSequentialResult = decomposeTilesIntoBlocks(memo, pool, DECOMPOSER_TILE_SET_IDS.nonSequential, NON_SEQUENTIAL_TILES, nonSequential.toitsu, nonSequential.taatsu, nonSequential.allowKotsuAsToitsu, false);
     const pinzuResult = decomposeTilesIntoBlocks(memo, pool, DECOMPOSER_TILE_SET_IDS.pinzu, PINZU_TILES, pinzu.toitsu, pinzu.taatsu, pinzu.allowKotsuAsToitsu, true);
     const sozuResult = decomposeTilesIntoBlocks(memo, pool, DECOMPOSER_TILE_SET_IDS.sozu, SOZU_TILES, sozu.toitsu, sozu.taatsu, sozu.allowKotsuAsToitsu, true, nonRealmWinsEachSozu);
-    
+
     const result: DecomposedResult<SanmaTile> = {
       count: nonSequentialResult.count + pinzuResult.count + sozuResult.count,
-      blocks: [ ...nonSequentialResult.blocks, ...pinzuResult.blocks, ...sozuResult.blocks ],
+      blocks: [...nonSequentialResult.blocks, ...pinzuResult.blocks, ...sozuResult.blocks],
       remaining: { ...nonSequentialResult.remaining, ...pinzuResult.remaining, ...sozuResult.remaining },
       nonRealmWinsEachTiles: sozuResult.nonRealmWinsEachTiles,
-    }
+    };
     if (result.count === Number.NEGATIVE_INFINITY) continue;
-    
+
     const mentsuBlocks = result.blocks.filter(block => MENTSU_TYPES.some(type => type === block.type));
     if (mentsuBlocks.length < requiredMentsuCount) continue;
-    
+
     const hand = { ...SANMA_TILE_RECORD_0 };
     if (requireSozuTanki) {
       // 単騎用の索子牌を探す処理
       const isSozuTileRemaining = SOZU_TILES.some(tile => sozuResult.remaining[tile] > 0);
       const isSozuMentsuRemaining = mentsuBlocks.length >= 5 && sozuResult.count > 0;
-      
+
       if (!isSozuTileRemaining && !isSozuMentsuRemaining) continue;
       if (isSozuTileRemaining) {
         // 索子の余り牌を単騎に使用
@@ -210,7 +207,7 @@ function createStandardTenpai(
         ++result.remaining[sozuBlock.tiles[2]];
       }
     }
-    
+
     // 索子ブロックを優先するためのソート
     result.blocks.sort((a, b) => {
       const aIsMentsu = MENTSU_TYPES.some(type => type === a.type);
@@ -228,7 +225,7 @@ function createStandardTenpai(
       if (!aIsMentsu && bIsMentsu) return 1;
       return 0;
     });
-    
+
     let blockCount = 0;
     result.blocks.forEach(block => {
       if (MENTSU_TYPES.some(type => type === block.type)) {
@@ -237,19 +234,19 @@ function createStandardTenpai(
       }
       // 手牌に指定された数の面子と面子以外の全てのブロックを追加
       block.tiles.forEach(tile => ++hand[tile]);
-    })
-    
+    });
+
     const totalNonRealmWins = SOZU_TILES.reduce((sum, tile) => sum + result.nonRealmWinsEachTiles[tile], 0);
     const tenpai: RealmTenpai = {
       hand,
       totalNonRealmWins,
       nonRealmWinsEachTiles: result.nonRealmWinsEachTiles,
-    }
+    };
     if (tenpai.totalNonRealmWins > bestTenpai.totalNonRealmWins) {
       bestTenpai = tenpai;
     }
   }
-  
+
   return bestTenpai;
 }
 
@@ -265,9 +262,9 @@ function createSevenPairsTenpai(pool: Record<SanmaTile, number>): RealmTenpai {
     totalNonRealmWins: 0,
     nonRealmWinsEachTiles: { ...SANMA_TILE_RECORD_0 },
   };
-  
+
   const pairTiles = SANMA_TILES.filter(tile => pool[tile] >= 2);
-  
+
   // 6対子以上 + 索子単体牌
   const sozuSingleTiles = SOZU_TILES.filter(tile => pool[tile] === 1);
   if (pairTiles.length >= 6 && sozuSingleTiles.length > 0) {
@@ -277,7 +274,7 @@ function createSevenPairsTenpai(pool: Record<SanmaTile, number>): RealmTenpai {
     result.hand[sozuSingleTiles[0]] = 1;
     return result;
   }
-  
+
   // 7対子以上(索子含む)
   const sozuPairTiles = SOZU_TILES.filter(tile => pool[tile] >= 2);
   if (pairTiles.length >= 7 && sozuPairTiles.length >= 1) {
@@ -296,7 +293,7 @@ function createSevenPairsTenpai(pool: Record<SanmaTile, number>): RealmTenpai {
     }
     return result;
   }
-  
+
   return EMPTY_REALM_TENPAI;
 }
 
@@ -308,13 +305,13 @@ function createSevenPairsTenpai(pool: Record<SanmaTile, number>): RealmTenpai {
  * @returns 聴牌手牌
  */
 function createKokushiTenpai(pool: Record<SanmaTile, number>, nonRealmWinsEachSozu: Record<Sozu, number>): RealmTenpai {
-  const kokushiTiles: SanmaTile[] = ["1m", "9m", "1p", "9p", "1s", "9s", "E", "S", "W", "N", "P", "F", "C"];
+  const kokushiTiles: SanmaTile[] = ['1m', '9m', '1p', '9p', '1s', '9s', 'E', 'S', 'W', 'N', 'P', 'F', 'C'];
   const result = {
     hand: { ...SANMA_TILE_RECORD_0 },
     totalNonRealmWins: 0,
     nonRealmWinsEachTiles: { ...SANMA_TILE_RECORD_0 },
   };
-  
+
   // 国士の雀頭
   let pairExists = false;
   for (const tile of kokushiTiles) {
@@ -325,35 +322,35 @@ function createKokushiTenpai(pool: Record<SanmaTile, number>, nonRealmWinsEachSo
     }
   }
   if (!pairExists) return EMPTY_REALM_TENPAI;
-  
+
   // 索子以外は最低1枚必要
   for (const tile of kokushiTiles) {
-    if (tile === "1s" || tile === "9s") continue;
+    if (tile === '1s' || tile === '9s') continue;
     if (result.hand[tile] === 2) continue;
     if (pool[tile] === 0) return EMPTY_REALM_TENPAI;
     result.hand[tile] = 1;
   }
-  
+
   // 索子の待ち
-  if (pool["1s"] === 0 && pool["9s"] === 0) return EMPTY_REALM_TENPAI;
-  if (result.hand["1s"] !== 2 && result.hand["9s"] !== 2) {
-    if (pool["1s"] > 0) {
-      result.hand["1s"] = 1;
+  if (pool['1s'] === 0 && pool['9s'] === 0) return EMPTY_REALM_TENPAI;
+  if (result.hand['1s'] !== 2 && result.hand['9s'] !== 2) {
+    if (pool['1s'] > 0) {
+      result.hand['1s'] = 1;
     } else {
-      result.hand["9s"] = 1;
+      result.hand['9s'] = 1;
     }
   }
-  
+
   // 非領域牌の和了
-  if (result.hand["1s"] === 0) {
-    result.totalNonRealmWins = nonRealmWinsEachSozu["1s"];
-    result.nonRealmWinsEachTiles["1s"] = nonRealmWinsEachSozu["1s"];
+  if (result.hand['1s'] === 0) {
+    result.totalNonRealmWins = nonRealmWinsEachSozu['1s'];
+    result.nonRealmWinsEachTiles['1s'] = nonRealmWinsEachSozu['1s'];
   }
-  if (result.hand["9s"] === 0) {
-    result.totalNonRealmWins = nonRealmWinsEachSozu["9s"];
-    result.nonRealmWinsEachTiles["9s"] = nonRealmWinsEachSozu["9s"];
+  if (result.hand['9s'] === 0) {
+    result.totalNonRealmWins = nonRealmWinsEachSozu['9s'];
+    result.nonRealmWinsEachTiles['9s'] = nonRealmWinsEachSozu['9s'];
   }
-  
+
   return result;
 }
 
@@ -388,15 +385,15 @@ export const calcRealmTenpai = (
   }
 
   (() => {
-    if (hand.drawn.tile === "empty" || hand.drawn.tile === "closed") return;
+    if (hand.drawn.tile === 'empty' || hand.drawn.tile === 'closed') return;
     if (!isRealmEachTile[hand.drawn.tile]) return;
     // 打牌アクション中は選択中のツモ牌を牌プールから除外する
     if (progress.action === RealmPhaseAction.Discard && hand.drawn.isSelected) return;
     ++pool[hand.drawn.tile];
   })();
-  
+
   const standardResult: RealmTenpaiResult = {
-    type: "standard",
+    type: 'standard',
     turn: Number.POSITIVE_INFINITY,
     hand: { ...SANMA_TILE_RECORD_0 },
     totalWins: Number.NEGATIVE_INFINITY,
@@ -404,7 +401,7 @@ export const calcRealmTenpai = (
     nonRealmWinsEachTiles: { ...SANMA_TILE_RECORD_0 },
   };
   const sevenPairsResult: RealmTenpaiResult = {
-    type: "sevenPairs",
+    type: 'sevenPairs',
     turn: Number.POSITIVE_INFINITY,
     hand: { ...SANMA_TILE_RECORD_0 },
     totalWins: Number.NEGATIVE_INFINITY,
@@ -412,32 +409,32 @@ export const calcRealmTenpai = (
     nonRealmWinsEachTiles: { ...SANMA_TILE_RECORD_0 },
   };
   const kokushiResult: RealmTenpaiResult = {
-    type: "kokushi",
+    type: 'kokushi',
     turn: Number.POSITIVE_INFINITY,
     hand: { ...SANMA_TILE_RECORD_0 },
     totalWins: Number.NEGATIVE_INFINITY,
     totalNonRealmWins: Number.NEGATIVE_INFINITY,
     nonRealmWinsEachTiles: { ...SANMA_TILE_RECORD_0 },
   };
-  
+
   const results: RealmTenpaiResult[] = [];
-  
+
   for (let turn = progress.turn; turn <= usableWallCount; ++turn) {
     // 現在ターン（progress.turn）の牌は手牌のツモ牌に含まれているため牌プールに加算しない
     if (turn > progress.turn) {
       const tile = wall[turn - 1];
-      if (tile === "empty" || tile === "closed") continue;
+      if (tile === 'empty' || tile === 'closed') continue;
       if (!isRealmEachTile[tile]) continue;
       pool[tile] += 1;
     }
     if (totalTiles(pool) < 13) continue;
-    
+
     const nonRealmWinsEachSozu = winsLogic.nonRealmWinsEachSozuByTenpaiTurn[turn];
     const realmWins = winsLogic.realmWinsByTenpaiTurn[turn];
     const maxPossibleNonRealmWins = winsLogic.maxPossibleNonRealmWinsByTenpaiTurn[turn];
     const maxPossibleWins = realmWins + maxPossibleNonRealmWins;
     const memo: Map<number, ResultInternal> = new Map();
-    
+
     if (standardResult.totalWins < maxPossibleWins) {
       // 非領域牌の和了による和了回数更新の見込みがある間は探索継続
       const standardTenpai = createStandardTenpai(pool, nonRealmWinsEachSozu, memo);
@@ -488,7 +485,6 @@ export const calcRealmTenpai = (
   return results;
 };
 
-
 /**
  * 捨て牌ごとの平均和了回数を計算する
  * @param progress シミュレーションの進行状況
@@ -514,14 +510,14 @@ export const calcRealmWinsAverageByDiscard = async (
   maxClosedTilesToEnumerate: number = 1,
 ): Promise<Record<SanmaTile, number> | null> => {
   if (!isSanmaTile(hand.drawn.tile)) {
-    console.error("[calcRealmWinCountAverageByDiscard] Unexpected drawn tile", hand.drawn.tile);
+    console.error('[calcRealmWinCountAverageByDiscard] Unexpected drawn tile', hand.drawn.tile);
     return null;
   }
   if (progress.phase !== RealmPhase.Main || progress.action === RealmPhaseAction.Draw) {
-    console.error("[calcRealmWinCountAverageByDiscard] Unexpected phase or action", progress);
+    console.error('[calcRealmWinCountAverageByDiscard] Unexpected phase or action', progress);
     return null;
   }
-  
+
   const pool: Record<SanmaTile, number> = { ...SANMA_TILE_RECORD_0 };
   // プールの作成
   for (const tile of SANMA_TILES) {
@@ -531,8 +527,8 @@ export const calcRealmWinsAverageByDiscard = async (
 
   // 打牌候補
   const handTilesToDiscard = SANMA_TILES.filter(tile => hand.closed[tile].length > 0 || hand.drawn.tile === tile);
-  
-  const closedDomains: SanmaTileOrNonRealm[] = ["nonRealm"];
+
+  const closedDomains: SanmaTileOrNonRealm[] = ['nonRealm'];
   const closedDomainCounts = { ...SANMA_TILES_OR_NON_REALM_RECORD_0 };
   for (const tile of SANMA_TILES) {
     if (remainingTiles[tile] <= 0) continue;
@@ -543,14 +539,14 @@ export const calcRealmWinsAverageByDiscard = async (
       closedDomainCounts.nonRealm += remainingTiles[tile];
     }
   }
-  
+
   // 列挙する裏牌の数
   let closedCountToEnumerate = 0;
   // 裏牌枚数ごとの順列リスト
-  const permutationsByClosedCount = Array.from({ length: maxClosedTilesToEnumerate + 1 }).map((_, i) => 
-    enumerateMultisetPermutations(closedDomainCounts, i)
+  const permutationsByClosedCount = Array.from({ length: maxClosedTilesToEnumerate + 1 }).map((_, i) =>
+    enumerateMultisetPermutations(closedDomainCounts, i),
   );
-  
+
   // 捨て牌ごとの探索済み管理
   const indexedTreeByDiscard = handTilesToDiscard.map(() => {
     const indexedTree = new IndexedTree(closedDomains, maxClosedTilesToEnumerate);
@@ -572,15 +568,15 @@ export const calcRealmWinsAverageByDiscard = async (
   const updatePercent = async (turn: number) => {
     const newPercent = Math.floor((turn - startTurn + 1) / totalTurns * 100);
     processingState.setPercent(newPercent);
-    await (() => new Promise((resolve) => setTimeout(resolve, 0)))();
-  }
-  
+    await (() => new Promise(resolve => setTimeout(resolve, 0)))();
+  };
+
   for (let turn = startTurn; turn <= endTurn; await updatePercent(turn), ++turn) {
     // 現在の巡目の牌山の牌は手牌のツモ牌に含まれているため牌プールに加算しない
     if (turn > progress.turn) {
       const tile = wall[turn - 1];
-      if (tile === "empty") continue;
-      if (tile === "closed") {
+      if (tile === 'empty') continue;
+      if (tile === 'closed') {
         if (maxClosedTilesToEnumerate > closedCountToEnumerate) {
           ++closedCountToEnumerate;
         } else {
@@ -591,36 +587,36 @@ export const calcRealmWinsAverageByDiscard = async (
         pool[tile] += 1;
       }
     }
-    
+
     const memo: Map<number, ResultInternal> = new Map();
-    
+
     handTilesToDiscard.forEach((tileToDiscard, discardIndex) => {
-      permutationsByClosedCount[closedCountToEnumerate].forEach((permutation) => {
+      permutationsByClosedCount[closedCountToEnumerate].forEach(permutation => {
         const realmWins = winsLogic.calcAdjustedRealmWinsForClosedPermutation(turn, permutation.tiles);
-        
+
         const maxPossibleNonRealmWins = winsLogic.calcAdjustedMaxPossibleNonRealmWinsForClosedPermutation(turn, permutation.tiles);
         const maxPossibleWins = realmWins + maxPossibleNonRealmWins;
 
         const maxWins = indexedTreeByDiscard[discardIndex].getScore(permutation.tiles);
         if (maxPossibleWins <= maxWins) return;
-        
-        const winsMemoKey = `${turn}:${[...permutation.tiles].sort().join("_")}`;
+
+        const winsMemoKey = `${turn}:${[...permutation.tiles].sort().join('_')}`;
         if (winsMemoByDiscard[discardIndex].has(winsMemoKey)) {
           const wins = winsMemoByDiscard[discardIndex].get(winsMemoKey)!;
           indexedTreeByDiscard[discardIndex].setScore(permutation.tiles, wins);
-          
+
           const winDiff = wins - maxWins;
           const expectedWinsDiff = winDiff * permutation.probability;
           totalWinsByDiscard[tileToDiscard] += expectedWinsDiff;
           return;
         }
-        
+
         const tenpais = [];
-        
+
         --pool[tileToDiscard];
-        permutation.tiles.forEach((closedTile) => {
-          if (closedTile !== "nonRealm") ++pool[closedTile];
-        })
+        permutation.tiles.forEach(closedTile => {
+          if (closedTile !== 'nonRealm') ++pool[closedTile];
+        });
         const standardTenpai = createStandardTenpai(pool, winsLogic.nonRealmWinsEachSozuByTenpaiTurn[turn], memo);
         if (standardTenpai.totalNonRealmWins >= 0) tenpais.push(standardTenpai);
         const sevenPairsTenpai = createSevenPairsTenpai(pool);
@@ -628,20 +624,20 @@ export const calcRealmWinsAverageByDiscard = async (
         const kokushiTenpai = createKokushiTenpai(pool, winsLogic.nonRealmWinsEachSozuByTenpaiTurn[turn]);
         if (kokushiTenpai.totalNonRealmWins >= 0) tenpais.push(kokushiTenpai);
         ++pool[tileToDiscard];
-        permutation.tiles.forEach((closedTile) => {
-          if (closedTile !== "nonRealm") --pool[closedTile];
-        })
-        
+        permutation.tiles.forEach(closedTile => {
+          if (closedTile !== 'nonRealm') --pool[closedTile];
+        });
+
         if (tenpais.length > 0) {
           tenpais.sort((a, b) => b.totalNonRealmWins - a.totalNonRealmWins);
-          
+
           const nonRealmWins = winsLogic.calcAdjustedNonRealmWinsForClosedPermutation(turn, permutation.tiles, tenpais[0]);
           const wins = realmWins + nonRealmWins;
           if (wins <= maxWins) return;
-          
+
           winsMemoByDiscard[discardIndex].set(winsMemoKey, wins);
           indexedTreeByDiscard[discardIndex].setScore(permutation.tiles, wins);
-          
+
           const winDiff = wins - maxWins;
           const expectedWinsDiff = winDiff * permutation.probability;
           totalWinsByDiscard[tileToDiscard] += expectedWinsDiff;
