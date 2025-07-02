@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES } from '@shared/types/simulation';
+import { NON_SEQUENTIAL_TILES, PINZU_TILES, SOZU_TILES, SanmaTile } from '@shared/types/simulation';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
 import styles from '../pages/RealmViewerPage.module.css';
@@ -48,8 +48,7 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
                     src="/tiles/empty.png"
                     alt="empty"
                   />
-                ),
-          )}
+                ))}
         </div>
       </div>
       <div>

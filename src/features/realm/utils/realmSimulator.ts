@@ -1,11 +1,17 @@
 import { ProcessingState } from '@shared/processing/context/ProcessingContext';
-import { RealmBoss, SanmaTile, SANMA_TILES, SANMA_MANZU_TILES, PINZU_TILES, SOZU_TILES, isSanmaManzuTile, isPinzuTile, isSozuTile, isWindTile, WIND_TILES, isDragonTile, DRAGON_TILES, WallTile, SANMA_TILE_RECORD_FALSE, Hand, SANMA_TILE_RECORD_0, RealmTenpaiResult, MENTSU_TYPES, SANMA_TILE_RECORD_NUMBER_ARRAY, Sozu, RealmTenpai, NON_SEQUENTIAL_TILES, DECOMPOSER_TILE_SET_IDS, SANMA_TILE_RECORD_MINUS_1, RealmSimulationProgress, RealmPhaseAction, SanmaTileOrNonRealm, SANMA_TILES_OR_NON_REALM_RECORD_0, RealmPhase, isSanmaTile, EMPTY_REALM_TENPAI, DecomposedResult } from '@shared/types/simulation';
+import {
+  DECOMPOSER_TILE_SET_IDS, DRAGON_TILES, EMPTY_REALM_TENPAI, MENTSU_TYPES, NON_SEQUENTIAL_TILES, PINZU_TILES, SANMA_MANZU_TILES, SANMA_TILE_RECORD_0,
+  SANMA_TILE_RECORD_FALSE, SANMA_TILE_RECORD_MINUS_1, SANMA_TILE_RECORD_NUMBER_ARRAY, SANMA_TILES, SANMA_TILES_OR_NON_REALM_RECORD_0, SOZU_TILES, WIND_TILES,
+  DecomposedResult, Hand, RealmBoss, RealmPhase, RealmPhaseAction, RealmSimulationProgress, RealmTenpai, RealmTenpaiResult, SanmaTile, SanmaTileOrNonRealm,
+  Sozu, WallTile,
+  isDragonTile, isPinzuTile, isSanmaManzuTile, isSanmaTile, isSozuTile, isWindTile,
+} from '@shared/types/simulation';
 import { enumerateMultisetPermutations } from '@shared/utils/combinatorics';
 import { IndexedTree } from '@shared/utils/indexedTree';
 
 import { WinsLogic } from '../hooks/useWinsLogic';
 
-import { decomposeTilesIntoBlocks, ResultInternal } from './blockDecomposer';
+import { ResultInternal, decomposeTilesIntoBlocks } from './blockDecomposer';
 
 /**
  * 全ての牌について領域牌かどうかを判定する
@@ -171,9 +177,37 @@ function createStandardTenpai(
 
   for (const blockCombination of blockCombinations) {
     const { requiredMentsuCount, requireSozuTanki, nonSequential, pinzu, sozu } = blockCombination;
-    const nonSequentialResult = decomposeTilesIntoBlocks(memo, pool, DECOMPOSER_TILE_SET_IDS.nonSequential, NON_SEQUENTIAL_TILES, nonSequential.toitsu, nonSequential.taatsu, nonSequential.allowKotsuAsToitsu, false);
-    const pinzuResult = decomposeTilesIntoBlocks(memo, pool, DECOMPOSER_TILE_SET_IDS.pinzu, PINZU_TILES, pinzu.toitsu, pinzu.taatsu, pinzu.allowKotsuAsToitsu, true);
-    const sozuResult = decomposeTilesIntoBlocks(memo, pool, DECOMPOSER_TILE_SET_IDS.sozu, SOZU_TILES, sozu.toitsu, sozu.taatsu, sozu.allowKotsuAsToitsu, true, nonRealmWinsEachSozu);
+    const nonSequentialResult = decomposeTilesIntoBlocks(
+      memo,
+      pool,
+      DECOMPOSER_TILE_SET_IDS.nonSequential,
+      NON_SEQUENTIAL_TILES,
+      nonSequential.toitsu,
+      nonSequential.taatsu,
+      nonSequential.allowKotsuAsToitsu,
+      false,
+    );
+    const pinzuResult = decomposeTilesIntoBlocks(
+      memo,
+      pool,
+      DECOMPOSER_TILE_SET_IDS.pinzu,
+      PINZU_TILES,
+      pinzu.toitsu,
+      pinzu.taatsu,
+      pinzu.allowKotsuAsToitsu,
+      true,
+    );
+    const sozuResult = decomposeTilesIntoBlocks(
+      memo,
+      pool,
+      DECOMPOSER_TILE_SET_IDS.sozu,
+      SOZU_TILES,
+      sozu.toitsu,
+      sozu.taatsu,
+      sozu.allowKotsuAsToitsu,
+      true,
+      nonRealmWinsEachSozu,
+    );
 
     const result: DecomposedResult<SanmaTile> = {
       count: nonSequentialResult.count + pinzuResult.count + sozuResult.count,
@@ -544,8 +578,7 @@ export const calcRealmWinsAverageByDiscard = async (
   let closedCountToEnumerate = 0;
   // 裏牌枚数ごとの順列リスト
   const permutationsByClosedCount = Array.from({ length: maxClosedTilesToEnumerate + 1 }).map((_, i) =>
-    enumerateMultisetPermutations(closedDomainCounts, i),
-  );
+    enumerateMultisetPermutations(closedDomainCounts, i));
 
   // 捨て牌ごとの探索済み管理
   const indexedTreeByDiscard = handTilesToDiscard.map(() => {

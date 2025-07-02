@@ -8,7 +8,7 @@ import './Layout.css';
 
 import * as React from 'react';
 
-import { useStaticQuery, graphql } from 'gatsby';
+import { graphql, useStaticQuery } from 'gatsby';
 
 import ProcessingModal from '@shared/processing/components/ProcessingModal';
 

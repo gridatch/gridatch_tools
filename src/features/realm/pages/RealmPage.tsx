@@ -1,13 +1,7 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import Layout from '@shared/layout/Layout';
-import {
-  RealmEditPhase,
-  RealmPhase,
-  SANMA_TILE_RECORD_4,
-  SANMA_TILE_RECORD_NUMBER_ARRAY,
-  SanmaTile,
-} from '@shared/types/simulation';
+import { SANMA_TILE_RECORD_4, SANMA_TILE_RECORD_NUMBER_ARRAY, RealmEditPhase, RealmPhase, SanmaTile } from '@shared/types/simulation';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
 import BossSection from '../components/BossSection';
@@ -24,12 +18,7 @@ import { useProgressState } from '../hooks/useProgressState';
 import { useRemainingTilesLogic } from '../hooks/useRemainingTilesLogic';
 import { useWallState } from '../hooks/useWallState';
 import { useWinsLogic } from '../hooks/useWinsLogic';
-import {
-  calcDrawTurnsByTiles,
-  calcIsRealmEachTile,
-  calcRealmTenpai,
-  calcFirstDrawTurnByTilesByTurns,
-} from '../utils/realmSimulator';
+import { calcDrawTurnsByTiles, calcFirstDrawTurnByTilesByTurns, calcIsRealmEachTile, calcRealmTenpai } from '../utils/realmSimulator';
 
 import styles from './RealmPage.module.css';
 
@@ -87,7 +76,16 @@ export const RealmPage: React.FC = () => {
       wallState.usableWallCount,
       winsLogic,
     );
-  }, [progressState.simulationProgress, progressState.editProgress.isEditing, progressState.editProgress.phase, isRealmEachTile, handState.hand, wallState.wall, wallState.usableWallCount, winsLogic]);
+  }, [
+    progressState.simulationProgress,
+    progressState.editProgress.isEditing,
+    progressState.editProgress.phase,
+    isRealmEachTile,
+    handState.hand,
+    wallState.wall,
+    wallState.usableWallCount,
+    winsLogic,
+  ]);
 
   // 巡目ごとの牌山から各牌を最初に引く巡目
   const firstDrawTurnByTilesByTurns: Record<SanmaTile, number>[] = useMemo(() => {
@@ -103,7 +101,17 @@ export const RealmPage: React.FC = () => {
     return calcDrawTurnsByTiles(progressState.simulationProgress, handState.hand, wallState.wall, wallState.usableWallCount);
   }, [progressState.simulationProgress, progressState.editProgress.isEditing, handState.hand, wallState.wall, wallState.usableWallCount]);
 
-  const handAction = useHandActions(progressState, bossState.boss, isRealmEachTile, remainingTiles, wallState.wall, wallState.usableWallCount, handState, results, winsLogic);
+  const handAction = useHandActions(
+    progressState,
+    bossState.boss,
+    isRealmEachTile,
+    remainingTiles,
+    wallState.wall,
+    wallState.usableWallCount,
+    handState,
+    results,
+    winsLogic,
+  );
 
   /** 初期化 */
   const clearAll = useCallback(() => {

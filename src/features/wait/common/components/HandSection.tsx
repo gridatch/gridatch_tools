@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SozuHand, HandComponent, SOZU_TILES } from '@shared/types/simulation';
+import { SOZU_TILES, HandComponent, SozuHand } from '@shared/types/simulation';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
 import styles from '../styles/wait.module.css';
@@ -86,7 +86,13 @@ const SozuHandSection: React.FC<SozuHandSectionProps> = ({
             && <img className={styles.hand_tile} src="/tiles/wild.png" alt="万象牌" />
           }
           {handTilesToRender.map((item, i) => (
-            <img key={`hand_${i}`} className={styles.hand_tile} src={`/tiles/${item.tile}.png`} onClick={item.onClick ? item.onClick : undefined} alt={item.tile} />
+            <img
+              key={`hand_${i}`}
+              className={styles.hand_tile}
+              src={`/tiles/${item.tile}.png`}
+              onClick={item.onClick ? item.onClick : undefined}
+              alt={item.tile}
+            />
           ))}
           <img
             className={styles.hand_tile}

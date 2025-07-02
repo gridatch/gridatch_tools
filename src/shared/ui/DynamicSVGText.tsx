@@ -105,5 +105,4 @@ export default React.memo(DynamicSVGText, (prev, next) =>
   prev.text === next.text
   && prev.className === next.className
   && prev.height === next.height
-  && serializeStyle(prev.style) === serializeStyle(next.style),
-);
+  && serializeStyle(prev.style) === serializeStyle(next.style));

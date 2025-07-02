@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 
-import { Hand, INITIAL_HAND, RealmSimulationProgress, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile } from '@shared/types/simulation';
+import { INITIAL_HAND, SANMA_TILE_RECORD_0, SANMA_TILES, Hand, RealmSimulationProgress, SanmaTile } from '@shared/types/simulation';
 
 import { RealmSnapshot, useHistoryState } from './useHistoryState';
 import { ProgressState } from './useProgressState';

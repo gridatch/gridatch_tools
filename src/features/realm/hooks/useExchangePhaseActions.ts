@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 
 import { produce } from 'immer';
 
-import { RealmBoss, RealmPhaseAction, SANMA_TILES, SanmaTile, TileStatus } from '@shared/types/simulation';
+import { SANMA_TILES, RealmBoss, RealmPhaseAction, SanmaTile, TileStatus } from '@shared/types/simulation';
 
 import { HandState } from './useHandState';
 import { ProgressState } from './useProgressState';

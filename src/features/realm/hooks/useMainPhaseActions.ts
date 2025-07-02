@@ -1,9 +1,13 @@
 import { useCallback, useMemo } from 'react';
 
-import { createDraft, Draft, finishDraft, isDraft, produce } from 'immer';
+import { Draft, createDraft, finishDraft, isDraft, produce } from 'immer';
 
 import { useProcessingContext } from '@shared/processing/context/ProcessingContext';
-import { Hand, isSanmaTile, isSozuTile, PINZU_TILES, RealmPhase, RealmPhaseAction, RealmSimulationProgress, RealmTenpaiResult, SANMA_TILE_RECORD_0, SANMA_TILES, SanmaTile, SOZU_TILES, WallTile } from '@shared/types/simulation';
+import {
+  PINZU_TILES, SANMA_TILE_RECORD_0, SANMA_TILES, SOZU_TILES,
+  Hand, RealmPhase, RealmPhaseAction, RealmSimulationProgress, RealmTenpaiResult, SanmaTile, WallTile,
+  isSanmaTile, isSozuTile,
+} from '@shared/types/simulation';
 
 import { calcRealmWinsAverageByDiscard } from '../utils/realmSimulator';
 
@@ -179,7 +183,8 @@ export const useMainPhaseActions = (
     const winsAverageByDiscard = await calcRealmWinsAverageByDiscard(
       newProgress,
       processingState,
-      isRealmEachTile, remainingTiles,
+      isRealmEachTile,
+      remainingTiles,
       draft,
       wall,
       usableWallCount,
@@ -399,7 +404,19 @@ export const useMainPhaseActions = (
     setHand(newHand);
     setDiscardedTiles(newDiscarded);
     pushHistory({ progress: newProgress, hand: newHand, discardedTiles: newDiscarded });
-  }, [discardedTiles, goToNextTurn, hand, progress, pushHistory, selectBestDiscardInDraft, setDiscardedTiles, setHand, updateCurrentHistory, usableWallCount, wall]);
+  }, [
+    discardedTiles,
+    goToNextTurn,
+    hand,
+    progress,
+    pushHistory,
+    selectBestDiscardInDraft,
+    setDiscardedTiles,
+    setHand,
+    updateCurrentHistory,
+    usableWallCount,
+    wall,
+  ]);
 
   const refreshMainHandAfterEditMode = useCallback(async () => {
     if (progress.action === RealmPhaseAction.Draw) {

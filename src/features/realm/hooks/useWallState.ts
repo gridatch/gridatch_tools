@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 
-import { RealmBoss, SANMA_TILES, SanmaTile, WallTile } from '@shared/types/simulation';
+import { SANMA_TILES, RealmBoss, SanmaTile, WallTile } from '@shared/types/simulation';
 
 import { ProgressState } from './useProgressState';
 

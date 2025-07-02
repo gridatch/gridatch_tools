@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, RealmBoss } from '@shared/types/simulation';
+import { NON_SEQUENTIAL_TILES, PINZU_TILES, SOZU_TILES, RealmBoss, SanmaTile } from '@shared/types/simulation';
 import ClearButton from '@shared/ui/ClearButton';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 import DynamicSVGTextSequence from '@shared/ui/DynamicSVGTextSequence';

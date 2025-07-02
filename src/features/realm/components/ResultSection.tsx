@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SANMA_TILES, RealmTenpaiResult, SanmaTile, SOZU_TILES } from '@shared/types/simulation';
+import { SANMA_TILES, SOZU_TILES, RealmTenpaiResult, SanmaTile } from '@shared/types/simulation';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 import DynamicSVGTextSequence from '@shared/ui/DynamicSVGTextSequence';
 

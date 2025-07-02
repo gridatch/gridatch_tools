@@ -1,4 +1,8 @@
-import { DRAGON_TILES, isDragonTile, isPinzuTile, isSanmaManzuTile, isSozuTile, isWindTile, PINZU_TILES, RealmBoss, SANMA_MANZU_TILES, SANMA_TILES, SanmaTile, SOZU_TILES, WIND_TILES } from '@shared/types/simulation';
+import {
+  DRAGON_TILES, PINZU_TILES, SANMA_MANZU_TILES, SANMA_TILES, SOZU_TILES, WIND_TILES,
+  RealmBoss, SanmaTile,
+  isDragonTile, isPinzuTile, isSanmaManzuTile, isSozuTile, isWindTile,
+} from '@shared/types/simulation';
 
 /**
  * 領域牌の枚数を計算する

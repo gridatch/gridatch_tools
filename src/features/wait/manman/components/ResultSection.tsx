@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SozuHand, SOZU_TILES, ManmanTenpaiResult } from '@shared/types/simulation';
+import { SOZU_TILES, ManmanTenpaiResult, SozuHand } from '@shared/types/simulation';
 import ClearButton from '@shared/ui/ClearButton';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 import DynamicSVGTextSequence from '@shared/ui/DynamicSVGTextSequence';

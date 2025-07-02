@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, SanmaTile, SANMA_TILES, RealmPhase, RealmPhaseAction } from '@shared/types/simulation';
+import { NON_SEQUENTIAL_TILES, PINZU_TILES, SANMA_TILES, SOZU_TILES, RealmPhase, RealmPhaseAction, SanmaTile } from '@shared/types/simulation';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 import DynamicSVGTextSequence from '@shared/ui/DynamicSVGTextSequence';
 
@@ -138,7 +138,10 @@ const HandSection: React.FC<HandSectionProps> = ({
                       alignItems: 'flex-end',
                     }}
                     >
-                      <DynamicSVGTextSequence text={`${isInWall ? firstDrawTurnByTiles[tile] : ''}`} className={styles.tile_counter_text_negative_margin_right} />
+                      <DynamicSVGTextSequence
+                        text={`${isInWall ? firstDrawTurnByTiles[tile] : ''}`}
+                        className={styles.tile_counter_text_negative_margin_right}
+                      />
                       <DynamicSVGText text="巡" style={{ fontSize: 'var(--font-xxs)' }} />
                     </span>
                     <span style={{

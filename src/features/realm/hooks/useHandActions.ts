@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import { produce } from 'immer';
 
-import { RealmBoss, RealmPhase, RealmPhaseAction, RealmTenpaiResult, SANMA_TILES, SanmaTile, WallTile } from '@shared/types/simulation';
+import { SANMA_TILES, RealmBoss, RealmPhase, RealmPhaseAction, RealmTenpaiResult, SanmaTile, WallTile } from '@shared/types/simulation';
 
 import { useExchangePhaseActions } from './useExchangePhaseActions';
 import { HandState } from './useHandState';
@@ -174,7 +174,7 @@ export const useHandActions = (
     if (progress.phase < RealmPhase.Exchange) return;
     if (progress.action === RealmPhaseAction.Draw) return;
 
-    handState.setHand(prev =>
+    handState.setHand(prev => (
       produce(prev, draft => {
         SANMA_TILES.forEach(tile => {
           draft.closed[tile].forEach(status => {
@@ -182,8 +182,8 @@ export const useHandActions = (
           });
         });
         draft.drawn.isSelected = false;
-      }),
-    );
+      })
+    ));
   }, [handState, progress.action, progress.phase]);
 
   /** 編集モード後に打牌アクションの場合、打牌候補を選択する */

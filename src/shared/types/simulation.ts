@@ -29,7 +29,17 @@ export const isWallTile = (tile: string): tile is WallTile => (WALL_TILES as rea
 export const isNonSequentialTile = (tile: string): tile is NonSequentialTile => (NON_SEQUENTIAL_TILES as readonly string[]).includes(tile);
 
 export const TILE_FACES = ['default', 'cat_saint'] as const;
-export const TILE_BACKS = ['orange', 'red', 'shuriken', 'orientation', 'cat_saint', 'happy_orange', 'small_cosmos', 'meeting_the_butterfly', 'tranquil_night_lights'] as const;
+export const TILE_BACKS = [
+  'orange',
+  'red',
+  'shuriken',
+  'orientation',
+  'cat_saint',
+  'happy_orange',
+  'small_cosmos',
+  'meeting_the_butterfly',
+  'tranquil_night_lights',
+] as const;
 
 export type TileFace = (typeof TILE_FACES)[number];
 export type TileBack = (typeof TILE_BACKS)[number];
@@ -153,14 +163,24 @@ export type RealmEditProgress = {
 export const REALM_BOSSES = ['dora_indicator', 'dora_manzu', 'dora_pinzu', 'dora_sozu', 'exchange_amount', 'lock', 'others', 'empty'] as const;
 export type RealmBoss = (typeof REALM_BOSSES)[number];
 
-export const SANMA_TILE_RECORD_FALSE: Record<SanmaTile, boolean> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, false])) as Record<SanmaTile, boolean>);
-export const SANMA_TILE_RECORD_TRUE: Record<SanmaTile, boolean> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, true])) as Record<SanmaTile, boolean>);
-
-export const SANMA_TILE_RECORD_MINUS_1: Record<SanmaTile, number> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, -1])) as Record<SanmaTile, number>);
-export const SANMA_TILE_RECORD_0: Record<SanmaTile, number> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, 0])) as Record<SanmaTile, number>);
-export const SANMA_TILE_RECORD_4: Record<SanmaTile, number> = Object.freeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, 4])) as Record<SanmaTile, number>);
-
-export const SANMA_TILE_RECORD_NUMBER_ARRAY: Record<SanmaTile, number[]> = deepFreeze(Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as number[]])) as Record<SanmaTile, number[]>);
+export const SANMA_TILE_RECORD_FALSE: Record<SanmaTile, boolean> = Object.freeze(
+  Object.fromEntries(SANMA_TILES.map(tile => [tile, false])) as Record<SanmaTile, boolean>,
+);
+export const SANMA_TILE_RECORD_TRUE: Record<SanmaTile, boolean> = Object.freeze(
+  Object.fromEntries(SANMA_TILES.map(tile => [tile, true])) as Record<SanmaTile, boolean>,
+);
+export const SANMA_TILE_RECORD_MINUS_1: Record<SanmaTile, number> = Object.freeze(
+  Object.fromEntries(SANMA_TILES.map(tile => [tile, -1])) as Record<SanmaTile, number>,
+);
+export const SANMA_TILE_RECORD_0: Record<SanmaTile, number> = Object.freeze(
+  Object.fromEntries(SANMA_TILES.map(tile => [tile, 0])) as Record<SanmaTile, number>,
+);
+export const SANMA_TILE_RECORD_4: Record<SanmaTile, number> = Object.freeze(
+  Object.fromEntries(SANMA_TILES.map(tile => [tile, 4])) as Record<SanmaTile, number>,
+);
+export const SANMA_TILE_RECORD_NUMBER_ARRAY: Record<SanmaTile, number[]> = deepFreeze(
+  Object.fromEntries(SANMA_TILES.map(tile => [tile, [] as number[]])) as Record<SanmaTile, number[]>,
+);
 
 export const SOZU_RECORD_0: Record<Sozu, number> = Object.freeze(Object.fromEntries(SOZU_TILES.map(tile => [tile, 0])) as Record<Sozu, number>);
 export const SOZU_RECORD_4: Record<Sozu, number> = Object.freeze(Object.fromEntries(SOZU_TILES.map(tile => [tile, 4])) as Record<Sozu, number>);
@@ -238,7 +258,9 @@ export type DecomposerTileSetId = (typeof DECOMPOSER_TILE_SET_IDS)[keyof typeof 
 export const SANMA_TILES_OR_NON_REALM = [...SANMA_TILES, 'nonRealm'] as const;
 export type SanmaTileOrNonRealm = (typeof SANMA_TILES_OR_NON_REALM)[number];
 export const isSanmaTileOrNonRealm = (tile: string): tile is SanmaTileOrNonRealm => (SANMA_TILES_OR_NON_REALM as readonly string[]).includes(tile);
-export const SANMA_TILES_OR_NON_REALM_RECORD_0: Record<SanmaTileOrNonRealm, number> = Object.freeze(Object.fromEntries(SANMA_TILES_OR_NON_REALM.map(tile => [tile, 0])) as Record<SanmaTileOrNonRealm, number>);
+export const SANMA_TILES_OR_NON_REALM_RECORD_0: Record<SanmaTileOrNonRealm, number> = Object.freeze(
+  Object.fromEntries(SANMA_TILES_OR_NON_REALM.map(tile => [tile, 0])) as Record<SanmaTileOrNonRealm, number>,
+);
 
 export interface MultisetPermutation<T> {
   tiles: T[];

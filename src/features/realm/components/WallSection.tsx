@@ -4,7 +4,7 @@ import { useDropzone } from 'react-dropzone';
 import Modal from 'react-responsive-modal';
 
 import { useWallDetection } from '@shared/opencv/hooks/useWallDetection';
-import { PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, WallTile, SanmaTile, SANMA_TILES, RealmPhase, RealmEditPhase } from '@shared/types/simulation';
+import { NON_SEQUENTIAL_TILES, PINZU_TILES, SANMA_TILES, SOZU_TILES, RealmEditPhase, RealmPhase, SanmaTile, WallTile } from '@shared/types/simulation';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 import DynamicSVGTextSequence from '@shared/ui/DynamicSVGTextSequence';
 

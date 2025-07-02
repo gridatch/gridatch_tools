@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { SanmaTile, PINZU_TILES, SOZU_TILES, NON_SEQUENTIAL_TILES, RealmPhase, RealmEditPhase } from '@shared/types/simulation';
+import { NON_SEQUENTIAL_TILES, PINZU_TILES, SOZU_TILES, RealmEditPhase, RealmPhase, SanmaTile } from '@shared/types/simulation';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
 import { DoraIndicatorsState } from '../hooks/useDoraIndicatorsState';
@@ -52,26 +52,28 @@ const DoraIndicatorsSection: React.FC<DoraIndicatorsSectionProps> = ({
           <DynamicSVGText text="ドラ表示牌" />
         </div>
         <div className={`${styles.area} ${styles.dora_indicators}`}>
-          {Array.from({ length: maxDoraIndicators }, (_, i) =>
-            i < doraIndicators.length
-              ? (
-                  <img
-                    key={`dora_indicator_${i}`}
-                    className={styles.dora_indicator}
-                    src={`/tiles/${doraIndicators[i]}.png`}
-                    onClick={() => removeDoraIndicatorAtIndex(i)}
-                    alt={doraIndicators[i]}
-                  />
-                )
-              : (
-                  <img
-                    key={`dora_indicator_${i}`}
-                    className={styles.dora_indicator}
-                    src="/tiles/empty.png"
-                    alt="empty"
-                  />
-                ),
-          )}
+          {
+            Array.from({ length: maxDoraIndicators }, (_, i) => (
+              i < doraIndicators.length
+                ? (
+                    <img
+                      key={`dora_indicator_${i}`}
+                      className={styles.dora_indicator}
+                      src={`/tiles/${doraIndicators[i]}.png`}
+                      onClick={() => removeDoraIndicatorAtIndex(i)}
+                      alt={doraIndicators[i]}
+                    />
+                  )
+                : (
+                    <img
+                      key={`dora_indicator_${i}`}
+                      className={styles.dora_indicator}
+                      src="/tiles/empty.png"
+                      alt="empty"
+                    />
+                  )
+            ))
+          }
         </div>
       </div>
       <div>

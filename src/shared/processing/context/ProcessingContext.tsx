@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  Dispatch,
-  SetStateAction,
-} from 'react';
+import React, { Dispatch, ReactNode, SetStateAction, createContext, useContext, useState } from 'react';
 
 export interface ProcessingState {
   percent: number;

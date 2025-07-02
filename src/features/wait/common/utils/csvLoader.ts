@@ -1,4 +1,4 @@
-import { ManmanCsvData, ManmanCsvRow, Sozu, SOZU_TILES, SozuCsvData, SozuCsvRow } from '@shared/types/simulation';
+import { SOZU_TILES, ManmanCsvData, ManmanCsvRow, Sozu, SozuCsvData, SozuCsvRow } from '@shared/types/simulation';
 
 /**
  * CSVファイルの内容を読み込み、各行の「手牌」文字列をキーにしたオブジェクトを返す。
@@ -66,7 +66,9 @@ export const loadSozuCsvData = async (fileNames: string[] | number[]): Promise<S
             const parts = line.split(',');
             const totalWaits = parseInt(parts[0], 10);
             const key = parts[1];
-            const waits: { [key in Sozu]: number } = Object.fromEntries(SOZU_TILES.map((tile, i) => [tile, parseInt(parts[2 + i], 10)])) as { [key in Sozu]: number };
+            const waits: { [key in Sozu]: number } = Object.fromEntries(
+              SOZU_TILES.map((tile, i) => [tile, parseInt(parts[2 + i], 10)]),
+            ) as { [key in Sozu]: number };
             data[key] = { totalWaits, key, waits };
           });
         }

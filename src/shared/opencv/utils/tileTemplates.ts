@@ -1,15 +1,6 @@
 import cv from '@techstark/opencv-js';
 
-import {
-  SANMA_TILES,
-  TILE_FACES,
-  TILE_BACKS,
-  SANMA_RED_TILES,
-  SANMA_RED_TO_BLACK,
-  WallTile,
-  TileFace,
-  TileBack,
-} from '@shared/types/simulation';
+import { SANMA_RED_TILES, SANMA_RED_TO_BLACK, SANMA_TILES, TILE_BACKS, TILE_FACES, TileBack, TileFace, WallTile } from '@shared/types/simulation';
 
 // グローバルキャッシュ先
 export const faceTemplates: Record<string, { skin: TileFace; tile: WallTile; isRed: boolean; mat: cv.Mat }[]> = {};

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Sozu, SOZU_TILES } from '@shared/types/simulation';
+import { SOZU_TILES, Sozu } from '@shared/types/simulation';
 import DynamicSVGText from '@shared/ui/DynamicSVGText';
 
 import styles from '../styles/wait.module.css';
@@ -43,8 +43,7 @@ const SozuWallSection: React.FC<SozuWallSectionProps> = ({
                     src="/tiles/empty.png"
                     alt="empty"
                   />
-                ),
-          )}
+                ))}
         </div>
       </div>
       <div>

@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 
-import { isSozuTile, RealmEditPhase, RealmPhase, RealmTenpai, SanmaTile, SanmaTileOrNonRealm, Sozu, SOZU_RECORD_0, SOZU_TILES } from '@shared/types/simulation';
+import { SOZU_RECORD_0, SOZU_TILES, RealmEditPhase, RealmPhase, RealmTenpai, SanmaTile, SanmaTileOrNonRealm, Sozu, isSozuTile } from '@shared/types/simulation';
 
 import { ProgressState } from './useProgressState';
 import { RemainingTilesLogic } from './useRemainingTilesLogic';
@@ -293,7 +293,12 @@ export const useWinsLogic = (
     const adjustmentFactor = (newTotalNonRealmRemainingCount / totalNonRealmRemainingCount) * (newTotalRemainingCount / totalRemainingCount);
 
     return openWins + closedWins * adjustmentFactor;
-  }, [nonRealmWinsEachSozuByTenpaiTurnEachVisibility.closed, nonRealmWinsEachSozuByTenpaiTurnEachVisibility.open, totalNonRealmRemainingCount, totalRemainingCount]);
+  }, [
+    nonRealmWinsEachSozuByTenpaiTurnEachVisibility.closed,
+    nonRealmWinsEachSozuByTenpaiTurnEachVisibility.open,
+    totalNonRealmRemainingCount,
+    totalRemainingCount,
+  ]);
 
   /** 列挙した裏牌により補正された非領域の取りうる最大の和了回数を計算する */
   const calcAdjustedMaxPossibleNonRealmWinsForClosedPermutation = useCallback((turn: number, permutation: SanmaTileOrNonRealm[]) => {
@@ -306,7 +311,12 @@ export const useWinsLogic = (
     const adjustmentFactor = (newTotalNonRealmRemainingCount / totalNonRealmRemainingCount) * (newTotalRemainingCount / totalRemainingCount);
 
     return maxPossibleNonRealmWinsByTenpaiTurnEachVisibility.open[turn] + maxPossibleNonRealmWinsByTenpaiTurnEachVisibility.closed[turn] * adjustmentFactor;
-  }, [maxPossibleNonRealmWinsByTenpaiTurnEachVisibility.closed, maxPossibleNonRealmWinsByTenpaiTurnEachVisibility.open, totalNonRealmRemainingCount, totalRemainingCount]);
+  }, [
+    maxPossibleNonRealmWinsByTenpaiTurnEachVisibility.closed,
+    maxPossibleNonRealmWinsByTenpaiTurnEachVisibility.open,
+    totalNonRealmRemainingCount,
+    totalRemainingCount,
+  ]);
 
   return useMemo(() => ({
     realmWinsByTenpaiTurn: realmWinsByTenpaiTurnsEachVisibility.total,

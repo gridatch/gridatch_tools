@@ -1,6 +1,6 @@
 import cv, { MatVector } from '@techstark/opencv-js';
 
-import { TILE_FACES, TILE_BACKS, TileFace, TileBack, WallTile, PLAIN_TILES, PLAIN_TILE_BACKS } from '@shared/types/simulation';
+import { PLAIN_TILE_BACKS, PLAIN_TILES, TILE_BACKS, TILE_FACES, TileBack, TileFace, WallTile } from '@shared/types/simulation';
 
 import { backTemplates, faceTemplates } from './tileTemplates';
 
@@ -219,8 +219,7 @@ function sortRotatedRectVertices(points: cv.Point[]): RectVertices {
     point,
     absRotationRad: Math.atan2(Math.abs(point.y - topPoint1.y), Math.abs(point.x - topPoint1.x)),
   })).reduce((prev, curr) =>
-    curr.absRotationRad < prev.absRotationRad ? curr : prev,
-  ).point;
+    curr.absRotationRad < prev.absRotationRad ? curr : prev).point;
   const [topLeft, topRight] = [topPoint1, topPoint2].sort((a, b) => a.x - b.x);
   const bottomPoints = points.filter(p => p !== topPoint1 && p !== topPoint2);
   const [bottomLeft, bottomRight] = bottomPoints.sort((a, b) => a.x - b.x);
@@ -299,10 +298,14 @@ function maskOutsideRotatedBoundingBox(
 ): void {
   const { vertices } = rotatedBoundingBox;
   const quad = cv.matFromArray(1, 4, cv.CV_32SC2, [
-    vertices.topLeft.x, vertices.topLeft.y,
-    vertices.topRight.x, vertices.topRight.y,
-    vertices.bottomRight.x, vertices.bottomRight.y,
-    vertices.bottomLeft.x, vertices.bottomLeft.y,
+    vertices.topLeft.x,
+    vertices.topLeft.y,
+    vertices.topRight.x,
+    vertices.topRight.y,
+    vertices.bottomRight.x,
+    vertices.bottomRight.y,
+    vertices.bottomLeft.x,
+    vertices.bottomLeft.y,
   ]);
 
   const innerMask = cv.Mat.zeros(binaryMat.rows, binaryMat.cols, cv.CV_8UC1);
@@ -496,10 +499,14 @@ function createQuadMatFromBoundaryLines(boundaryLines: BoundaryLines): cv.Mat {
   }
 
   const quad = cv.matFromArray(4, 1, cv.CV_32FC2, [
-    topLeftPoint.x, topLeftPoint.y,
-    topRightPoint.x, topRightPoint.y,
-    bottomRightPoint.x, bottomRightPoint.y,
-    bottomLeftPoint.x, bottomLeftPoint.y,
+    topLeftPoint.x,
+    topLeftPoint.y,
+    topRightPoint.x,
+    topRightPoint.y,
+    bottomRightPoint.x,
+    bottomRightPoint.y,
+    bottomLeftPoint.x,
+    bottomLeftPoint.y,
   ]);
 
   return quad;
@@ -524,10 +531,14 @@ function warpQuadToRect(src: cv.Mat, srcQuad: cv.Mat, dstSize: cv.Size): cv.Mat 
   const intermediateH = Math.round(dstH * scale);
 
   const intermediateQuad = cv.matFromArray(4, 1, cv.CV_32FC2, [
-    0, 0,
-    intermediateW, 0,
-    intermediateW, intermediateH,
-    0, intermediateH,
+    0,
+    0,
+    intermediateW,
+    0,
+    intermediateW,
+    intermediateH,
+    0,
+    intermediateH,
   ]);
 
   const M = cv.getPerspectiveTransform(srcQuad, intermediateQuad);

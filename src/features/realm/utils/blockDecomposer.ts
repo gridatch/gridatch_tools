@@ -1,4 +1,4 @@
-import { Block, BlockType, DecomposedResult, DecomposerTileSetId, SOZU_RECORD_0, SOZU_TILES } from '@shared/types/simulation';
+import { SOZU_RECORD_0, SOZU_TILES, Block, BlockType, DecomposedResult, DecomposerTileSetId } from '@shared/types/simulation';
 
 // 内部では牌の種類を区別せず、整数で牌を管理する。
 // 整数で管理することで、牌の種類に依らず共通の牌姿になった際に共通のmemoを使うことができる。

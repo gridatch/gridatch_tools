@@ -1,4 +1,7 @@
-import { SozuHand, ManmanCsvData, Sozu, ManmanTenpaiResult, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES, SozuCsvData, SozuTenpaiResult, HandComponent, HAND_COMPONENT_RECORD_0 } from '@shared/types/simulation';
+import {
+  HAND_COMPONENT_RECORD_0, HAND_COMPONENTS, HAND_COMPONENTS_TILE_COUNT, SOZU_TILES,
+  HandComponent, ManmanCsvData, ManmanTenpaiResult, Sozu, SozuCsvData, SozuHand, SozuTenpaiResult,
+} from '@shared/types/simulation';
 
 // CSVファイルに記載されているロス数の最大値
 const MAX_LOSS = 12;
@@ -49,7 +52,14 @@ const enumerateAllHands = (
   for (let componentCount = pool[component]; componentCount >= 0; --componentCount) {
     if (currentTileCount + HAND_COMPONENTS_TILE_COUNT[component] * componentCount <= targetTileCount) {
       currentHand[component] += componentCount;
-      enumerateAllHands(pool, componentIndex + 1, currentHand, currentTileCount + HAND_COMPONENTS_TILE_COUNT[component] * componentCount, targetTileCount, results);
+      enumerateAllHands(
+        pool,
+        componentIndex + 1,
+        currentHand,
+        currentTileCount + HAND_COMPONENTS_TILE_COUNT[component] * componentCount,
+        targetTileCount,
+        results,
+      );
       currentHand[component] -= componentCount;
     }
   }
@@ -60,7 +70,14 @@ const enumerateAllHands = (
     const componentCount = 1;
     if (currentTileCount + HAND_COMPONENTS_TILE_COUNT[component] * componentCount <= targetTileCount) {
       currentHand[component] += componentCount;
-      enumerateAllHands(pool, componentIndex + 1, currentHand, currentTileCount + HAND_COMPONENTS_TILE_COUNT[component] * componentCount, targetTileCount, results);
+      enumerateAllHands(
+        pool,
+        componentIndex + 1,
+        currentHand,
+        currentTileCount + HAND_COMPONENTS_TILE_COUNT[component] * componentCount,
+        targetTileCount,
+        results,
+      );
       currentHand[component] -= componentCount;
     }
   }
