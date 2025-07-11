@@ -3,6 +3,7 @@ import eslintjs from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import importPlugin from 'eslint-plugin-import';
+import newlineDestructuring from 'eslint-plugin-newline-destructuring';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
@@ -32,6 +33,7 @@ export default [
       'import': importPlugin,
       '@stylistic': stylistic,
       'import-case-sort': sortImportSpecifiersByCase,
+      'newline-destructuring': newlineDestructuring,
     },
 
     languageOptions: {
@@ -87,6 +89,13 @@ export default [
       }],
       '@stylistic/object-property-newline': ['error', { allowAllPropertiesOnSameLine: true }],
       '@stylistic/semi': ['error', 'always'],
+      'newline-destructuring/newline': ['error', {
+        items: Number.POSITIVE_INFINITY,
+        itemsWithRest: Number.POSITIVE_INFINITY,
+        maxLength: 160,
+        consistent: true,
+        allowAllPropertiesOnSameLine: true,
+      }],
       // feature 間の import を禁止
       'import/no-restricted-paths': [
         'error',
@@ -130,24 +139,56 @@ export default [
             'index',
           ],
           'pathGroups': [
-            { pattern: 'react', group: 'external', position: 'before' },
-            { pattern: 'gatsby', group: 'external', position: 'before' },
-            { pattern: 'gatsby-plugin-**', group: 'external', position: 'before' },
-            { pattern: '@shared/**', group: 'internal', position: 'after' },
-            { pattern: '@features/**', group: 'internal', position: 'after' },
+            {
+              pattern: 'react',
+              group: 'external',
+              position: 'before',
+            },
+            {
+              pattern: 'gatsby',
+              group: 'external',
+              position: 'before',
+            },
+            {
+              pattern: 'gatsby-plugin-**',
+              group: 'external',
+              position: 'before',
+            },
+            {
+              pattern: '@shared/**',
+              group: 'internal',
+              position: 'after',
+            },
+            {
+              pattern: '@features/**',
+              group: 'internal',
+              position: 'after',
+            },
           ],
           'pathGroupsExcludedImportTypes': ['react', 'gatsby', 'gatsby-plugin-**'],
           'newlines-between': 'always',
-          'alphabetize': { order: 'asc', caseInsensitive: true },
+          'alphabetize': {
+            order: 'asc',
+            caseInsensitive: true,
+          },
         },
       ],
 
       // カスタムルール: アッパースネーク / パスカル / キャメルケース別に並び替え
       'import-case-sort/sort-import-specifiers-by-case': ['error', {
         groups: [
-          { type: 'constant', pattern: '^[A-Z0-9_]+$' },
-          { type: 'type', pattern: '^[A-Z][A-Za-z0-9]+$' },
-          { type: 'variable', pattern: '^[a-z][A-Za-z0-9]+$' },
+          {
+            type: 'constant',
+            pattern: '^[A-Z0-9_]+$',
+          },
+          {
+            type: 'type',
+            pattern: '^[A-Z][A-Za-z0-9]+$',
+          },
+          {
+            type: 'variable',
+            pattern: '^[a-z][A-Za-z0-9]+$',
+          },
         ],
 
         mode: 'threshold',
