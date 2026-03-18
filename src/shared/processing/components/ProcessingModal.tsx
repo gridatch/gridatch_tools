@@ -1,6 +1,6 @@
 import 'react-responsive-modal/styles.css';
 
-import React, { useEffect, useMemo, useRef } from 'react';
+import React from 'react';
 
 import { Modal } from 'react-responsive-modal';
 
@@ -11,32 +11,23 @@ import { useProcessingContext } from '../context/ProcessingContext';
 
 const ProcessingModal: React.FC = () => {
   const { isBusy, percent } = useProcessingContext();
-  const hasPreloaded = useRef(false);
-  useEffect(() => {
-    hasPreloaded.current = true;
-  }, []);
 
-  return useMemo(() => (
+  return (
     <>
-      {
-        !hasPreloaded.current
-          ? null
-          : (
-              <div
-                style={{
-                  position: 'absolute',
-                  width: 0,
-                  height: 0,
-                  overflow: 'hidden',
-                  visibility: 'hidden',
-                  pointerEvents: 'none',
-                }}
-              >
-                <DynamicSVGText text="計算中…" />
-                <DynamicSVGTextSequence text="1234567890%" />
-              </div>
-            )
-      }
+      <div
+        style={{
+          position: 'absolute',
+          width: 0,
+          height: 0,
+          overflow: 'hidden',
+          visibility: 'hidden',
+          pointerEvents: 'none',
+        }}
+      >
+        <DynamicSVGText text="計算中…" />
+        <DynamicSVGTextSequence text="1234567890%" />
+      </div>
+
       <Modal
         open={isBusy}
         center
@@ -61,7 +52,7 @@ const ProcessingModal: React.FC = () => {
         <p><DynamicSVGTextSequence text={`${percent}%`} /></p>
       </Modal>
     </>
-  ), [isBusy, percent]);
+  );
 };
 
 export default ProcessingModal;

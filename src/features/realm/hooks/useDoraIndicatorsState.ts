@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { RealmBoss, SanmaTile } from '@shared/types/simulation';
 
@@ -21,12 +21,20 @@ export const useDoraIndicatorsState = (
   remainingTiles: Record<SanmaTile, number>,
   initialDoraIndicators: SanmaTile[] = [],
 ): DoraIndicatorsState => {
-  const [doraIndicators, setDoraIndicators] = useState(initialDoraIndicators);
   const maxDoraIndicators = boss === 'dora_indicator' ? 3 : MAX_DORA_INDICATORS;
 
-  useEffect(() => {
-    setDoraIndicators(prev => prev.slice(0, maxDoraIndicators));
-  }, [maxDoraIndicators]);
+  const [doraIndicators, setDoraIndicators] = useState(
+    initialDoraIndicators.slice(0, maxDoraIndicators),
+  );
+  const [prevMaxDoraIndicators, setPrevMaxDoraIndicators] = useState(maxDoraIndicators);
+
+  if (prevMaxDoraIndicators !== maxDoraIndicators) {
+    setPrevMaxDoraIndicators(maxDoraIndicators);
+
+    if (doraIndicators.length > maxDoraIndicators) {
+      setDoraIndicators(prev => prev.slice(0, maxDoraIndicators));
+    }
+  }
 
   const addDoraIndicator = useCallback((tile: SanmaTile) => {
     if (remainingTiles[tile] === 0) return;

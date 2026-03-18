@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { RealmBoss, SanmaTile } from '@shared/types/simulation';
 
@@ -12,13 +12,24 @@ export interface UseDoraIndicatorsStateReturn {
   clearDoraIndicator: () => void;
 }
 
-export const useDoraIndicatorsState = (boss: RealmBoss, initialDoraIndicators: SanmaTile[] = []): UseDoraIndicatorsStateReturn => {
-  const [doraIndicators, setDoraIndicators] = useState(initialDoraIndicators);
+export const useDoraIndicatorsState = (
+  boss: RealmBoss,
+  initialDoraIndicators: SanmaTile[] = [],
+): UseDoraIndicatorsStateReturn => {
   const maxDoraIndicators = boss === 'dora_indicator' ? 3 : MAX_DORA_INDICATORS;
 
-  useEffect(() => {
-    setDoraIndicators(prev => prev.slice(0, maxDoraIndicators));
-  }, [maxDoraIndicators]);
+  const [doraIndicators, setDoraIndicators] = useState<SanmaTile[]>(
+    () => initialDoraIndicators.slice(0, maxDoraIndicators),
+  );
+  const [prevMaxDoraIndicators, setPrevMaxDoraIndicators] = useState(maxDoraIndicators);
+
+  if (prevMaxDoraIndicators !== maxDoraIndicators) {
+    setPrevMaxDoraIndicators(maxDoraIndicators);
+
+    if (doraIndicators.length > maxDoraIndicators) {
+      setDoraIndicators(prev => prev.slice(0, maxDoraIndicators));
+    }
+  }
 
   const addDoraIndicator = (tile: SanmaTile) => {
     setDoraIndicators(prev => (prev.length < maxDoraIndicators ? [...prev, tile] : prev));
@@ -32,5 +43,11 @@ export const useDoraIndicatorsState = (boss: RealmBoss, initialDoraIndicators: S
     setDoraIndicators([]);
   };
 
-  return { doraIndicators, maxDoraIndicators, addDoraIndicator, removeDoraIndicatorAtIndex, clearDoraIndicator };
+  return {
+    doraIndicators,
+    maxDoraIndicators,
+    addDoraIndicator,
+    removeDoraIndicatorAtIndex,
+    clearDoraIndicator,
+  };
 };

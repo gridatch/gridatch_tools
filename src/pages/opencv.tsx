@@ -873,6 +873,19 @@ const MahjongRecognizer: React.FC = () => {
   const [cvReady, setCvReady] = useState(false);
   const isTemplateLoadedRef = useRef(false);
 
+  const resizedCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const edgesCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const morphologyCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const allContourCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const contourCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const croppedContourCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const houghCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const clusterCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const warpedCanvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  const tileCanvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
+  const tileLabelRefs = useRef<(HTMLSpanElement | null)[]>([]);
+
   useEffect(() => {
     cv.onRuntimeInitialized = () => {
       console.log('initialized');
@@ -880,34 +893,12 @@ const MahjongRecognizer: React.FC = () => {
     };
   }, []);
 
-  const canvasRefs = {
-    _1resized: useRef<HTMLCanvasElement>(null),
-    _2edges: useRef<HTMLCanvasElement>(null),
-    _3morphology: useRef<HTMLCanvasElement>(null),
-    _4allContour: useRef<HTMLCanvasElement>(null),
-    _5contour: useRef<HTMLCanvasElement>(null),
-    _6croppedContour: useRef<HTMLCanvasElement>(null),
-    _7hough: useRef<HTMLCanvasElement>(null),
-    _8cluster: useRef<HTMLCanvasElement>(null),
-    _9warped: useRef<HTMLCanvasElement>(null),
-    _10tiles: useRef<HTMLCanvasElement[]>([]),
-  };
-  const tileRefs = useRef<HTMLSpanElement[]>([]);
-
-  // 初期レンダリング時に空配列をセット
   useEffect(() => {
-    canvasRefs._10tiles.current = Array(36).fill(null);
-    tileRefs.current = Array(36).fill(null);
-  }, [canvasRefs._10tiles]);
-
-  // 起動時にテンプレート読み込み
-  React.useEffect(() => {
     if (!cvReady) return;
     if (isTemplateLoadedRef.current) return;
 
     isTemplateLoadedRef.current = true;
-
-    loadTemplates();
+    void loadTemplates();
   }, [cvReady]);
 
   const processWallImage = useCallback((img: HTMLImageElement) => {
@@ -916,15 +907,15 @@ const MahjongRecognizer: React.FC = () => {
 
     const colorMat = cv.imread(img);
     resizeToReduceMoire(colorMat);
-    drawMatToCanvas(canvasRefs._1resized, colorMat);
+    drawMatToCanvas(resizedCanvasRef, colorMat);
 
     const edgeMat = detectEdges(colorMat);
-    drawMatToCanvas(canvasRefs._2edges, edgeMat);
+    drawMatToCanvas(edgesCanvasRef, edgeMat);
 
     morphologyClose(edgeMat);
-    drawMatToCanvas(canvasRefs._3morphology, edgeMat);
+    drawMatToCanvas(morphologyCanvasRef, edgeMat);
 
-    drawMatWithAllContoursToCanvas(canvasRefs._4allContour, colorMat, edgeMat);
+    drawMatWithAllContoursToCanvas(allContourCanvasRef, colorMat, edgeMat);
 
     const contourMat = findBestContour(edgeMat, new cv.Point(edgeMat.cols / 2, edgeMat.rows * 0.55));
     edgeMat.delete();
@@ -933,21 +924,31 @@ const MahjongRecognizer: React.FC = () => {
       colorMat.delete();
       return;
     }
-    drawMatWithContourToCanvas(canvasRefs._5contour, colorMat, contourMat);
+
+    drawMatWithContourToCanvas(contourCanvasRef, colorMat, contourMat);
 
     const binaryContourMat = createBinaryContourMat(new cv.Size(colorMat.cols, colorMat.rows), contourMat);
     const boundingBox = calcRotatedBoundingBox(contourMat);
     contourMat.delete();
+
     const croppedBoundingBox = trimBoundingBoxRight(boundingBox, 2);
     maskOutsideRotatedBoundingBox(binaryContourMat, croppedBoundingBox);
 
-    drawMatToCanvas(canvasRefs._6croppedContour, binaryContourMat);
+    drawMatToCanvas(croppedContourCanvasRef, binaryContourMat);
 
     const lines = new cv.Mat();
-    cv.HoughLinesP(binaryContourMat, lines, 1, Math.PI / 720, 100, croppedBoundingBox.height * 0.4, croppedBoundingBox.height * 0.25);
+    cv.HoughLinesP(
+      binaryContourMat,
+      lines,
+      1,
+      Math.PI / 720,
+      100,
+      croppedBoundingBox.height * 0.4,
+      croppedBoundingBox.height * 0.25,
+    );
     binaryContourMat.delete();
 
-    drawMatWithLinesToCanvas(canvasRefs._7hough, colorMat, lines);
+    drawMatWithLinesToCanvas(houghCanvasRef, colorMat, lines);
 
     const { hClusters, vClusters } = clusterLines(lines, croppedBoundingBox);
     lines.delete();
@@ -966,7 +967,7 @@ const MahjongRecognizer: React.FC = () => {
     const boundaryLines = pickBoundaryLines(hClusters, vClusters);
     const quad = createQuadMatFromBoundaryLines(boundaryLines);
 
-    drawMatWithPolygonToCanvas(canvasRefs._8cluster, colorMat, quad);
+    drawMatWithPolygonToCanvas(clusterCanvasRef, colorMat, quad);
 
     const warped = warpQuadToRect(colorMat, quad, new cv.Size(441, 283));
     colorMat.delete();
@@ -975,31 +976,25 @@ const MahjongRecognizer: React.FC = () => {
     const wallMat = warped.roi(new cv.Rect(0, 0, 441, 264));
     warped.delete();
 
-    drawMatToCanvas(canvasRefs._9warped, wallMat);
-
-    drawTilesToCanvases(canvasRefs._10tiles, wallMat);
+    drawMatToCanvas(warpedCanvasRef, wallMat);
+    drawTilesToCanvases(tileCanvasRefs as React.RefObject<HTMLCanvasElement[]>, wallMat);
 
     const results = splitWallAndMatch(wallMat);
-    results.forEach((result, i) => tileRefs.current[i].innerText = result.tile);
+    results.forEach((result, i) => {
+      const el = tileLabelRefs.current[i];
+      if (el) {
+        el.innerText = result.tile;
+      }
+    });
+
     console.log(results);
     wallMat.delete();
-  }, [
-    canvasRefs._10tiles,
-    canvasRefs._1resized,
-    canvasRefs._2edges,
-    canvasRefs._3morphology,
-    canvasRefs._4allContour,
-    canvasRefs._5contour,
-    canvasRefs._6croppedContour,
-    canvasRefs._7hough,
-    canvasRefs._8cluster,
-    canvasRefs._9warped,
-    cvReady,
-  ]);
+  }, [cvReady]);
 
   const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     const img = new Image();
     img.src = URL.createObjectURL(file);
     await img.decode();
@@ -1010,42 +1005,43 @@ const MahjongRecognizer: React.FC = () => {
     <div>
       <h2>Mahjong Recognizer</h2>
       <input type="file" accept="image/*" onChange={handleFileChange} />
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginTop: 16 }}>
         <div>
           <p>1. Resized</p>
-          <canvas ref={canvasRefs._1resized} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={resizedCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>2. Edges</p>
-          <canvas ref={canvasRefs._2edges} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={edgesCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>3. Morphology</p>
-          <canvas ref={canvasRefs._3morphology} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={morphologyCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>4. All Contour</p>
-          <canvas ref={canvasRefs._4allContour} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={allContourCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>5. Contour</p>
-          <canvas ref={canvasRefs._5contour} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={contourCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>6. Cropped contour</p>
-          <canvas ref={canvasRefs._6croppedContour} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={croppedContourCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>7. Hough</p>
-          <canvas ref={canvasRefs._7hough} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={houghCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>8. Cluster</p>
-          <canvas ref={canvasRefs._8cluster} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={clusterCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>9. Warped</p>
-          <canvas ref={canvasRefs._9warped} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
+          <canvas ref={warpedCanvasRef} style={{ maxWidth: '100%', border: '1px solid #ccc' }} />
         </div>
         <div>
           <p>10. Tiles</p>
@@ -1054,15 +1050,15 @@ const MahjongRecognizer: React.FC = () => {
               <div key={`roi-${idx}`}>
                 <canvas
                   ref={el => {
-                    if (el) canvasRefs._10tiles.current[idx] = el;
+                    tileCanvasRefs.current[idx] = el;
                   }}
                   style={{ border: '1px solid #666', width: '100%', height: 'auto' }}
                 />
-                <span ref={el => {
-                  if (el) tileRefs.current[idx] = el;
-                }}
-                >
-                </span>
+                <span
+                  ref={el => {
+                    tileLabelRefs.current[idx] = el;
+                  }}
+                />
               </div>
             ))}
           </div>

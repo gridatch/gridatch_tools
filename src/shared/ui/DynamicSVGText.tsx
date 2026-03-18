@@ -1,4 +1,4 @@
-import React, { SVGAttributes, useEffect, useState } from 'react';
+import React, { SVGAttributes, useEffect, useMemo, useState } from 'react';
 
 import parse from 'html-react-parser';
 import sanitize from 'sanitize-filename';
@@ -26,14 +26,20 @@ const serializeStyle = (style?: React.CSSProperties) => {
     .join(';');
 };
 
-const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, height = '1.2em', className = '', style }) => {
-  const [svgContent, setSvgContent] = useState<React.ReactNode>(<span />);
+const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({
+  text,
+  height = '1.2em',
+  className = '',
+  style,
+}) => {
+  const [svgContent, setSvgContent] = useState<React.ReactNode | null>(null);
+
+  const styleStr = useMemo(() => serializeStyle(style), [style]);
 
   useEffect(() => {
     let aborted = false;
 
     if (text.length === 0) {
-      setSvgContent(<span />);
       return;
     }
 
@@ -41,19 +47,17 @@ const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, height = '1.2em',
     const hash = hash32(text);
     const filename = encodeURIComponent(`${base}_${hash}.svg`);
     const src = `/generated_svgs/${filename}`;
+    const cacheKey = `${text}|h=${height}|c=${className}|s=${styleStr}`;
 
     const fetchAndCacheSVG = async () => {
       try {
-        const styleStr = serializeStyle(style);
-        const cacheKey = `${text}|h=${height}|c=${className}|s=${styleStr}`;
-
-        // パース済みSVGのキャッシュ
         if (svgParsedCache.has(cacheKey)) {
-          setSvgContent(svgParsedCache.get(cacheKey)!);
+          if (!aborted) {
+            setSvgContent(svgParsedCache.get(cacheKey)!);
+          }
           return;
         }
 
-        // rawSVGのキャッシュ
         let rawSVG: string | undefined = svgRawCache.get(filename);
         if (!rawSVG) {
           const response = await fetch(src);
@@ -69,13 +73,15 @@ const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, height = '1.2em',
         const svgDoc = domParser.parseFromString(rawSVG, 'image/svg+xml');
         const svgElement = svgDoc.documentElement;
 
-        svgElement.setAttribute('height', height || '1.2em');
+        svgElement.setAttribute('height', height);
         svgElement.setAttribute('fill', 'currentColor');
         svgElement.classList.add(styles.dynamicSVGText);
+
         if (className) {
           const classes = className.split(/\s+/).filter(Boolean);
           classes.forEach(c => svgElement.classList.add(c));
         }
+
         if (style) {
           Object.entries(style).forEach(([jsProp, value]) => {
             if (value == null) return;
@@ -86,17 +92,25 @@ const DynamicSVGText: React.FC<DynamicSVGTextProps> = ({ text, height = '1.2em',
 
         const parsed = parse(svgElement.outerHTML);
         svgParsedCache.set(cacheKey, parsed);
-        if (!aborted) setSvgContent(parsed);
+
+        if (!aborted) {
+          setSvgContent(parsed);
+        }
       } catch (error) {
         console.error(`[fetchAndCacheSVG] Failed to load or process SVG: "${text}"`, error);
       }
     };
 
-    fetchAndCacheSVG();
+    void fetchAndCacheSVG();
+
     return () => {
       aborted = true;
     };
-  }, [text, className, height, style]);
+  }, [text, className, height, style, styleStr]);
+
+  if (text.length === 0) {
+    return <span />;
+  }
 
   return <>{svgContent}</>;
 };
